@@ -1,5 +1,4 @@
 from mammoth.datasets import CSV
-from typing import Dict, List
 from mammoth.integration import loader
 import pandas as pd
 
