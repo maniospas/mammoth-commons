@@ -25,7 +25,7 @@ You may have additional keyword arguments without annotation.
 Don't forget to create a docstring for your component too.
 
 In the end, decorate your component with our `metric` decorator,
-proving a version.
+providing a version.
 
 ```python
 from mammoth.datasets import CSV
@@ -42,8 +42,7 @@ def new_metric(
     sensitive: List[str],
     parameters: Dict[str, any] = None,
 ) -> Markdown:
-    """
-    Write your metric's description here.
+    """Write your metric's description here.
     """
     return Markdown("these are the results")
 
