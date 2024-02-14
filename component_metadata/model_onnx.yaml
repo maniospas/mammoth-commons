@@ -1,19 +1,17 @@
 # PIPELINE DEFINITION
-# Name: data-csv-loader
+# Name: model-onnx
 # Inputs:
-#    parameters: dict [Default: {'on_bad_lines': 'skip', 'delimiter': ','}]
+#    parameters: dict [Default: {}]
 #    path: str
 # Outputs:
-#    output: system.Dataset
+#    output: system.Model
 components:
-  comp-data-csv-loader:
-    executorLabel: exec-data-csv-loader
+  comp-model-onnx:
+    executorLabel: exec-model-onnx
     inputDefinitions:
       parameters:
         parameters:
-          defaultValue:
-            delimiter: ','
-            on_bad_lines: skip
+          defaultValue: {}
           isOptional: true
           parameterType: STRUCT
         path:
@@ -22,17 +20,17 @@ components:
       artifacts:
         output:
           artifactType:
-            schemaTitle: system.Dataset
+            schemaTitle: system.Model
             schemaVersion: 0.0.1
 deploymentSpec:
   executors:
-    exec-data-csv-loader:
+    exec-model-onnx:
       container:
         args:
         - --executor_input
         - '{{$}}'
         - --function_to_execute
-        - data_csv_loader
+        - model_onnx
         command:
         - sh
         - -c
@@ -43,9 +41,9 @@ deploymentSpec:
         - python3
         - -m
         - kfp.dsl.executor_main
-        image: 'mammotheu/loader_data_csv_loader: v003'
+        image: maniospas/model_onnx:v003
 pipelineInfo:
-  name: data-csv-loader
+  name: model-onnx
 root:
   dag:
     outputs:
@@ -53,13 +51,13 @@ root:
         output:
           artifactSelectors:
           - outputArtifactKey: output
-            producerSubtask: data-csv-loader
+            producerSubtask: model-onnx
     tasks:
-      data-csv-loader:
+      model-onnx:
         cachingOptions:
           enableCache: true
         componentRef:
-          name: comp-data-csv-loader
+          name: comp-model-onnx
         inputs:
           parameters:
             parameters:
@@ -67,13 +65,11 @@ root:
             path:
               componentInputParameter: path
         taskInfo:
-          name: data-csv-loader
+          name: model-onnx
   inputDefinitions:
     parameters:
       parameters:
-        defaultValue:
-          delimiter: ','
-          on_bad_lines: skip
+        defaultValue: {}
         isOptional: true
         parameterType: STRUCT
       path:
@@ -82,7 +78,7 @@ root:
     artifacts:
       output:
         artifactType:
-          schemaTitle: system.Dataset
+          schemaTitle: system.Model
           schemaVersion: 0.0.1
 schemaVersion: 2.1.0
 sdkVersion: kfp-2.6.0

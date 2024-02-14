@@ -5,22 +5,29 @@ from typing import Dict, List
 import pickle
 import yaml
 import os
-from collections import OrderedDict
 
 _default_python = "3.11"
 _default_packages = ()  # appended to ["mammoth-commons"]
 
 
+def _path(method):
+    running_path = os.path.abspath(os.getcwd())
+    method_path = os.path.abspath(inspect.getfile(method))
+    assert method_path.startswith(running_path)
+    method_path = method_path[len(running_path):]
+    method_path = os.path.join('.', *method_path.split(os.sep)[:-1])
+    return method_path
+
 def _class_to_name(arg_type):
     return arg_type.__name__
 
 
-def metric(version, python=_default_python, packages=_default_packages):
+def metric(namespace, version, python=_default_python, packages=_default_packages):
     def wrapper(method):
         # prepare the kfp wrapper given decorator arguments
         name = method.__name__  # will use this as the component id
         base_image = f"python:{python}-slim-bullseye"
-        target_image = f"mammotheu/metric_{name}: {version}"
+        target_image = f"{namespace}/{name}:{version}"
         kfp_wrapper = dsl.component(
             base_image=base_image,
             target_image=target_image,
@@ -65,9 +72,9 @@ def metric(version, python=_default_python, packages=_default_packages):
             "input_types": input_types,
             "output_types": []  # no kfp output, the data are exported when running the metric
         }
-        if not os.path.exists("component_metadata/"):
-            os.makedirs("component_metadata/")
-        with open(f'component_metadata/{name}_meta.yaml', 'w') as file:
+        if not os.path.exists(_path(method)+"/component_metadata/"):
+            os.makedirs(_path(method)+"/component_metadata/")
+        with open(f'{_path(method)}/component_metadata/{name}_meta.yaml', 'w') as file:
             yaml.dump(metadata, file, sort_keys=False)
 
         # create the kfp method to be wrapped
@@ -93,7 +100,7 @@ def metric(version, python=_default_python, packages=_default_packages):
     return wrapper
 
 
-def loader(version, ltype=None, python=_default_packages, packages=_default_packages):
+def loader(namespace, version, ltype=None, python=_default_packages, packages=_default_packages):
     def wrapper(method, ltype):
         # prepare the kfp wrapper given decorator arguments
         name = method.__name__  # will use this as the component id
@@ -110,7 +117,7 @@ def loader(version, ltype=None, python=_default_packages, packages=_default_pack
                     "Either `data` or `model` should be part of your loader's name when its ltype is not explicitly declared.")
 
         base_image = f"python:{python}-slim-bullseye"
-        target_image = f"mammotheu/loader_{name}: {version}"
+        target_image = f"{namespace}/{name}:{version}"
         kfp_wrapper = dsl.component(
             base_image=base_image,
             target_image=target_image,
@@ -152,9 +159,9 @@ def loader(version, ltype=None, python=_default_packages, packages=_default_pack
             "input_types": [],  # input_types would just be ["str"] instead
             "output_types": [_class_to_name(return_type)]
         }
-        if not os.path.exists("component_metadata/"):
-            os.makedirs("component_metadata/")
-        with open(f'component_metadata/{name}_meta.yaml', 'w') as file:
+        if not os.path.exists(_path(method)+"/component_metadata/"):
+            os.makedirs(_path(method)+"/component_metadata/")
+        with open(f'{_path(method)}/component_metadata/{name}_meta.yaml', 'w') as file:
             yaml.dump(metadata, file, sort_keys=False)
 
         # create the kfp method to be wrapped

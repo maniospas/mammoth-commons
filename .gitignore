@@ -3,3 +3,7 @@ MAMMOth_commons.egg-info
 venv
 dist
 build
+Dockerfile
+kfp_config.ini
+runtime-requirements.txt
+.dockerignore

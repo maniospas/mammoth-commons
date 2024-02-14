@@ -3,8 +3,8 @@ from mammoth.integration import loader
 import pandas as pd
 
 
-@loader(version="v003", python="3.11")
-def data_csv_loader(
+@loader(namespace="mammotheu", version="v003", python="3.11")
+def data_csv(
     path: str,
     delimiter: str = ",",
     on_bad_lines: str = "skip",

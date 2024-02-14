@@ -6,7 +6,7 @@ from kfp import dsl
 
 
 class CSV:
-    integration = dsl.Output[dsl.Dataset]
+    integration = dsl.Dataset
 
     def __init__(self, data, numeric, categorical, labels):
         self.data = data

@@ -1,31 +1,60 @@
 # MAMMOth-commons
 
-Component interfaces of the MAMMOth fairness toolkit.
+Fast component development for the MAMMOth fairness toolkit.
 
 **This package is in the pre-alpha stage.**
 
-A first version will be released with the first 
-version of the toolkit.
+This file contains instructions on how to:
+1. [Set things up](#set-things-up)
+2. [Write a new component](#write-a-new-component)
+3. [Build and upload a component](#build-and-upload-a-component)
 
-## How to create a new component
+## Set things up
 
 Install the latest version of `MAMMOth-commons`
-in your virtual environment:
+and the `docker` package in your virtual environment:
 
 ```bash
 pip install --upgrade MAMMOth-commons
+pip install docker
 ```
 
-Import the necessary dataset or models from the `mammoth`
-namespace and use them to annotate your method's inputs
-and outputs, like in the snippet bellow. 
-*Annotations are mandatory for these data types.* 
+You also need to create an account in
+[DockerHub](!https://hub.docker.com/) or any other online
+hosting service for docker images. You can ignore this
 
-You may have additional keyword arguments without annotation.
-Don't forget to create a docstring for your component too.
+Finally, download, install, and run Decker Desktop
+from [here](https://docs.docker.com/get-docker/). Command 
+line instructions will use this to build docker images locally
+before uploading them to the hosting service.
 
-In the end, decorate your component with our `metric` decorator,
-providing a version.
+## Write a new component
+
+You need to have set everything up as above to build and
+deploy your MAMMOth components. Follow these guidelines
+to write a component:
+
+1. Import the necessary dataset or model classes
+from the `mammoth.datasets`
+and `mammoth.models` namespace respectively. 
+Use them to annotate your method's argument
+and return types. *Type annotations are mandatory for 
+datasets and models.*
+3. You may also add keyword arguments that serve
+as parameters with default values, which don't require annotation.
+4. Don't forget to create a docstring for your component.
+5. Decorate your component with either the 
+`@mammoth.integration.metric(namespace, version, python="3.11")` or 
+the `@mammoth.integration.loader(namespace, version, python="3.11")` decorator. 
+These decorators require at least one argument to denote
+the component's version. The namespace refers to whom the component
+should be accredited to and should be the same as your DockerHub 
+username.
+
+Here are some examples of components:
+
+<details>
+<summary>Example metric decorator</summary>
 
 ```python
 from mammoth.datasets import CSV
@@ -47,9 +76,63 @@ def new_metric(
     return Markdown("these are the results")
 
 ```
+</details>
 
-You can then create a technical component by running the following
-command (to run this, also run `pip install docker` first):
-```bash
-kfp component build . --component-filepattern test.py --no-push-image
+
+<details>
+<summary>Example loader decorator</summary>
+
+```python
+from mammoth.datasets import CSV
+from mammoth.integration import loader
+
+@loader(namespace="...", version="v001", python="3.11")
+def data_csv_loader(
+    path: str,
+    delimiter: str = ",",
+) -> CSV:
+    """This is a CSV loader.
+    """
+    # load from path given delimiter or other arguments
+    return CSV(
+        ...  # add arguments here
+    )
 ```
+</details>
+
+## Build and upload a component
+
+Don't forget to set the correct component version first.
+Then, [login to your docker account](https://docs.docker.com/engine/reference/commandline/login/).
+For example, in the simplest case where you want to host your component
+in DockerHub, it suffices to run the following command in your terminal:
+
+```bash
+docker login
+```
+
+This will ask for your DockerHub username (if you are not part of
+a team in DockerHub, this should be the same as your namespace) 
+and password. This way, your terminal will have
+permission to push the created docker images there. Finally,
+create and upload a technical component by running the following
+command (kfp is installed alongside MAMMOth-commons):
+
+```bash
+kfp component build . --component-filepattern test_components/metric.py 
+```
+
+In this, replace the `test_components/metric.py` with any other path
+that contains the Python file in which you implemented your component. 
+
+If you do *not* want to push the created docker image, for
+example to run your new component in a local copy of the MAMMOth
+bias toolkit without logging in and uploading it to DockerHub, run
+this instead:
+
+```bash
+kfp component build . --component-filepattern test_components/metric.py --no-push-image
+````
+
+:warning: The build should be called from a directory where both your
+component and virtual environment are subdirectories.

@@ -1,8 +1,0 @@
-id: data_csv_loader
-name: data csv loader
-description: "This is a CSV loader.\n    "
-parameter_info: Some parameters are needed.
-component_type: LOADER_DATA
-input_types: []
-output_types:
-- CSV

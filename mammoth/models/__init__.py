@@ -1,1 +1,1 @@
-from mammoth.models.onnx import ONNX, load_onnx
+from mammoth.models.onnx import ONNX
