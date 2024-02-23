@@ -64,7 +64,7 @@ from typing import Dict, List
 from mammoth.integration import metric
 
 
-@metric(version="v001")
+@metric(namespace="...", version="v001", python="3.11")
 def new_metric(
     dataset: CSV,
     model: ONNX,

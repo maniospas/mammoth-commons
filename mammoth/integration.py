@@ -5,6 +5,7 @@ from typing import Dict, List
 import pickle
 import yaml
 import os
+from mammoth import custom_kfp
 
 _default_python = "3.11"
 _default_packages = ()  # appended to ["mammoth-commons"]
@@ -28,7 +29,9 @@ def metric(namespace, version, python=_default_python, packages=_default_package
         name = method.__name__  # will use this as the component id
         base_image = f"python:{python}-slim-bullseye"
         target_image = f"{namespace}/{name}:{version}"
-        kfp_wrapper = dsl.component(
+        kfp_wrapper = lambda func: custom_kfp.custom_create_component_from_func(
+            func,
+            true_func=method,
             base_image=base_image,
             target_image=target_image,
             packages_to_install=["mammoth-commons"]+list(packages),
@@ -95,6 +98,7 @@ def metric(namespace, version, python=_default_python, packages=_default_package
 
         # rename the kfp_method so that kfp will create an appropriate name for it
         kfp_method.__name__ = name
+        kfp_method.__module__ = method.__module__
         # return the wrapped kfp method
         return kfp_wrapper(kfp_method)
     return wrapper
@@ -118,7 +122,9 @@ def loader(namespace, version, ltype=None, python=_default_packages, packages=_d
 
         base_image = f"python:{python}-slim-bullseye"
         target_image = f"{namespace}/{name}:{version}"
-        kfp_wrapper = dsl.component(
+        kfp_wrapper = lambda func: custom_kfp.custom_create_component_from_func(
+            func,
+            true_func=method,
             base_image=base_image,
             target_image=target_image,
             packages_to_install=["mammoth-commons"]+list(packages),
@@ -178,6 +184,7 @@ def loader(namespace, version, ltype=None, python=_default_packages, packages=_d
 
         # rename the kfp_method so that kfp will create an appropriate name for it
         kfp_method.__name__ = name
+        kfp_method.__module__ = method.__module__
 
         # return the wrapped kfp method
         return kfp_wrapper(kfp_method)

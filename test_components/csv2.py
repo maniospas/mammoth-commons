@@ -28,4 +28,3 @@ def data_csv(
         labels=(raw_data["y"] != "no").values,
     )
     return csv_dataset
-
