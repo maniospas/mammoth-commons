@@ -1,3 +1,4 @@
+import kfp.dsl.executor
 from kfp import dsl
 import inspect
 from typing import get_type_hints
@@ -9,6 +10,7 @@ from mammoth import custom_kfp
 
 _default_python = "3.11"
 _default_packages = ()  # appended to ["mammoth-commons"]
+
 
 
 def _path(method):
@@ -137,6 +139,8 @@ def loader(namespace, version, ltype=None, python=_default_packages, packages=_d
             raise Exception(f"The loader {name} must declare a return type")
         if not hasattr(return_type, "integration"):
             raise Exception(f"Missing static field in the return type of {name}: {return_type.__name__}.integration")
+        if return_type.integration is inspect.Signature.empty:
+            raise Exception(f"The loader {name} must declare a return type which is type-hinted")
 
         # keep type hint names, keeping default kwargs (these will be kwarg parameters)
         type_hints = get_type_hints(method)
@@ -174,7 +178,7 @@ def loader(namespace, version, ltype=None, python=_default_packages, packages=_d
         def kfp_method(path: str,
                        output: dsl.Output[return_type.integration],
                        parameters: Dict[str, any] = defaults,
-                       ):
+                       ) -> str:
             parameters = {**defaults, **parameters}  # insert missing defaults into parameters (TODO: maybe this is not needed)
             ret = method(path, **parameters)
             assert isinstance(ret, return_type)

@@ -1,7 +1,5 @@
 import numpy as np
 from fairbench.bench.loader import features
-from typing import Dict
-import pandas as pd
 from kfp import dsl
 
 
