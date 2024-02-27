@@ -101,6 +101,7 @@ def metric(namespace, version, python=_default_python, packages=_default_package
         # rename the kfp_method so that kfp will create an appropriate name for it
         kfp_method.__name__ = name
         kfp_method.__module__ = method.__module__
+        kfp_method.__mammoth_wrapped__ = method
         # return the wrapped kfp method
         return kfp_wrapper(kfp_method)
     return wrapper
@@ -189,6 +190,7 @@ def loader(namespace, version, ltype=None, python=_default_packages, packages=_d
         # rename the kfp_method so that kfp will create an appropriate name for it
         kfp_method.__name__ = name
         kfp_method.__module__ = method.__module__
+        kfp_method.__mammoth_wrapped__ = method
 
         # return the wrapped kfp method
         return kfp_wrapper(kfp_method)

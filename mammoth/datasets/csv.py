@@ -1,5 +1,6 @@
 import numpy as np
 from fairbench.bench.loader import features
+from fairbench import categories
 from kfp import dsl
 
 
@@ -10,7 +11,7 @@ class CSV:
         self.data = data
         self.numeric = numeric
         self.categorical = categorical
-        self.labels = labels
+        self.labels = categories@data[labels]
         self.cols = numeric + categorical
 
     def to_features(self):

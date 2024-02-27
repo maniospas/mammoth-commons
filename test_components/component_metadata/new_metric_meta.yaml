@@ -1,7 +1,7 @@
 id: new_metric
 name: new metric
 description: "Write your metric's description here.\n    "
-parameter_info: Some parameters are needed.
+parameter_info: No parameters needed.
 component_type: METRIC
 input_types:
 - CSV
