@@ -94,7 +94,7 @@ def metric(namespace, version, python=_default_python, packages=_default_package
             with open(model.path, "rb") as f:
                 model_instance = pickle.load(f)
             parameters = {**defaults, **parameters}  # insert missing defaults into parameters (TODO: maybe this is not needed)
-            ret = method(dataset_instance, model_instance, output.path, sensitive, **parameters)
+            ret = method(dataset_instance, model_instance, sensitive, **parameters)
             assert isinstance(ret, return_type)
             ret.export(output)
 
