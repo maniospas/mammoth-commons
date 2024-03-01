@@ -26,13 +26,11 @@ def new_metric(
     # TODO: the following analysis is only for one class label
     report = fb.multireport(predictions=predictions, labels=labels[list(labels)[0]], sensitive=sensitive)
 
+    print(report)
+
     stamps = fb.combine(
         fb.stamps.prule(report),
         fb.stamps.accuracy(report),
         fb.stamps.four_fifths_rule(report)
     )
     return Markdown(fb.modelcards.tomarkdown(stamps))
-
-
-
-

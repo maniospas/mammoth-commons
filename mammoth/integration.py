@@ -56,7 +56,7 @@ def metric(namespace, version, python=_default_python, packages=_default_package
                 continue
             arg_type = type_hints.get(pname, parameter.annotation)
             if parameter.default is not inspect.Parameter.empty:  # ignore kwargs
-                defaults[pname] = parameter.default
+                defaults[pname] = "__MAMMOTH_COMMON_NONE__" if parameter.default is None else parameter.default
                 continue
             if pname not in ["dataset", "model"]:
                 raise Exception("Only `dataset`, `model`, `sensitive` and keyword arguments are supported for metrics")
@@ -94,6 +94,7 @@ def metric(namespace, version, python=_default_python, packages=_default_package
             with open(model.path, "rb") as f:
                 model_instance = pickle.load(f)
             parameters = {**defaults, **parameters}  # insert missing defaults into parameters (TODO: maybe this is not needed)
+            parameters = {k: None if isinstance(v, str) and v == "__MAMMOTH_COMMON_NONE__" else v for k, v in parameters.items()}
             ret = method(dataset_instance, model_instance, sensitive, **parameters)
             assert isinstance(ret, return_type)
             ret.export(output)
@@ -150,7 +151,7 @@ def loader(namespace, version, ltype=None, python=_default_packages, packages=_d
         for pname, parameter in signature.parameters.items():
             arg_type = type_hints.get(pname, parameter.annotation)
             if parameter.default is not inspect.Parameter.empty:  # ignore kwargs
-                defaults[pname] = parameter.default
+                defaults[pname] = "__MAMMOTH_COMMON_NONE__" if parameter.default is None else parameter.default
                 continue
             if pname not in ["path"]:
                 raise Exception("Only `path` and keyword arguments are supported for loaders")
@@ -181,6 +182,7 @@ def loader(namespace, version, ltype=None, python=_default_packages, packages=_d
                        parameters: Dict[str, any] = defaults,
                        ) -> str:
             parameters = {**defaults, **parameters}  # insert missing defaults into parameters (TODO: maybe this is not needed)
+            parameters = {k: None if isinstance(v, str) and v == "__MAMMOTH_COMMON_NONE__" else v for k, v in parameters.items()}
             ret = method(path, **parameters)
             assert isinstance(ret, return_type)
             with open(output.path, "wb") as file:

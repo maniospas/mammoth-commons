@@ -3,7 +3,7 @@
 # Inputs:
 #    dataset: system.Dataset
 #    model: system.Model
-#    parameters: dict [Default: {'branch': 'all'}]
+#    parameters: dict [Default: {}]
 #    sensitive: list
 # Outputs:
 #    output: system.Markdown
@@ -22,8 +22,7 @@ components:
             schemaVersion: 0.0.1
       parameters:
         parameters:
-          defaultValue:
-            branch: all
+          defaultValue: {}
           isOptional: true
           parameterType: STRUCT
         sensitive:
@@ -95,8 +94,7 @@ root:
           schemaVersion: 0.0.1
     parameters:
       parameters:
-        defaultValue:
-          branch: all
+        defaultValue: {}
         isOptional: true
         parameterType: STRUCT
       sensitive:

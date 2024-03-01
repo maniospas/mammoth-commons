@@ -1,9 +1,10 @@
 # PIPELINE DEFINITION
 # Name: data-csv
 # Inputs:
-#    parameters: dict [Default: {'on_bad_lines': 'skip', 'delimiter': ','}]
+#    parameters: dict [Default: {'on_bad_lines': 'skip', 'categorical': False, 'delimiter': ',', 'numeric': False, 'labels': False}]
 #    path: str
 # Outputs:
+#    Output: str
 #    output: system.Dataset
 components:
   comp-data-csv:
@@ -12,7 +13,10 @@ components:
       parameters:
         parameters:
           defaultValue:
+            categorical: false
             delimiter: ','
+            labels: false
+            numeric: false
             on_bad_lines: skip
           isOptional: true
           parameterType: STRUCT
@@ -24,6 +28,9 @@ components:
           artifactType:
             schemaTitle: system.Dataset
             schemaVersion: 0.0.1
+      parameters:
+        Output:
+          parameterType: STRING
 deploymentSpec:
   executors:
     exec-data-csv:
@@ -54,6 +61,11 @@ root:
           artifactSelectors:
           - outputArtifactKey: output
             producerSubtask: data-csv
+      parameters:
+        Output:
+          valueFromParameter:
+            outputParameterKey: Output
+            producerSubtask: data-csv
     tasks:
       data-csv:
         cachingOptions:
@@ -72,7 +84,10 @@ root:
     parameters:
       parameters:
         defaultValue:
+          categorical: false
           delimiter: ','
+          labels: false
+          numeric: false
           on_bad_lines: skip
         isOptional: true
         parameterType: STRUCT
@@ -84,5 +99,8 @@ root:
         artifactType:
           schemaTitle: system.Dataset
           schemaVersion: 0.0.1
+    parameters:
+      Output:
+        parameterType: STRING
 schemaVersion: 2.1.0
 sdkVersion: kfp-2.6.0
