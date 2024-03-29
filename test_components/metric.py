@@ -12,25 +12,30 @@ def new_metric(
     model: ONNX,
     sensitive: List[str],
 ) -> Markdown:
-    """Write your metric's description here.
-    """
+    """Write your metric's description here."""
     for attr in sensitive:
         if attr not in dataset.categorical:
-            raise Exception("Fairness analysis not supported on non-categorical attributes")
+            raise Exception(
+                "Fairness analysis not supported on non-categorical attributes"
+            )
     # declare sensitive attributes
     labels = dataset.labels
-    sensitive = fb.Fork({attr: fb.categories @ dataset.data[attr] for attr in sensitive})
+    sensitive = fb.Fork(
+        {attr: fb.categories @ dataset.data[attr] for attr in sensitive}
+    )
     # obtain predictions
     predictions = model.predict(dataset.to_features())
 
     # TODO: the following analysis is only for one class label
-    report = fb.multireport(predictions=predictions, labels=labels[list(labels)[0]], sensitive=sensitive)
+    report = fb.multireport(
+        predictions=predictions, labels=labels[list(labels)[0]], sensitive=sensitive
+    )
 
     print(report)
 
     stamps = fb.combine(
         fb.stamps.prule(report),
         fb.stamps.accuracy(report),
-        fb.stamps.four_fifths_rule(report)
+        fb.stamps.four_fifths_rule(report),
     )
     return Markdown(fb.modelcards.tomarkdown(stamps))

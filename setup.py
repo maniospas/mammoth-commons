@@ -14,8 +14,8 @@ with open("requirements.txt", "r") as file:
     requirements = file.read().splitlines()
 
 setuptools.setup(
-    name='MAMMOth-commons',
-    version='0.0.12',
+    name="MAMMOth-commons",
+    version="0.0.12",
     author="Emmanouil (Manios) Krasanakis",
     author_email="maniospas@hotmail.com",
     description="Component interfaces of the MAMMOth fairness toolkit.",
@@ -24,9 +24,9 @@ setuptools.setup(
     url="https://github.com/mammoth-eu/mammoth-commons",
     packages=setuptools.find_packages(),
     classifiers=[
-         "Programming Language :: Python :: 3",
-         "License :: OSI Approved :: MIT License",
-         "Operating System :: OS Independent",
-     ],
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
     install_requires=requirements,
- )
+)

@@ -11,7 +11,7 @@ class CSV:
         self.data = data
         self.numeric = numeric
         self.categorical = categorical
-        self.labels = categories@data[labels]
+        self.labels = categories @ data[labels]
         self.cols = numeric + categorical
 
     def to_features(self):

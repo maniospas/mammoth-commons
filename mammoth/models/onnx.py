@@ -18,4 +18,3 @@ class ONNX:
         label_name = sess.get_outputs()[0].name
 
         return sess.run([label_name], {input_name: x.astype(np.float64)})[0]
-
