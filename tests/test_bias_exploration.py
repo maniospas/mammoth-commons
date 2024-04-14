@@ -1,8 +1,8 @@
 import os
 
 import mammoth
-from catalogue.autocsv import data_csv
-from catalogue.onnx import model_onnx
+from catalogue.loaders.autocsv import data_csv
+from catalogue.loaders.onnx import model_onnx
 from catalogue.modelcard import model_card
 
 
