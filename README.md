@@ -1,8 +1,9 @@
 # MAMMOth-commons
 
 Fast component development for the MAMMOth fairness toolkit.
+Components refer to model loaders, dataset loaders, or metrics.
 
-**This package is in the pre-alpha stage.**
+**This package is in its alpha stage.**
 
 This file contains instructions on how to:
 1. [Set things up](#set-things-up)
