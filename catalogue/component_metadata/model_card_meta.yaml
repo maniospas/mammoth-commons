@@ -1,0 +1,9 @@
+id: model_card
+name: model card
+description: Write your metric's description here.
+parameter_info: No parameters needed.
+component_type: METRIC
+input_types:
+- Dataset
+- Model
+output_types: []

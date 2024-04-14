@@ -1,5 +1,5 @@
 # PIPELINE DEFINITION
-# Name: new-metric
+# Name: model-card
 # Inputs:
 #    dataset: system.Dataset
 #    model: system.Model
@@ -8,8 +8,8 @@
 # Outputs:
 #    output: system.Markdown
 components:
-  comp-new-metric:
-    executorLabel: exec-new-metric
+  comp-model-card:
+    executorLabel: exec-model-card
     inputDefinitions:
       artifacts:
         dataset:
@@ -35,13 +35,13 @@ components:
             schemaVersion: 0.0.1
 deploymentSpec:
   executors:
-    exec-new-metric:
+    exec-model-card:
       container:
         args:
         - --executor_input
         - '{{$}}'
         - --function_to_execute
-        - new_metric
+        - model_card
         command:
         - sh
         - -c
@@ -52,9 +52,9 @@ deploymentSpec:
         - python3
         - -m
         - kfp.dsl.executor_main
-        image: mammotheu/new_metric:v003
+        image: mammotheu/model_card:v003
 pipelineInfo:
-  name: new-metric
+  name: model-card
 root:
   dag:
     outputs:
@@ -62,13 +62,13 @@ root:
         output:
           artifactSelectors:
           - outputArtifactKey: output
-            producerSubtask: new-metric
+            producerSubtask: model-card
     tasks:
-      new-metric:
+      model-card:
         cachingOptions:
           enableCache: true
         componentRef:
-          name: comp-new-metric
+          name: comp-model-card
         inputs:
           artifacts:
             dataset:
@@ -81,7 +81,7 @@ root:
             sensitive:
               componentInputParameter: sensitive
         taskInfo:
-          name: new-metric
+          name: model-card
   inputDefinitions:
     artifacts:
       dataset:

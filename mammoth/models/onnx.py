@@ -1,12 +1,10 @@
 import numpy as np
-from kfp import dsl
 import urllib
 import onnxruntime as rt
+from mammoth.models.model import Model
 
 
-class ONNX:
-    integration = dsl.Model
-
+class ONNX(Model):
     def __init__(self, path: str):
         self.model_url = path
 

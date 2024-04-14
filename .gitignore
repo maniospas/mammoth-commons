@@ -7,4 +7,6 @@ Dockerfile
 kfp_config.ini
 runtime-requirements.txt
 .dockerignore
-test_components/data
+catalogue/data
+data
+*.pyc

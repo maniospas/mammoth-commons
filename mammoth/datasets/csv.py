@@ -1,12 +1,10 @@
 import numpy as np
 from fairbench.bench.loader import features
 from fairbench import categories
-from kfp import dsl
+from mammoth.datasets.dataset import Dataset
 
 
-class CSV:
-    integration = dsl.Dataset
-
+class CSV(Dataset):
     def __init__(self, data, numeric, categorical, labels):
         self.data = data
         self.numeric = numeric

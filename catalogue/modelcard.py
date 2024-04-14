@@ -1,5 +1,5 @@
-from mammoth.datasets import CSV
-from mammoth.models import ONNX
+from mammoth.datasets import Dataset
+from mammoth.models import Model
 from mammoth.exports import Markdown
 from typing import Dict, List
 from mammoth.integration import metric
@@ -7,9 +7,9 @@ import fairbench as fb
 
 
 @metric(namespace="mammotheu", version="v003", python="3.11")
-def new_metric(
-    dataset: CSV,
-    model: ONNX,
+def model_card(
+    dataset: Dataset,
+    model: Model,
     sensitive: List[str],
 ) -> Markdown:
     """Write your metric's description here."""

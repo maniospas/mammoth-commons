@@ -165,7 +165,7 @@ create and upload a technical component by running the following
 command (kfp is installed alongside MAMMOth-commons):
 
 ```bash
-kfp component build . --component-filepattern test_components/metric.py 
+kfp component build . --component-filepattern catalogue/fairbench/modelcard.py 
 ```
 
 In this, replace the `test_components/metric.py` with any other path
@@ -177,7 +177,7 @@ bias toolkit without logging in and uploading it to DockerHub, run
 this instead:
 
 ```bash
-kfp component build . --component-filepattern test_components/metric.py --no-push-image
+kfp component build . --component-filepattern catalogue/fairbench/modelcard.py --no-push-image
 ````
 
 :warning: The build should be called from a directory where both your
