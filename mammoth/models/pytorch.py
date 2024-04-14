@@ -1,10 +1,8 @@
-from kfp import dsl
 import torch
+from mammoth.models.model import Model
 
 
-class PYTORCH:
-    integration = dsl.Model
-
+class Pytorch(Model):
     def __init__(self, path: str, model: torch.nn.Module):
         self.model_url = path
         self.model = model()
