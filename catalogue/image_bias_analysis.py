@@ -1,5 +1,5 @@
 from mammoth.datasets.image_dataset import ImageDataset
-from mammoth.models.pytorch import PYTORCH
+from mammoth.models.pytorch import Pytorch
 from mammoth.exports import Markdown
 from typing import List
 from mammoth.integration import metric
@@ -14,7 +14,7 @@ import torch
 @metric(namespace="mammotheu", version="v003", python="3.11")
 def image_bias_analysis(
     dataset: ImageDataset,
-    model: PYTORCH,
+    model: Pytorch,
     sensitive: List[str],
     task: str = "",
 ) -> Markdown:

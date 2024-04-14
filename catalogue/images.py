@@ -1,20 +1,16 @@
-import os.path
-
-from mammoth.datasets.image_dataset import ImageDataset
+from mammoth.datasets import Image
 from mammoth.integration import loader
-from typing import List
-import torchvision.transforms as transforms
 
 
 @loader(namespace="gsarridis", version="v003", python="3.11")
-def image_dataset(
+def images(
     path: str,
     root_dir: str = "./",
-    target="",
+    target: str = "",
     data_transform: str = "",
-    batch_size=4,
-    shuffle=False,
-) -> ImageDataset:
+    batch_size: int = 4,
+    shuffle: bool = False,
+) -> Image:
     """
     Creates a Dataset for loading image data from a CSV file.
 
@@ -26,8 +22,7 @@ def image_dataset(
     """
 
     # TODO: load data transforms (transforms.Compose) from the data_transform path eg './data/data_transforms.py'
-
-    dataset = ImageDataset(
+    dataset = Image(
         path=path,
         root_dir=root_dir,
         target=target,
