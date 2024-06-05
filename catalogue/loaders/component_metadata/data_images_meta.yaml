@@ -1,0 +1,11 @@
+id: data_images
+name: data images
+description: "\n    Creates a Dataset for loading image data from a CSV file.\n\n\
+  \    Args:\n        path (str): The path to the CSV file containing information\
+  \ about the dataset.\n        root_dir (str): The root directory where the actual\
+  \ image files are stored.\n    Returns:\n        Dataset\n    "
+parameter_info: Some parameters are needed.
+component_type: LOADER_DATA
+input_types: []
+output_types:
+- Image

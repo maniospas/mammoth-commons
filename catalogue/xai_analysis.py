@@ -4,14 +4,25 @@ from mammoth.exports import Markdown
 from typing import List
 from mammoth.integration import metric
 
+# install facex lib using: pip install facextool
+from facex.component import run_mammoth
 
-@metric(namespace="mammotheu", version="v003", python="3.11", packages=("torch", "torchvision"))
-def facex(dataset: Image, model: Pytorch, sensitive: List[str]) -> Markdown:
+
+@metric(
+    namespace="gsarridis",
+    version="v003",
+    python="3.11",
+    packages=("torch", "torchvision", "facextool"),
+)
+def facex(
+    dataset: Image,
+    model: Pytorch,
+    sensitive: List[str],
+    target_class: int = None,
+    target_layer: str = None,
+) -> Markdown:
     """Write your metric's description here."""
 
-    # just testing
-    torch_loader = dataset.to_torch(sensitive)
-    for img, target, sensitive in torch_loader:
-        predictions = model.predict(img)
+    html = run_mammoth(dataset, sensitive[0], target_class, model, target_layer)
 
-    return Markdown(text="")
+    return html
