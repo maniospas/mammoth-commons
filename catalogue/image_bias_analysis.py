@@ -6,7 +6,12 @@ from mammoth.integration import metric
 from cvbiasmitigation.suggest import analysis
 
 
-@metric(namespace="mammotheu", version="v003", python="3.11")
+@metric(
+    namespace="mammotheu",
+    version="v003",
+    python="3.11",
+    packages=("torch", "torchvision", "cvbiasmitigation"),
+)
 def image_bias_analysis(
     dataset: Image,
     model: Pytorch,
