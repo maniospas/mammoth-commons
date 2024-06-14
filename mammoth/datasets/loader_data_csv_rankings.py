@@ -18,16 +18,7 @@ def data_csv_rankings(
 ) -> CSV:
     """This is a CSV loader."""
     if not path.endswith(".csv"):
-#         card = path + os.path.pathsep + "card.yaml"
-#         path = path + os.path.pathsep + "data.csv"
         raise Exception("The csv component does not yet support dataset cards.")
     raw_data = pd.read_csv(
-        path, on_bad_lines=on_bad_lines, delimiter=delimiter
-    )
-    csv_dataset = CSV(
-        raw_data,
-        numeric=numeric,
-        categorical=categorical,
-        labels=labels,
-    )
-    return csv_dataset
+        path, on_bad_lines=on_bad_lines, delimiter=delimiter)
+    return raw_data
