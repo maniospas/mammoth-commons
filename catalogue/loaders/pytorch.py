@@ -1,7 +1,6 @@
 import os
 from mammoth.models.pytorch import Pytorch
 from mammoth.integration import loader
-import torch
 
 
 @loader(namespace="gsarridis", version="v003", python="3.11")

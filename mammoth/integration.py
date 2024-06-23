@@ -143,13 +143,13 @@ def loader(
                 ltype = "LOADER_DATA"
                 if "model" in name.lower():
                     raise Exception(
-                        "You can't have both `data` and `model` as part of your loader's name when its ltype is not explicitly declared."
+                        "You can't have both `data` and `model` as part of your loader's name when its return type is not explicitly declared."
                     )
             elif "model" in name.lower():
                 ltype = "LOADER_MODEL"
             else:
                 raise Exception(
-                    "Either `data` or `model` should be part of your loader's name when its ltype is not explicitly declared."
+                    "Either `data` or `model` should be part of your loader's name when its return type is not explicitly declared."
                 )
 
         base_image = f"python:{python}-slim-bullseye"
@@ -179,7 +179,7 @@ def loader(
         # keep type hint names, keeping default kwargs (these will be kwarg parameters)
         type_hints = get_type_hints(method)
         defaults = dict()
-        input_types = list()
+        #input_types = list()
         for pname, parameter in signature.parameters.items():
             arg_type = type_hints.get(pname, parameter.annotation)
             if parameter.default is not inspect.Parameter.empty:  # ignore kwargs
@@ -189,17 +189,16 @@ def loader(
                     else parameter.default
                 )
                 continue
-            if pname not in ["path"]:
-                raise Exception(
-                    "Only `path` and keyword arguments are supported for loaders"
-                )
-            if arg_type is inspect.Signature.empty:
-                raise Exception(
-                    f"Add a type annotation in method {name} for the argument: {pname}"
-                )
-            input_types.append(_class_to_name(arg_type))
-        if len(input_types) != 1:
-            raise Exception("Your loader should have a 'path' argument")
+            #if pname not in ["path"]:
+            #    raise Exception(
+            #        "Only keyword arguments are supported for loaders"
+            #    )
+            raise Exception(
+                f"Add a type annotation or default value in method {name} for the argument: {pname}"
+            )
+            #input_types.append(_class_to_name(arg_type))
+        #if len(input_types) != 1:
+        #    raise Exception("Your loader should have a 'path' argument")
 
         # create component_metadata/{name}_meta.yaml
         metadata = {
@@ -217,27 +216,33 @@ def loader(
             os.makedirs(_path(method) + "/component_metadata/")
         with open(f"{_path(method)}/component_metadata/{name}_meta.yaml", "w") as file:
             yaml.dump(metadata, file, sort_keys=False)
-
+        param_name = name+"__params"
+        exec_context = globals().copy()
+        exec_context.update(locals())
         # create the kfp method to be wrapped
-        def kfp_method(
-            path: str,
-            output: dsl.Output[return_type.integration],
-            parameters: Dict[str, any] = defaults,
-        ) -> str:
-            parameters = {
-                **defaults,
-                **parameters,
-            }  # insert missing defaults into parameters (TODO: maybe this is not needed)
-            parameters = {
-                k: None if isinstance(v, str) and v == "__MAMMOTH_COMMON_NONE__" else v
-                for k, v in parameters.items()
-            }
-            ret = method(path, **parameters)
-            assert isinstance(ret, return_type)
-            with open(output.path, "wb") as file:
-                pickle.dump(ret, file)
-            return output.path
-
+        exec(f"""
+def kfp_method(
+    path: str,
+    output: dsl.Output[return_type.integration],
+    {param_name}: Dict[str, any] = defaults,
+) -> str:
+    parameters = {param_name}
+    """+"""
+    parameters = {
+        **defaults,
+        **parameters,
+    }  # insert missing defaults into parameters (TODO: maybe this is not needed)
+    parameters = {
+        k: None if isinstance(v, str) and v == "__MAMMOTH_COMMON_NONE__" else v
+        for k, v in parameters.items()
+    }
+    ret = method(path, **parameters)
+    assert isinstance(ret, return_type)
+    with open(output.path, "wb") as file:
+        pickle.dump(ret, file)
+    return output.path
+        """, exec_context)
+        kfp_method = exec_context["kfp_method"]
         # rename the kfp_method so that kfp will create an appropriate name for it
         kfp_method.__name__ = name
         kfp_method.__module__ = method.__module__
