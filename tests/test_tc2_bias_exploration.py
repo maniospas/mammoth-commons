@@ -3,7 +3,7 @@ import os
 import mammoth
 from catalogue.loaders.autocsv import data_csv
 from catalogue.loaders.onnx import model_onnx
-from catalogue.modelcard import model_card
+from catalogue.metrics.modelcard import model_card
 
 
 def test_bias_exploration():

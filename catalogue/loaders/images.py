@@ -1,10 +1,11 @@
 from mammoth.datasets import Image
 from mammoth.integration import loader
+from mammoth.externals import safeexec
 
 
 @loader(namespace="gsarridis", version="v003", python="3.11")
 def data_images(
-    path: str,
+    path: str = "",
     root_dir: str = "./",
     target: str = "",
     data_transform: str = "",
@@ -17,11 +18,16 @@ def data_images(
     Args:
         path (str): The path to the CSV file containing information about the dataset.
         root_dir (str): The root directory where the actual image files are stored.
+        target (str): Indicates the predictive attribute in the dataset.
+        data_transform (str): A path or implementation of a torchvision data transform.
     Returns:
-        Dataset
+        Image dataset.
     """
 
-    # TODO: load data transforms (transforms.Compose) from the data_transform path eg './data/data_transforms.py'
+    data_transform = safeexec(data_transform,
+                              out="transform",
+                              whitelist=["torchvision"])
+
     dataset = Image(
         path=path,
         root_dir=root_dir,
@@ -30,4 +36,5 @@ def data_images(
         batch_size=batch_size,
         shuffle=shuffle,
     )
+
     return dataset

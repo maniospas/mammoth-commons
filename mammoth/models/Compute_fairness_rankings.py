@@ -5,7 +5,7 @@ from mammoth.integration import metric
 from mammoth.models import onnx
 from loader_data_csv_rankings import data_csv_rankings
 from Rankings import RANKINGS
-from Fairness_metrics_in_rankings import Fairness_metrics_in_rankings
+from ranking_fairness import Fairness_metrics_in_rankings
 
 @metric(namespace="mammotheu", version="v003", python="3.11")
 

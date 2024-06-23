@@ -1,7 +1,6 @@
 import torchvision.transforms as transforms
 
-
-data_transform = transforms.Compose(
+transform = transforms.Compose(
     [
         transforms.Resize((32, 32)),  # Resize image to 256x256
         transforms.RandomHorizontalFlip(),  # Randomly flip the image horizontally
