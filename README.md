@@ -160,8 +160,19 @@ docker login
 This will ask for your DockerHub username (if you are not part of
 a team in DockerHub, this should be the same as your namespace) 
 and password. This way, your terminal will have
-permission to push the created docker images there. Finally,
-create and upload a technical component by running the following
+permission to push the created docker images there. 
+
+Also make
+sure that the library is visible to your virtual environment by calling
+in the top level (from where you can access subdirecories 
+*mammoth/*, *catalogue/*, *tests/*, etc)
+
+```bash
+pip install -e .
+```
+
+
+Finally, create and upload a component by running the following
 command (kfp is installed alongside MAMMOth-commons):
 
 ```bash

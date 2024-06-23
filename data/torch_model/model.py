@@ -3,7 +3,7 @@ import torch.nn.functional as F
 
 
 class Cnn32_Small(nn.Module):
-    def __init__(self, num_classes=10, input_channels=3):
+    def __init__(self, num_classes, input_channels):
         super(Cnn32_Small, self).__init__()
         self.conv1 = nn.Conv2d(input_channels, 8, kernel_size=3)
         self.conv1_bn = nn.BatchNorm2d(8)
@@ -25,3 +25,6 @@ class Cnn32_Small(nn.Module):
         out = F.relu(self.fc1(out))
         out = self.fc2(out)
         return out
+
+
+model = Cnn32_Small(10, 3)

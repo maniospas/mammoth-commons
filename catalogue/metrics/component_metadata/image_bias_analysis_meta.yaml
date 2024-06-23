@@ -1,0 +1,9 @@
+id: image_bias_analysis
+name: image bias analysis
+description: null
+parameter_info: Some parameters are needed.
+component_type: METRIC
+input_types:
+- Image
+- Pytorch
+output_types: []

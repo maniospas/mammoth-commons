@@ -13,9 +13,9 @@ _default_packages = ()  # appended to ["mammoth-commons"]
 
 
 def _path(method):
-    running_path = os.path.abspath(os.getcwd())
-    method_path = os.path.abspath(inspect.getfile(method))
-    assert method_path.startswith(running_path), f"Running path is not a super-path of the path of module {method.__name__}:\nRunning path: {running_path}\nModule path: {method_path}\nHOW TO FIX:-\n- If you are running tests, create a launch configuration from the top level of mammoth-commons.\n- If you are building, change the console's folder (CD) to the top directory of mammoth-commons."
+    running_path = os.path.abspath(os.getcwd()).lower()
+    method_path = os.path.abspath(inspect.getfile(method)).lower()
+    assert method_path.startswith(running_path), f"Running path is not a super-path of the path of module {method.__name__}:\nRunning path : {running_path}\nModule path: {method_path}\nHOW TO FIX:-\n- If you are running tests, create a launch configuration from the top level of mammoth-commons.\n- If you are building, change the console's folder (CD) to the top directory of mammoth-commons."
     method_path = method_path[len(running_path) :]
     method_path = os.path.join(".", *method_path.split(os.sep)[:-1])
     return method_path
@@ -129,8 +129,6 @@ def kfp_method(
         """, exec_context)
 
         kfp_method = exec_context["kfp_method"]
-        print("Declared", kfp_method)
-        print(param_name)
 
         # rename the kfp_method so that kfp will create an appropriate name for it
         kfp_method.__name__ = name

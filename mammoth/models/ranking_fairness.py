@@ -1,6 +1,7 @@
 import pandas as pd
-import numpy as pd
+import numpy as np
 from loader_data_csv_rankings import data_csv_rankings
+
 
 class Fairness_metrics_in_rankings:
 

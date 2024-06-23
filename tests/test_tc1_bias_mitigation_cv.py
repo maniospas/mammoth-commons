@@ -1,7 +1,7 @@
 import mammoth
 from catalogue.loaders.images import data_images
 from catalogue.loaders.pytorch import model_torch
-from catalogue.image_bias_analysis import image_bias_analysis
+from catalogue.metrics.image_bias_analysis import image_bias_analysis
 
 
 def test_facex():
@@ -17,13 +17,13 @@ def test_facex():
             path=csv_dir,
             root_dir=data_dir,
             target=target,
-            data_transform="",
+            data_transform="./data/xai_images/torch_transform.py",
             batch_size=1,
             shuffle=False,
         )
-
+        model = env.model_torch("./data/torch_model/model.py", "./data/torch_model/model.pth")
         analysis_outcome = env.image_bias_analysis(
-            dataset, model_torch, [protected], task
+            dataset, model, [protected], task
         )
         print(analysis_outcome.text)
 
