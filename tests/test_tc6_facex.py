@@ -1,6 +1,6 @@
 import mammoth
-from catalogue.loaders.images import data_images
-from catalogue.loaders.pytorch import model_torch
+from catalogue.dataset_loaders.images import data_images
+from catalogue.dataset_loaders.pytorch import model_torch
 from catalogue.xai_analysis import facex
 
 

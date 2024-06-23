@@ -1,6 +1,6 @@
 import mammoth
-from catalogue.loaders.images import data_images
-from catalogue.loaders.pytorch import model_torch
+from catalogue.dataset_loaders.images import data_images
+from catalogue.model_loaders.pytorch import model_torch
 from catalogue.metrics.image_bias_analysis import image_bias_analysis
 
 
@@ -26,6 +26,5 @@ def test_facex():
             dataset, model, [protected], task
         )
         print(analysis_outcome.text)
-
 
 test_facex()
