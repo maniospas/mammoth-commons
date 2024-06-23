@@ -7,6 +7,6 @@ Dockerfile
 kfp_config.ini
 runtime-requirements.txt
 .dockerignore
-catalogue/data
-data
 *.pyc
+__pycache__/
+fairbench.log

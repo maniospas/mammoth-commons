@@ -31,11 +31,11 @@ def model_card(
         predictions=predictions, labels=labels[list(labels)[0]], sensitive=sensitive
     )
 
-    print(report)
+    # print(report)
 
     stamps = fb.combine(
         fb.stamps.prule(report),
         fb.stamps.accuracy(report),
-        fb.stamps.four_fifths_rule(report),
+        fb.stamps.four_fifths(report),
     )
     return Markdown(fb.modelcards.tomarkdown(stamps))

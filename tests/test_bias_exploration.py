@@ -27,8 +27,11 @@ def test_bias_exploration():
             dataset_uri, categorical=categorical, numeric=numeric, labels="y", delimiter=";"
         )
 
-        model_path = "file://localhost//" + os.path.abspath("./catalogue/model.onnx")
+        model_path = "file://localhost//" + os.path.abspath("./data/model.onnx")
+        print(model_path)
         model = env.model_onnx(model_path)
 
         analysis_outcome = env.model_card(dataset, model, sensitive)
         print(analysis_outcome.text)
+
+test_bias_exploration()

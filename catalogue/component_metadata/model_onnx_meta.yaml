@@ -1,8 +1,0 @@
-id: model_onnx
-name: model onnx
-description: This is an ONNX loader.
-parameter_info: No parameters needed.
-component_type: LOADER_MODEL
-input_types: []
-output_types:
-- ONNX

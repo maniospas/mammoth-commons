@@ -3,7 +3,7 @@ from mammoth.integration import loader
 
 
 @loader(namespace="gsarridis", version="v003", python="3.11")
-def images(
+def data_images(
     path: str,
     root_dir: str = "./",
     target: str = "",
