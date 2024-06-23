@@ -15,7 +15,7 @@ _default_packages = ()  # appended to ["mammoth-commons"]
 def _path(method):
     running_path = os.path.abspath(os.getcwd())
     method_path = os.path.abspath(inspect.getfile(method))
-    assert method_path.startswith(running_path)
+    assert method_path.startswith(running_path), f"Running path is not a super-path of the path of module {method.__name__}:\nRunning path: {running_path}\nModule path: {method_path}\nHOW TO FIX:-\n- If you are running tests, create a launch configuration from the top level of mammoth-commons.\n- If you are building, change the console's folder (CD) to the top directory of mammoth-commons."
     method_path = method_path[len(running_path) :]
     method_path = os.path.join(".", *method_path.split(os.sep)[:-1])
     return method_path
@@ -61,7 +61,7 @@ def metric(namespace, version, python=_default_python, packages=_default_package
             arg_type = type_hints.get(pname, parameter.annotation)
             if parameter.default is not inspect.Parameter.empty:  # ignore kwargs
                 defaults[pname] = (
-                    "__MAMMOTH_COMMON_NONE__"
+                    "None"
                     if parameter.default is None
                     else parameter.default
                 )
@@ -98,29 +98,39 @@ def metric(namespace, version, python=_default_python, packages=_default_package
         with open(f"{_path(method)}/component_metadata/{name}_meta.yaml", "w") as file:
             yaml.dump(metadata, file, sort_keys=False)
 
+        exec_context = globals().copy()
+        exec_context.update(locals())
+        param_name = name+"__params"
         # create the kfp method to be wrapped
-        def kfp_method(
-            dataset: dsl.Input[dsl.Dataset],
-            model: dsl.Input[dsl.Model],
-            output: dsl.Output[return_type.integration],
-            sensitive: List[str],
-            parameters: Dict[str, any] = defaults,
-        ):
-            with open(dataset.path, "rb") as f:
-                dataset_instance = pickle.load(f)
-            with open(model.path, "rb") as f:
-                model_instance = pickle.load(f)
-            parameters = {
-                **defaults,
-                **parameters,
-            }  # insert missing defaults into parameters (TODO: maybe this is not needed)
-            parameters = {
-                k: None if isinstance(v, str) and v == "__MAMMOTH_COMMON_NONE__" else v
-                for k, v in parameters.items()
-            }
-            ret = method(dataset_instance, model_instance, sensitive, **parameters)
-            assert isinstance(ret, return_type)
-            ret.export(output)
+        exec(f"""
+def kfp_method(
+    model: dsl.Input[dsl.Model],
+    output: dsl.Output[return_type.integration],
+    sensitive: List[str],
+    {param_name}: Dict[str, any] = defaults
+):
+    parameters = {param_name}
+    """+"""
+    with open(dataset.path, "rb") as f:
+        dataset_instance = pickle.load(f)
+    with open(model.path, "rb") as f:
+        model_instance = pickle.load(f)
+    parameters = {
+        **defaults,
+        **parameters,
+    }  # insert missing defaults into parameters (TODO: maybe this is not needed)
+    parameters = {
+        k: None if isinstance(v, str) and v == "None" else v
+        for k, v in parameters.items()
+    }
+    ret = method(dataset_instance, model_instance, sensitive, **parameters)
+    assert isinstance(ret, return_type)
+    ret.export(output)
+        """, exec_context)
+
+        kfp_method = exec_context["kfp_method"]
+        print("Declared", kfp_method)
+        print(param_name)
 
         # rename the kfp_method so that kfp will create an appropriate name for it
         kfp_method.__name__ = name
@@ -184,17 +194,13 @@ def loader(
             arg_type = type_hints.get(pname, parameter.annotation)
             if parameter.default is not inspect.Parameter.empty:  # ignore kwargs
                 defaults[pname] = (
-                    "__MAMMOTH_COMMON_NONE__"
+                    "None"
                     if parameter.default is None
                     else parameter.default
                 )
                 continue
-            #if pname not in ["path"]:
-            #    raise Exception(
-            #        "Only keyword arguments are supported for loaders"
-            #    )
             raise Exception(
-                f"Add a type annotation or default value in method {name} for the argument: {pname}"
+                f"Add both a type annotation and default value in method {name} for the argument: {pname}"
             )
             #input_types.append(_class_to_name(arg_type))
         #if len(input_types) != 1:
@@ -209,6 +215,7 @@ def loader(
             if not defaults
             else "Some parameters are needed.",
             "component_type": ltype,
+            "parameter_default": defaults,
             "input_types": [],  # input_types would just be ["str"] instead
             "output_types": [_class_to_name(return_type)],
         }
@@ -233,7 +240,7 @@ def kfp_method(
         **parameters,
     }  # insert missing defaults into parameters (TODO: maybe this is not needed)
     parameters = {
-        k: None if isinstance(v, str) and v == "__MAMMOTH_COMMON_NONE__" else v
+        k: None if isinstance(v, str) and v == "None" else v
         for k, v in parameters.items()
     }
     ret = method(path, **parameters)

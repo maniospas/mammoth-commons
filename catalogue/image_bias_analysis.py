@@ -3,25 +3,21 @@ from mammoth.models.pytorch import Pytorch
 from mammoth.exports import Markdown
 from typing import List
 from mammoth.integration import metric
+from cvbiasmitigation.suggest import analysis
 
 
-@metric(namespace="mammotheu", version="v003", python="3.11")
+@metric(
+    namespace="mammotheu",
+    version="v003",
+    python="3.11",
+    packages=("torch", "torchvision", "cvbiasmitigation"),
+)
 def image_bias_analysis(
     dataset: Image,
     model: Pytorch,
     sensitive: List[str],
     task: str = "",
 ) -> Markdown:
-    """Write your metric's description here."""
-    if task == "face_verification":
-        raise Exception("Not implemented yet")
-    elif task == "face_attribute_extraction":
-        raise Exception("Not implemented yet")
-    else:
-        # just testing
-        torch_loader = dataset.to_torch(sensitive)
-        # model.load_model(model_class)
-        for img, target, sensitive in torch_loader:
-            predictions = model.predict(img)
 
-    return Markdown(text="")
+    md = analysis(dataset.path, task, dataset.target, sensitive)
+    return Markdown(md)
