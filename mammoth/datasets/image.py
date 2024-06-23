@@ -6,10 +6,14 @@ class Image(Dataset):
     def __init__(self, path, root_dir, target, data_transform, batch_size, shuffle):
         """
         Args:
-            path (string): Path to the CSV file with annotations (should involve the columns path|attribute1|...|attributeN).
-            root_dir (string): Root image dataset directory.
-
+            path (str): Path to the CSV file with annotations (should involve the columns path|attribute1|...|attributeN).
+            root_dir (str): Root image dataset directory.
+            target (str): The target attribute to be predicted.
+            data_transform (callable): A function/transform that takes in an image and returns a transformed version.
+            batch_size (int): How many samples per batch to load.
+            shuffle (bool): Set to True to have the data reshuffled every time they are obtained.
         """
+
         self.path = path
         self.root_dir = root_dir
         self.target = target
