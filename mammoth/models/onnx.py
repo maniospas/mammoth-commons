@@ -5,14 +5,13 @@ from mammoth.models.model import Model
 
 
 class ONNX(Model):
-    def __init__(self, path: str):
-        self.model_url = path
+    def __init__(self, model_bytes, np_type=np.float64):
+        self.model_bytes = model_bytes
+        self.np_type = np_type
 
     def predict(self, x):
-        with urllib.request.urlopen(self.model_url) as f:
-            model_bytes = f.read()
-        sess = rt.InferenceSession(model_bytes, providers=["CPUExecutionProvider"])
+        sess = rt.InferenceSession(self.model_bytes, providers=["CPUExecutionProvider"])
         input_name = sess.get_inputs()[0].name
         label_name = sess.get_outputs()[0].name
 
-        return sess.run([label_name], {input_name: x.astype(np.float64)})[0]
+        return sess.run([label_name], {input_name: x.astype(self.np_type)})[0]

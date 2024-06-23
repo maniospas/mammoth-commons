@@ -2,7 +2,7 @@ import os
 
 import mammoth
 from catalogue.dataset_loaders.autocsv import data_csv
-from catalogue.dataset_loaders.onnx import model_onnx
+from catalogue.model_loaders.onnx import model_onnx
 from catalogue.metrics.model_card import model_card
 
 
