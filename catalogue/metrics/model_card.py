@@ -6,7 +6,12 @@ from mammoth.integration import metric
 import fairbench as fb
 
 
-@metric(namespace="mammotheu", version="v003", python="3.11")
+@metric(
+    namespace="maniospas",
+    version="v003",
+    python="3.11",
+    packages=("fairbench",)
+)
 def model_card(
     dataset: Dataset,
     model: Model,
@@ -30,8 +35,6 @@ def model_card(
     report = fb.multireport(
         predictions=predictions, labels=labels[list(labels)[0]], sensitive=sensitive
     )
-
-    # print(report)
 
     stamps = fb.combine(
         fb.stamps.prule(report),
