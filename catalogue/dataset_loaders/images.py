@@ -3,7 +3,12 @@ from mammoth.integration import loader
 from mammoth.externals import safeexec
 
 
-@loader(namespace="gsarridis", version="v003", python="3.11")
+@loader(
+    namespace="gsarridis",
+    version="v003",
+    python="3.11",
+    packages=("torch", "torchvision")
+)
 def data_images(
     path: str = "",
     root_dir: str = "./",
