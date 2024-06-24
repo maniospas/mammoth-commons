@@ -9,7 +9,6 @@ from Rankings import normal_ranking
 
 
 @loader(namespace="mammotheu", version="v003", python="3.11")
-
 def normal_ranking_model(
     path: str,
     ranking_variable: str,

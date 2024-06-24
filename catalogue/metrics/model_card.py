@@ -17,28 +17,40 @@ def model_card(
     model: Model,
     sensitive: List[str],
 ) -> Markdown:
-    """Write your metric's description here."""
+    """Creates a model card using FairBench."""
     for attr in sensitive:
         if attr not in dataset.categorical:
             raise Exception(
                 "Fairness analysis not supported on non-categorical attributes"
             )
+
+    # obtain predictions
+    if hasattr(model, "predict_fair"):
+        predictions = model.predict_fair(dataset.to_features(), dataset.to_features(sensitive))
+    else:
+        predictions = model.predict(dataset.to_features())
+
+
     # declare sensitive attributes
     labels = dataset.labels
     sensitive = fb.Fork(
         {attr: fb.categories @ dataset.data[attr] for attr in sensitive}
     )
-    # obtain predictions
-    predictions = model.predict(dataset.to_features())
 
-    # TODO: the following analysis is only for one class label
-    report = fb.multireport(
-        predictions=predictions, labels=labels[list(labels)[0]], sensitive=sensitive
-    )
-
-    stamps = fb.combine(
-        fb.stamps.prule(report),
-        fb.stamps.accuracy(report),
-        fb.stamps.four_fifths(report),
-    )
+    if labels is None:
+        report = fb.multireport(predictions=predictions, sensitive=sensitive)
+        stamps = fb.combine(
+            fb.stamps.prule(report),
+            fb.stamps.four_fifths(report),
+        )
+    else:
+        # TODO: the following analysis is only for one class label
+        report = fb.multireport(
+            predictions=predictions, labels=labels[list(labels)[0]], sensitive=sensitive
+        )
+        stamps = fb.combine(
+            fb.stamps.prule(report),
+            fb.stamps.accuracy(report),
+            fb.stamps.four_fifths(report),
+        )
     return Markdown(fb.modelcards.tomarkdown(stamps))
