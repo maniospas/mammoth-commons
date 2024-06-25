@@ -1,0 +1,9 @@
+id: facex
+name: facex
+description: Write your metric's description here.
+parameter_info: Some parameters are needed.
+component_type: METRIC
+input_types:
+- Image
+- Pytorch
+output_types: []
