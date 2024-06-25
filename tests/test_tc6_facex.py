@@ -1,7 +1,7 @@
 import mammoth
 from catalogue.dataset_loaders.images import data_images
-from catalogue.dataset_loaders.pytorch import model_torch
-from catalogue.xai_analysis import facex
+from catalogue.model_loaders.pytorch import model_torch
+from catalogue.metrics.xai_analysis import facex
 
 
 def test_facex():
@@ -9,8 +9,8 @@ def test_facex():
 
         target = "task"
         protected = "protected"
-        model_path = "./catalogue/model"
-        model_dict = "resnet18.pt"
+        model_path = "./data/torch_model/torch_model.py"
+        model_dict = "./data/torch_model/resnet18.pt"
         data_dir = "./data/xai_images/race_per_7000"
         csv_dir = "./data/xai_images/bupt_anno.csv"
 
@@ -22,7 +22,7 @@ def test_facex():
             path=csv_dir,
             root_dir=data_dir,
             target=target,
-            data_transform="",
+            data_transform="./data/xai_images/torch_transform.py",
             batch_size=1,
             shuffle=False,
         )
