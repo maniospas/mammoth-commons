@@ -9,9 +9,7 @@ import torch
 def model_torch(model: str = "", state: str = "") -> Pytorch:
     """This is an PYTORCH model loader."""
 
-    model = safeexec(model,
-                     out="model",
-                     whitelist=["torchvision"])
+    model = safeexec(model, out="model", whitelist=["torchvision", "torch"])
 
     model.load_state_dict(torch.load(state))
 
