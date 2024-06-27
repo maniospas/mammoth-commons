@@ -5,7 +5,7 @@ import urllib
 
 @loader(
     namespace="maniospas",
-    version="v003",
+    version="v004",
     python="3.11"
 )
 def model_onnx(path: str = None) -> ONNX:

@@ -12,7 +12,7 @@ from facex.component import run_mammoth
     namespace="gsarridis",
     version="v003",
     python="3.11",
-    packages=("torch", "torchvision", "facextool"),
+    packages=("torch", "torchvision", "timm", "facextool"),
 )
 def facex(
     dataset: Image,
