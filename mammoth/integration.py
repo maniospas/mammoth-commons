@@ -7,6 +7,8 @@ import pickle
 import yaml
 import os
 from mammoth import custom_kfp
+import json
+
 
 _default_python = "3.11"
 _default_packages = ()  # appended to ["mammoth-commons"]
@@ -91,7 +93,7 @@ def metric(namespace, version, python=_default_python, packages=_default_package
             else "Some parameters are needed.",
             "component_type": "METRIC",
             "input_types": input_types,
-            "parameter_default": str(defaults),
+            "parameter_default": defaults,
             "output_types": [],  # no kfp output, the data are exported when running the metric
         }
         if not os.path.exists(_path(method) + "/component_metadata/"):
@@ -214,7 +216,7 @@ def loader(
             if not defaults
             else "Some parameters are needed.",
             "component_type": ltype,
-            "parameter_default": str(defaults),
+            "parameter_default": defaults,
             "input_types": [],  # input_types would just be ["str"] instead
             "output_types": [_class_to_name(return_type)],
         }
@@ -228,7 +230,6 @@ def loader(
         # create the kfp method to be wrapped
         exec(f"""
 def kfp_method(
-    path: str,
     output: dsl.Output[return_type.integration],
     {param_name}: Dict[str, any] = defaults,
 ) -> str:
@@ -242,7 +243,7 @@ def kfp_method(
         k: None if isinstance(v, str) and v == "None" else v
         for k, v in parameters.items()
     }
-    ret = method(path, **parameters)
+    ret = method(**parameters)
     assert isinstance(ret, return_type)
     with open(output.path, "wb") as file:
         pickle.dump(ret, file)
