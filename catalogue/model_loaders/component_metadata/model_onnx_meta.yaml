@@ -3,8 +3,7 @@ name: model onnx
 description: This is an ONNX loader.
 parameter_info: Some parameters are needed.
 component_type: LOADER_MODEL
-parameter_default:
-  path: None
+parameter_default: '{''path'': ''None''}'
 input_types: []
 output_types:
 - ONNX

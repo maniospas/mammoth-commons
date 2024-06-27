@@ -91,6 +91,7 @@ def metric(namespace, version, python=_default_python, packages=_default_package
             else "Some parameters are needed.",
             "component_type": "METRIC",
             "input_types": input_types,
+            "parameter_default": str(defaults),
             "output_types": [],  # no kfp output, the data are exported when running the metric
         }
         if not os.path.exists(_path(method) + "/component_metadata/"):
@@ -213,7 +214,7 @@ def loader(
             if not defaults
             else "Some parameters are needed.",
             "component_type": ltype,
-            "parameter_default": defaults,
+            "parameter_default": str(defaults),
             "input_types": [],  # input_types would just be ["str"] instead
             "output_types": [_class_to_name(return_type)],
         }
