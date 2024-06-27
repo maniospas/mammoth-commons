@@ -8,7 +8,7 @@ from typing import List, Optional
 
 @loader(
     namespace="maniospas",
-    version="v004",
+    version="v005",
     python="3.11"
 )
 def data_csv(
