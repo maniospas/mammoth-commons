@@ -24,14 +24,16 @@ and place components of respective types:
 
 The following components are currently presented in the catalogue:
 
-| Component                        | Input datatypes        | Output datypes | Parameters                                                                              |
-|----------------------------------|------------------------|----------------|-----------------------------------------------------------------------------------------|
-| `dataset_loaders/autocsv.py`     |                        | CSV            | Path and options to provide to Pandas.                                                  |
-| `dataset_loaders/autocsv.py`     |                        | Image          | Path for csv attributes and image location.                                             |
-| `model_loaders/rankings.py`      |                        | 
-| `model_loaders/onnx.py`          |                        | ONNX           | Path to the stored model.                                                               |
-| `model_loaders/onnx_ensemble.py` |                        | ONNXEnsemble   | Path to the stored model.                                                               |
-| `model_loaders/pytorch.py`       |                        | Pytorch        | Path or code to the torch model's construction, and path to the torch state dictionary. |
-| `metrics/image_bias_analysis.py` | Image, Pytorch         | Markdown       |                                                                                         |
-| `metrics/model_card.py`          | Any dataset, any model | Markdown       |                                                                                         |
-| `metrics/xai_analysis.py`        | Image, Pytorch         | HTML           |                                                                                         |
+| Component                        | Dependencies                                | Input datatypes        | Output datypes | Parameters                                                                                                                                                           |
+|----------------------------------|---------------------------------------------|------------------------|----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `dataset_loaders/autocsv.py`     |                                             |                        | CSV            | Path and options to provide to Pandas.                                                                                                                               |
+| `dataset_loaders/autocsv.py`     |                                             |                        | Image          | Path for csv attributes and image location.                                                                                                                          |
+| `dataset_loaders/graph.py`       | `pygrank`                                   |                        | Graph          | Dataset name that is either a local folder or a pygrank automatically downloaded dataset.                                                                            |
+| `dataset_loaders/images.py`      | `torch`, `torchvision`                      |                        | Image          | Path to csv of image metadata, path to image hosting folder, predictive attribute, transformer code or path to code, as well as shuffling and batch size parameters. |
+| `model_loaders/rankings.py`      |                                             |                        | 
+| `model_loaders/onnx.py`          | `onnx_runtime`                              |                        | ONNX           | Path to the stored model.                                                                                                                                            |
+| `model_loaders/onnx_ensemble.py` | `onnx_runtime`                              |                        | ONNXEnsemble   | Path to the stored model.                                                                                                                                            |
+| `model_loaders/pytorch.py`       | `torch`                                     |                        | Pytorch        | Code or path to code for the torch model's construction, and path to the torch state dictionary.                                                                     |
+| `metrics/image_bias_analysis.py` | `torch`, `torchvision`, `cvbiasmitigation`  | Image, Pytorch         | Markdown       |                                                                                                                                                                      |
+| `metrics/model_card.py`          |                                             | Any dataset, any model | Markdown       |                                                                                                                                                                      |
+| `metrics/xai_analysis.py`        | `torch`, `torchvision`, `timm`, `facextool` | Image, Pytorch         | HTML           |                                                                                                                                                                      |

@@ -6,4 +6,7 @@ component_type: METRIC
 input_types:
 - Image
 - Pytorch
+parameter_default:
+  target_class: None
+  target_layer: None
 output_types: []

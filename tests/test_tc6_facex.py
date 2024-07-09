@@ -1,11 +1,11 @@
-import mammoth
+from mammoth import testing
 from catalogue.dataset_loaders.images import data_images
 from catalogue.model_loaders.pytorch import model_torch
 from catalogue.metrics.xai_analysis import facex
 
 
 def test_facex():
-    with mammoth.testing.Env(data_images, model_torch, facex) as env:
+    with testing.Env(data_images, model_torch, facex) as env:
 
         target = "task"
         protected = "protected"
