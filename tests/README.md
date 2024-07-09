@@ -2,7 +2,6 @@
 
 This directory contains test pipelines of modules
 by implementing MAMMOth's technical components.
-
 If you just cloned this repository, install the
 `mammoth` namespace in development mode from the top
 level (you should never need to navigate within
