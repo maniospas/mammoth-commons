@@ -1,13 +1,13 @@
 import os
 
-import mammoth
+from mammoth import testing
 from catalogue.dataset_loaders.autocsv import data_csv
 from catalogue.model_loaders.onnx import model_onnx
 from catalogue.metrics.model_card import model_card
 
 
 def test_bias_exploration():
-    with mammoth.testing.Env(data_csv, model_onnx, model_card) as env:
+    with testing.Env(data_csv, model_onnx, model_card) as env:
         numeric = ["age", "duration", "campaign", "pdays", "previous"]
         categorical = [
             "job",
@@ -28,10 +28,9 @@ def test_bias_exploration():
         )
 
         model_path = "file://localhost//" + os.path.abspath("./data/model.onnx")
-        print(model_path)
         model = env.model_onnx(model_path)
 
-        analysis_outcome = env.model_card(dataset, model, sensitive)
-        print(analysis_outcome.text)
+        markdown_result = env.model_card(dataset, model, sensitive)
+        markdown_result.show()
 
 test_bias_exploration()
