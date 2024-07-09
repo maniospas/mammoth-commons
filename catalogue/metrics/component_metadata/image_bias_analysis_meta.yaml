@@ -6,4 +6,6 @@ component_type: METRIC
 input_types:
 - Image
 - Pytorch
+parameter_default:
+  task: ''
 output_types: []

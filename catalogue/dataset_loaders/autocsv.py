@@ -8,13 +8,13 @@ from typing import List, Optional
 
 @loader(
     namespace="maniospas",
-    version="v005",
+    version="v007",
     python="3.11"
 )
 def data_csv(
     path: str = "",
     numeric: Optional[List[str]] = None,  # numeric = ["age", "duration", "campaign", "pdays", "previous"]
-    categorical: Optional[List[str]] = None,  # ["job", "marital", "education", "default", "housing", "loan", "contact", "poutcome",]
+    categorical: Optional[List[str]] = None,  # ["job", "marital", "education", "default", "housing", "loan", "contact", "poutcome"]
     labels: Optional[str] = None,
     delimiter: str = ",",
     on_bad_lines: str = "skip",

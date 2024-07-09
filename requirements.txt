@@ -4,3 +4,4 @@ fairbench
 PyYAML
 kfp
 onnxruntime
+markdown2

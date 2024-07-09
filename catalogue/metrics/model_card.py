@@ -1,5 +1,5 @@
-from mammoth.datasets import Dataset
-from mammoth.models import Model
+from mammoth.datasets import CSV
+from mammoth.models import ONNX
 from mammoth.exports import Markdown
 from typing import Dict, List
 from mammoth.integration import metric
@@ -8,13 +8,13 @@ import fairbench as fb
 
 @metric(
     namespace="maniospas",
-    version="v005",
+    version="v006",
     python="3.11",
     packages=("fairbench",)
 )
 def model_card(
-    dataset: Dataset,
-    model: Model,
+    dataset: CSV,
+    model: ONNX,
     sensitive: List[str],
 ) -> Markdown:
     """Creates a model card using FairBench."""
