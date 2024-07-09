@@ -6,7 +6,6 @@ from catalogue.metrics.image_bias_analysis import image_bias_analysis
 
 def test_facex():
     with testing.Env(data_images, model_torch, image_bias_analysis) as env:
-
         target = "task"
         task = "image classification"  # or "face verification" TODO: error on unknown tasks
         protected = "protected"
