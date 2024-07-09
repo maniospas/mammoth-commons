@@ -13,7 +13,7 @@ def _replace_emojis(text):
     emoji_patterns = {
         ":x:": "❌",
         ":rocket:": "🚀",
-        ":checkmark:": "✔️",
+        ":checkmark:": "🗸",
         ":smile:": "😄",
         ":thumbsup:": "👍",
         ":heart:": "❤️",
@@ -21,6 +21,7 @@ def _replace_emojis(text):
         ":fire:": "🔥",
         ":tada:": "🎉",
         ":clap:": "👏",
+        ":heavy_check_mark:": "✔️"
     }
     pattern = re.compile("|".join(re.escape(key) for key in emoji_patterns.keys()))
     return pattern.sub(lambda m: emoji_patterns[m.group(0)], text)

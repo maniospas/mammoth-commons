@@ -11,6 +11,6 @@ def test_fair_graph_filtering():
 
         sensitive = ["0"]
         analysis_outcome = env.model_card(graph, model, sensitive)
-        print(analysis_outcome.text)
+        analysis_outcome.show()
 
 test_fair_graph_filtering()
