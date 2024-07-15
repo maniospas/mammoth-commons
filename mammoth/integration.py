@@ -108,6 +108,7 @@ def metric(namespace, version, python=_default_python, packages=_default_package
         exec(f"""
 def kfp_method(
     model: dsl.Input[dsl.Model],
+    dataset: dsl.Input[dsl.Dataset],
     output: dsl.Output[return_type.integration],
     sensitive: List[str],
     {param_name}: Dict[str, any] = defaults

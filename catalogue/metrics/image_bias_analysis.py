@@ -18,6 +18,10 @@ def image_bias_analysis(
     sensitive: List[str],
     task: str = "",
 ) -> Markdown:
+    """
+    Performs analysis of image bias, and recommends mitigation strategies.
+    """
 
+    assert task in ["face verification", "image classification"]
     md = analysis(dataset.path, task, dataset.target, sensitive)
     return Markdown(md)
