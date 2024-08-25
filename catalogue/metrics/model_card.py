@@ -8,7 +8,7 @@ import fairbench as fb
 
 @metric(
     namespace="maniospas",
-    version="v006",
+    version="v007",
     python="3.11",
     packages=("fairbench",)
 )
@@ -43,14 +43,22 @@ def model_card(
             fb.stamps.prule(report),
             fb.stamps.four_fifths(report),
         )
+        text = fb.modelcards.tomarkdown(stamps)
     else:
-        # TODO: the following analysis is only for one class label
-        report = fb.multireport(
-            predictions=predictions, labels=labels[list(labels)[0]], sensitive=sensitive
-        )
-        stamps = fb.combine(
-            fb.stamps.prule(report),
-            fb.stamps.accuracy(report),
-            fb.stamps.four_fifths(report),
-        )
-    return Markdown(fb.modelcards.tomarkdown(stamps))
+        text = ""
+        for label in labels:
+            # TODO: the following analysis is only for one class label
+            report = fb.multireport(
+                predictions=predictions, labels=label, sensitive=sensitive
+            )
+            stamps = fb.combine(
+                fb.stamps.prule(report),
+                fb.stamps.accuracy(report),
+                fb.stamps.four_fifths(report),
+                fb.stamps.dfpr(report),
+                fb.stamps.dfnr(report),
+                fb.stamps.auc(report),
+                fb.stamps.abroca(report),
+            )
+        text += fb.modelcards.tomarkdown(stamps)
+    return Markdown(text)
