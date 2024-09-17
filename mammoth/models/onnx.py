@@ -1,6 +1,4 @@
 import numpy as np
-import urllib
-import onnxruntime as rt
 from mammoth.models.model import Model
 
 
@@ -10,6 +8,7 @@ class ONNX(Model):
         self.np_type = np_type
 
     def predict(self, x):
+        import onnxruntime as rt
         sess = rt.InferenceSession(self.model_bytes, providers=["CPUExecutionProvider"])
         input_name = sess.get_inputs()[0].name
         label_name = sess.get_outputs()[0].name

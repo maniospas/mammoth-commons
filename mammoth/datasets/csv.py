@@ -1,16 +1,23 @@
 import numpy as np
-from fairbench.bench.loader import features
-from fairbench import categories
 from mammoth.datasets.dataset import Dataset
+
+
+def _features(df, numeric, categorical):
+    import pandas as pd
+    dfs = [df[col] for col in numeric] + [
+        pd.get_dummies(df[col]) for col in categorical
+    ]
+    return pd.concat(dfs, axis=1).values
 
 
 class CSV(Dataset):
     def __init__(self, data, numeric, categorical, labels):
+        import pandas as pd
         self.data = data
         self.numeric = numeric
         self.categorical = categorical
-        self.labels = categories @ data[labels]
+        self.labels = pd.get_dummies(data[labels])
         self.cols = numeric + categorical
 
     def to_features(self):
-        return features(self.data, self.numeric, self.categorical).astype(np.float64)
+        return _features(self.data, self.numeric, self.categorical).astype(np.float64)

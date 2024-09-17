@@ -6,7 +6,8 @@ import urllib
 @loader(
     namespace="maniospas",
     version="v005",
-    python="3.11"
+    python="3.11",
+    packages=("onnxruntime",)
 )
 def model_onnx(path: str = None) -> ONNX:
     """This is an ONNX loader."""

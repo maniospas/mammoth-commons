@@ -1,8 +1,5 @@
 numpy==1.*
 pandas
-fairbench
 PyYAML
 kfp
-onnxruntime
 markdown2
-dill

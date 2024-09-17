@@ -1,15 +1,15 @@
 # PIPELINE DEFINITION
-# Name: model-card
+# Name: interactive-report
 # Inputs:
 #    dataset: system.Dataset
+#    interactive_report__params: dict [Default: {}]
 #    model: system.Model
-#    model_card__params: dict [Default: {}]
 #    sensitive: list
 # Outputs:
-#    output: system.Markdown
+#    output: system.HTML
 components:
-  comp-model-card:
-    executorLabel: exec-model-card
+  comp-interactive-report:
+    executorLabel: exec-interactive-report
     inputDefinitions:
       artifacts:
         dataset:
@@ -21,7 +21,7 @@ components:
             schemaTitle: system.Model
             schemaVersion: 0.0.1
       parameters:
-        model_card__params:
+        interactive_report__params:
           defaultValue: {}
           isOptional: true
           parameterType: STRUCT
@@ -31,17 +31,17 @@ components:
       artifacts:
         output:
           artifactType:
-            schemaTitle: system.Markdown
+            schemaTitle: system.HTML
             schemaVersion: 0.0.1
 deploymentSpec:
   executors:
-    exec-model-card:
+    exec-interactive-report:
       container:
         args:
         - --executor_input
         - '{{$}}'
         - --function_to_execute
-        - model_card
+        - interactive_report
         command:
         - sh
         - -c
@@ -52,9 +52,9 @@ deploymentSpec:
         - python3
         - -m
         - kfp.dsl.executor_main
-        image: maniospas/model_card:v007
+        image: maniospas/interactive_report:v003
 pipelineInfo:
-  name: model-card
+  name: interactive-report
 root:
   dag:
     outputs:
@@ -62,13 +62,13 @@ root:
         output:
           artifactSelectors:
           - outputArtifactKey: output
-            producerSubtask: model-card
+            producerSubtask: interactive-report
     tasks:
-      model-card:
+      interactive-report:
         cachingOptions:
           enableCache: true
         componentRef:
-          name: comp-model-card
+          name: comp-interactive-report
         inputs:
           artifacts:
             dataset:
@@ -76,12 +76,12 @@ root:
             model:
               componentInputArtifact: model
           parameters:
-            model_card__params:
-              componentInputParameter: model_card__params
+            interactive_report__params:
+              componentInputParameter: interactive_report__params
             sensitive:
               componentInputParameter: sensitive
         taskInfo:
-          name: model-card
+          name: interactive-report
   inputDefinitions:
     artifacts:
       dataset:
@@ -93,7 +93,7 @@ root:
           schemaTitle: system.Model
           schemaVersion: 0.0.1
     parameters:
-      model_card__params:
+      interactive_report__params:
         defaultValue: {}
         isOptional: true
         parameterType: STRUCT
@@ -103,7 +103,7 @@ root:
     artifacts:
       output:
         artifactType:
-          schemaTitle: system.Markdown
+          schemaTitle: system.HTML
           schemaVersion: 0.0.1
 schemaVersion: 2.1.0
 sdkVersion: kfp-2.8.0
