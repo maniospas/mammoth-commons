@@ -48,7 +48,7 @@ def _highlight_code(html_content):
 
 
 class HTML:
-    integration = dsl.HTML
+    integration = "dsl.HTML"
 
     def __init__(self, body, header="", script="", images=None):
         self.body = body

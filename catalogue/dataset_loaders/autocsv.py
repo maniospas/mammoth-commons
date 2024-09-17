@@ -8,8 +8,9 @@ from typing import List, Optional
 
 @loader(
     namespace="maniospas",
-    version="v007",
-    python="3.11"
+    version="v009",
+    python="3.11",
+    packages=("fairbench", "pandas",)
 )
 def data_csv(
     path: str = "",

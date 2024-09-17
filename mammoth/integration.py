@@ -1,17 +1,10 @@
-import kfp.dsl.executor
-from kfp import dsl
 import inspect
-from typing import get_type_hints
-from typing import Dict, List
-import pickle
-import yaml
+from typing import get_type_hints, Dict, List
 import os
-from mammoth import custom_kfp
-import json
 
 
 _default_python = "3.11"
-_default_packages = ()  # appended to ["mammoth-commons"]
+_default_packages = ()  # appended to ["mammoth-commons[deployment]"]
 
 
 def _path(method):
@@ -28,6 +21,11 @@ def _class_to_name(arg_type):
 
 
 def metric(namespace, version, python=_default_python, packages=_default_packages):
+    import kfp.dsl.executor
+    from kfp import dsl
+    from mammoth import custom_kfp
+    import yaml
+
     def wrapper(method):
         # prepare the kfp wrapper given decorator arguments
         name = method.__name__  # will use this as the component id
@@ -38,7 +36,7 @@ def metric(namespace, version, python=_default_python, packages=_default_package
             true_func=method,
             base_image=base_image,
             target_image=target_image,
-            packages_to_install=["mammoth-commons"] + list(packages),
+            packages_to_install=["mammoth-commons[deployment]"] + list(packages),
         )
 
         # find signature and check that we can obtain the integration type from the returned type
@@ -106,10 +104,11 @@ def metric(namespace, version, python=_default_python, packages=_default_package
         param_name = name+"__params"
         # create the kfp method to be wrapped
         exec(f"""
+from kfp import dsl
 def kfp_method(
     model: dsl.Input[dsl.Model],
     dataset: dsl.Input[dsl.Dataset],
-    output: dsl.Output[return_type.integration],
+    output: dsl.Output[{return_type.integration}],
     sensitive: List[str],
     {param_name}: Dict[str, any] = defaults
 ):
@@ -147,6 +146,10 @@ def kfp_method(
 def loader(
     namespace, version, ltype=None, python=_default_packages, packages=_default_packages
 ):
+    import kfp.dsl.executor
+    from mammoth import custom_kfp
+    import yaml
+
     def wrapper(method, ltype):
         # prepare the kfp wrapper given decorator arguments
         name = method.__name__  # will use this as the component id
@@ -171,7 +174,7 @@ def loader(
             true_func=method,
             base_image=base_image,
             target_image=target_image,
-            packages_to_install=["mammoth-commons"] + list(packages),
+            packages_to_install=["mammoth-commons[deployment]"] + list(packages),
         )
 
         # find signature and check that we can obtain the integration type from the returned type
@@ -230,8 +233,9 @@ def loader(
         exec_context.update(locals())
         # create the kfp method to be wrapped
         exec(f"""
+from kfp import dsl
 def kfp_method(
-    output: dsl.Output[return_type.integration],
+    output: dsl.Output[{return_type.integration}],
     {param_name}: Dict[str, any] = defaults,
 ) -> str:
     parameters = {param_name}

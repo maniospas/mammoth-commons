@@ -8,7 +8,7 @@ import fairbench as fb
 
 @metric(
     namespace="maniospas",
-    version="v001",
+    version="v003",
     python="3.11",
     packages=("fairbench",)
 )

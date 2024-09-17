@@ -2,7 +2,7 @@ from kfp import dsl
 
 
 class Markdown:
-    integration = dsl.Markdown
+    integration = "dsl.Markdown"
 
     def __init__(self, text):
             self.text = text

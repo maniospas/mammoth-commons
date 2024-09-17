@@ -5,7 +5,10 @@ import numpy as np
 import zipfile
 
 
-@loader(namespace="maniospas", version="v003", python="3.11")
+@loader(namespace="arjunroy",
+        version="v003",
+        python="3.11",
+        packages=("onnxruntime",))
 def model_onnx_ensemble(path: str = "") -> ONNXEnsemble:
     """This is an ONNX_Ensemble loader."""
 
