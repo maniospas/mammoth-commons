@@ -6,6 +6,11 @@ The library holds common datatypes that are shared between
 components, and automates the integration strategy by only
 needing to add a decorator.
 
+## :microscope: Investigate fairness
+
+This repo includes a thinned down variation of the MAMMOth toolkit
+that you can quickly install and run locally.
+
 ## :clipboard: Catalogue
 
 Find a catalogue of modules implemented by the MAMMOth consortium

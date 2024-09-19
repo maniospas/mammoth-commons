@@ -7,9 +7,9 @@ from mammoth.externals import safeexec
     namespace="gsarridis",
     version="v001",
     python="3.11",
-    packages=("torch", "torchvision")
+    packages=("torch", "torchvision"),
 )
-def data_images(
+def data_image_pairs(
     path: str = "",
     root_dir: str = "./",
     target: str = "",
@@ -17,10 +17,10 @@ def data_images(
     batch_size: int = 4,
     shuffle: bool = False,
     img1_path_format: str = "{root}/{col}/{id}.png",
-    img2_path_format: str = "{root}/{col}/{id}.png"
+    img2_path_format: str = "{root}/{col}/{id}.png",
 ) -> ImagePairs:
     """
-    Creates a Dataset for loading image pairs declared in a CSV file.
+    Loads image pairs declared in a CSV file.
     The expected format is to have the first image's identifier in the first column,
     and the second image's identifier in the second column, Sensitive attributes
     can be selected from the rest of the columns. The images identifiers read from the columns
@@ -29,21 +29,19 @@ def data_images(
     to refer to the column entry.
 
     Args:
-        path (str): The path to the CSV file containing information about the dataset.
-        root_dir (str): The root directory where the actual image files are stored.
-        target (str): Indicates the predictive attribute in the dataset.
-        data_transform (str): A path or implementation of a torchvision data transform.
-        batch_size (int): The number of image pairs in each batch. Default is 4.
-        shuffle (bool): Whether to shuffle the dataset. Default is False.
-        img1_path_format (str): The first image path format. Default is "{root}/{col}/{id}.png".
-        img2_path_format (str): The second image path format. Default is "{root}/{col}/{id}.png".
-    Returns:
-        Image dataset.
+        path: The path to the CSV file containing information about the dataset.
+        root_dir: The root directory where the actual image files are stored.
+        target Indicates the predictive attribute in the dataset.
+        data_transform: A path or implementation of a torchvision data transform.
+        batch_size: The number of image pairs in each batch. Default is 4.
+        shuffle: Whether to shuffle the dataset. Default is False.
+        img1_path_format: The first image path format. Default is "{root}/{col}/{id}.png".
+        img2_path_format: The second image path format. Default is "{root}/{col}/{id}.png".
     """
 
-    data_transform = safeexec(data_transform,
-                              out="transform",
-                              whitelist=["torchvision"])
+    data_transform = safeexec(
+        data_transform, out="transform", whitelist=["torchvision"]
+    )
 
     dataset = ImagePairs(
         path=path,

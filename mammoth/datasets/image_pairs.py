@@ -3,9 +3,17 @@ from mammoth.datasets import Dataset
 
 
 class ImagePairs(Dataset):
-    def __init__(self, path, root_dir, target, data_transform, batch_size, shuffle,
-                img1_path_format: str = "{root}/{col}/{id}.png",
-                img2_path_format: str = "{root}/{col}/{id}.png"):
+    def __init__(
+        self,
+        path,
+        root_dir,
+        target,
+        data_transform,
+        batch_size,
+        shuffle,
+        img1_path_format: str = "{root}/{col}/{id}.png",
+        img2_path_format: str = "{root}/{col}/{id}.png",
+    ):
         """
         Args:
             path (str): Path to the CSV file with annotations (should involve the columns img1_name|img2_name|attribute1|...|attributeN).
@@ -28,7 +36,9 @@ class ImagePairs(Dataset):
     def to_torch(self, sensitive: List[str]):
         # dynamic dependencies here to not force a torch dependency on commons from components that don't need it
         from torch.utils.data import DataLoader
-        from mammoth.datasets.backend.torch_implementations import PytorchImagePairsDataset
+        from mammoth.datasets.backend.torch_implementations import (
+            PytorchImagePairsDataset,
+        )
 
         torch_dataset = PytorchImagePairsDataset(
             csv_path=self.path,
@@ -37,7 +47,7 @@ class ImagePairs(Dataset):
             sensitive=sensitive,
             data_transform=self.data_transform,
             img1_path_format=self.img1_path_format,
-            img2_path_format=self.img2_path_format
+            img2_path_format=self.img2_path_format,
         )
 
         return DataLoader(

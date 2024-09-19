@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<form method="post" id="analysis-form">
+    <div class="form-group">
+        <select class="form-control form-dropdown" name="analysis_method" id="analysis_method" onchange="updateAnalysisParameters()">
+            <option value="" disabled>Choose an analysis method</option>
+            {% for name, fields in analysis_methods.items() %}
+                <option value="{{ name }}" {% if name == preselected_method %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+        </select>
+
+    </div>
+
+    <div class="card card-body">
+        <p id="analysis-description">Analysis parameters will appear here.</p>
+        <div id="analysis-parameters-container"></div>
+    </div>
+
+    <div class="card card-body mt-3">
+        <div class="form-group">
+            <h5>Sensitive attributes</h5>
+            <p>Add and remove which of the available data attributes should be considered sensitive during analysis.</p>
+            <div id="sensitive-attributes-container">
+            </div>
+            <button type="button" class="btn btn-info" onclick="addSensitiveAttribute()">+</button>
+        </div>
+    </div>
+
+    <div class="form-group card card-body mt-3">
+        <h5>Analysis name</h5>
+        <p>Describe what kind of fairness analysis you are doing. This cannot change once the task starts running.</p>
+        <input type="text" class="form-control" id="task_name" name="task_name" value="{{ default_task_name }}" required>
+    </div>
+
+    <button type="submit" class="btn btn-success btn-lg btn-block mt-5">Start</button>
+</form>
+
+
+<div class="steps d-flex flex-wrap flex-sm-nowrap justify-content-between padding-top-2x padding-bottom-1x mt-3">
+  <div class="step completed">
+    <div class="step-icon-wrap">
+      <div class="step-icon">1</div>
+    </div>
+    <h4 class="step-title">Load data</h4>
+  </div>
+  <div class="step completed">
+    <div class="step-icon-wrap">
+      <div class="step-icon">2</div>
+    </div>
+    <h4 class="step-title">Load model</h4>
+  </div>
+  <div class="step completed">
+    <div class="step-icon-wrap">
+      <div class="step-icon">3</div>
+    </div>
+    <h4 class="step-title">Analysis type</h4>
+  </div>
+</div>
+
+
+<script>
+    const analysisMethods = JSON.parse('{{ analysis_methods|tojson|safe }}');
+    const sensitiveAttributes = JSON.parse('{{ sensitive_attributes|tojson|safe }}');  // Load sensitive attributes from the backend
+
+    function updateAnalysisParameters() {
+        const methodName = document.getElementById('analysis_method').value;
+        const parametersContainer = document.getElementById('analysis-parameters-container');
+        parametersContainer.innerHTML = '';
+        document.getElementById('analysis-description').innerHTML = analysisMethods[methodName].description;
+
+        if (analysisMethods[methodName]) {
+            const fields = analysisMethods[methodName].parameters;
+            for (const [param, type, def, title_text] of fields) {
+                const existingValue = "{{ prefilled_parameters[param] | default('None') }}";  // Pull pre-filled value from backend
+                const inputGroup = createInputField(param, type, existingValue !== 'None' ? existingValue : def, title_text);
+                parametersContainer.appendChild(inputGroup);
+            }
+        }
+    }
+
+
+
+    function createInputField(param, type, def, title_text) {
+        const div = document.createElement('div');
+        div.className = 'form-group';
+        div.style.display = 'flex'; // Use flexbox to arrange elements horizontally
+
+        if (type === 'bool') {
+            const label = document.createElement('span');
+            label.innerHTML = title_text;
+            label.htmlFor = param;
+            label.style.marginRight = '10px'; // Add some margin for spacing
+            label.style.width = '210px';
+
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.name = param;
+            input.id = param;
+            if (def === true) input.checked = true;
+
+            div.appendChild(label);
+            div.appendChild(input);
+        } else if (type === 'url') {
+            const title = document.createElement('span');
+            title.innerHTML = title_text;
+            title.htmlFor = param;
+            title.style.marginRight = '10px'; // Add some margin for spacing
+            title.style.width = '250px';
+
+            const urlInput = document.createElement('input');
+            urlInput.type = 'text';
+            urlInput.name = param;
+            urlInput.className = 'form-control';
+            urlInput.placeholder = 'Enter a URL or file path';
+            urlInput.required = true;
+            urlInput.value = def !== 'None' ? def : '';
+
+            const browseButton = document.createElement('button');
+            browseButton.type = 'button';
+            browseButton.className = 'btn btn-secondary';
+            browseButton.innerHTML = '<i class="bi bi-folder"></i>';
+            browseButton.style.marginLeft = '10px'; // Add some margin for spacing
+
+            browseButton.addEventListener('click', () => {
+                const fileInput = document.getElementById('hiddenFileInput');
+                fileInput.click();
+
+                fileInput.addEventListener('change', () => {
+                    if (fileInput.files.length > 0) {
+                        urlInput.value = `.../${fileInput.files[0].name}`;
+                        checkFormCompletion();
+                    }
+                });
+            });
+
+            div.appendChild(title);
+            div.appendChild(urlInput);
+            div.appendChild(browseButton);
+        } else {
+            const title = document.createElement('span');
+            title.innerHTML = title_text;
+            title.htmlFor = param;
+            title.style.marginRight = '10px'; // Add some margin for spacing
+            title.style.width = '250px';
+
+            const input = document.createElement('input');
+            input.className = 'form-control';
+            input.name = param;
+            //input.placeholder = param.charAt(0).toUpperCase() + param.slice(1);
+            if (def != 'None') input.value = def;
+
+            switch (type) {
+                case 'str':
+                    input.type = 'text';
+                    break;
+                case 'int':
+                    input.type = 'number';
+                    input.step = '1';
+                    break;
+                case 'float':
+                    input.type = 'number';
+                    input.step = 'any';
+                    break;
+                default:
+                    input.type = 'text';
+            }
+            input.required = true;
+            input.addEventListener('input', checkFormCompletion);
+
+            div.appendChild(title);
+            div.appendChild(input);
+        }
+
+        return div;
+    }
+
+    function addSensitiveAttribute(prefilledValue = null) {
+        const container = document.getElementById('sensitive-attributes-container');
+        const selectGroup = document.createElement('div');
+        selectGroup.className = 'input-group mb-2';
+
+        const select = document.createElement('select');
+        select.name = 'sensitive_attributes';
+        select.className = 'form-control';
+        select.placeholder = 'Select sensitive attribute';
+
+        // Populate dropdown options with sensitive attributes
+        sensitiveAttributes.forEach(attribute => {
+            const option = document.createElement('option');
+            option.value = attribute;
+            option.textContent = attribute;
+            if (attribute === prefilledValue) {
+                option.selected = true;  // Pre-select if it matches the prefilled value
+            }
+            select.appendChild(option);
+        });
+
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.className = 'btn btn-danger';
+        removeButton.textContent = '-';
+        removeButton.onclick = function() {
+            container.removeChild(selectGroup);
+        };
+
+        selectGroup.appendChild(select);
+        selectGroup.appendChild(removeButton);
+        container.appendChild(selectGroup);
+    }
+
+    // Pre-fill existing sensitive attributes
+    const prefilledSensitiveAttributes = JSON.parse('{{ prefilled_sensitive_attributes | tojson | safe }}');
+    prefilledSensitiveAttributes.forEach(attr => addSensitiveAttribute(attr));
+</script>
+
+</script>
+{% endblock %}

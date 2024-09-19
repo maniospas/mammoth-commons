@@ -6,11 +6,29 @@ import torch
 
 
 @loader(namespace="gsarridis", version="v003", python="3.11")
-def model_torch(model: str = "", state: str = "") -> Pytorch:
-    """This is an PYTORCH model loader."""
+def model_torch(
+    state_path: str = "",
+    model_path: str = "",
+    model_name: str = "model",
+    safe_libraries: str = "torch, torchvision",
+) -> Pytorch:
+    """Loads a pytorch model that comprises a Python code initializing the
+    architecture and a file of trained parameters. For safety, the architecture's
+    definition is allowed to directly import only specified libraries.
 
-    model = safeexec(model, out="model", whitelist=["torchvision", "torch"])
+    Args:
+        state_path: The path in which the architecture's state is stored.
+        model_path: The path in which the architecture's initialization script resides. Alternatively, you may also just paste the initialization code in this field.
+        model_name: The variable in the model path's script to which the architecture is assigned.
+        safe_libraries: A comma-separated list of libraries that can be imported.
+    """
 
-    model.load_state_dict(torch.load(state))
+    model = safeexec(
+        model_path,
+        out=model_name,
+        whitelist=[lib.strip() for lib in safe_libraries.split(",")],
+    )
+
+    model.load_state_dict(torch.load(state_path))
 
     return Pytorch(model)

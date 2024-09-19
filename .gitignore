@@ -9,3 +9,4 @@ runtime-requirements.txt
 *.pyc
 __pycache__/
 fairbench.log
+history.json

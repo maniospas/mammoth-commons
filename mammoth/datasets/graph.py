@@ -4,8 +4,11 @@ from mammoth.datasets.dataset import Dataset
 class Graph(Dataset):
     def __init__(self, graph, communities: dict):
         import pygrank as pg
+
         self.graph = graph
-        self.communities = {str(k): pg.to_signal(graph, v) for k, v in communities.items()}
+        self.communities = {
+            str(k): pg.to_signal(graph, v) for k, v in communities.items()
+        }
         self.labels = None
         self.categorical = set(self.communities.keys())
 

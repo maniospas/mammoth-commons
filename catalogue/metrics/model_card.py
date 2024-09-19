@@ -6,18 +6,23 @@ from mammoth.integration import metric
 import fairbench as fb
 
 
-@metric(
-    namespace="maniospas",
-    version="v007",
-    python="3.11",
-    packages=("fairbench",)
-)
+@metric(namespace="maniospas", version="v007", python="3.11", packages=("fairbench",))
 def model_card(
     dataset: CSV,
     model: ONNX,
     sensitive: List[str],
+    prule: bool = True,
+    worst_accuracy: bool = True,
 ) -> Markdown:
-    """Creates a model card using FairBench."""
+    """Creates a model card using FairBench.
+    The created model card includes caveats and recommendations from a socio-technical database and
+    may include the evaluation of several fairness stamps. All stamps consider all pairs of population
+    groups or subgraphs.
+
+    Args:
+        prule: The worst ratio between group positive rates.
+        worst_accuracy: The worst accuracy among groups.
+    """
     for attr in sensitive:
         if attr not in dataset.categorical:
             raise Exception(
@@ -26,10 +31,11 @@ def model_card(
 
     # obtain predictions
     if hasattr(model, "predict_fair"):
-        predictions = model.predict_fair(dataset.to_features(), dataset.to_features(sensitive))
+        predictions = model.predict_fair(
+            dataset.to_features(), dataset.to_features(sensitive)
+        )
     else:
         predictions = model.predict(dataset.to_features())
-
 
     # declare sensitive attributes
     labels = dataset.labels

@@ -32,7 +32,5 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     install_requires=requirements,
-    extras_require={
-        "deployment": deployment_requirements
-    },
+    extras_require={"deployment": deployment_requirements},
 )

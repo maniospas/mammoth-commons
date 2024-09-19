@@ -5,7 +5,7 @@ import re
 
 def _encode_image_to_base64(filepath):
     with open(filepath, "rb") as image_file:
-        encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+        encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
     return encoded_string
 
 
@@ -21,7 +21,7 @@ def _replace_emojis(text):
         ":fire:": "🔥",
         ":tada:": "🎉",
         ":clap:": "👏",
-        ":heavy_check_mark:": "✔️"
+        ":heavy_check_mark:": "✔️",
     }
     pattern = re.compile("|".join(re.escape(key) for key in emoji_patterns.keys()))
     return pattern.sub(lambda m: emoji_patterns[m.group(0)], text)
@@ -33,18 +33,26 @@ def _highlight_code(html_content):
         from pygments.lexers import get_lexer_by_name
         from pygments.formatters import HtmlFormatter
 
-        code_block_pattern = re.compile(r'<pre><code class="language-(\w+)">(.*?)</code></pre>', re.DOTALL)
+        code_block_pattern = re.compile(
+            r'<pre><code class="language-(\w+)">(.*?)</code></pre>', re.DOTALL
+        )
+
         def replace_code_block(match):
             lang = match.group(1)
-            code = match.group(2).replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&')
+            code = (
+                match.group(2)
+                .replace("&lt;", "<")
+                .replace("&gt;", ">")
+                .replace("&amp;", "&")
+            )
             lexer = get_lexer_by_name(lang)
             formatter = HtmlFormatter()
             return highlight(code, lexer, formatter)
+
         return code_block_pattern.sub(replace_code_block, html_content)
     except:
         print("Consider install pygments (pip install pygments) to highlight HTML code")
         return html_content
-
 
 
 class HTML:
@@ -74,11 +82,15 @@ class HTML:
         def run_server():
             with socketserver.TCPServer(("", port), CustomHandler) as httpd:
                 # Open the web browser after the server starts
-                webbrowser.open(f'http://localhost:{port}')
+                webbrowser.open(f"http://localhost:{port}")
                 if shutdown:
-                    print(f"Temporarily serving at port {port} (use shutdown=False to make this permanent)")
+                    print(
+                        f"Temporarily serving at port {port} (use shutdown=False to make this permanent)"
+                    )
                 else:
-                    print(f"Serving at port {port} (use shutdown=True to make this temporary)")
+                    print(
+                        f"Serving at port {port} (use shutdown=True to make this temporary)"
+                    )
                 httpd.serve_forever()
                 if shutdown:
                     httpd.shutdown()

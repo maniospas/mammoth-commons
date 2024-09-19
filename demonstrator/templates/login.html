@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="jumbotron text-center">
+    <h1>MAMMOth-commons</h1>
+    <p>Fairness analysis of models and datasets. This application demonstrates base functionality offered by the modules of the MAMMOth <a href="https://github.com/mammoth-eu/mammoth-toolkit-releases">bias toolkit</a>.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <form method="POST" action="{{ url_for('login') }}">
+            <div class="form-group">
+                <label for="admin_name">Admin Name</label>
+                <input type="text" class="form-control" id="admin_name" name="admin_name" placeholder="Enter admin name" required>
+            </div>
+            <div class="form-group mt-3">
+                <label for="admin_password">Password</label>
+                <input type="password" class="form-control" id="admin_password" name="admin_password" placeholder="Enter password" required>
+            </div>
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-primary btn-lg">Login</button>
+            </div>
+
+            {% if error %}
+            <div class="alert alert-danger mt-3" role="alert">
+                {{ error }}
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -9,6 +9,7 @@ class ONNX(Model):
 
     def predict(self, x):
         import onnxruntime as rt
+
         sess = rt.InferenceSession(self.model_bytes, providers=["CPUExecutionProvider"])
         input_name = sess.get_inputs()[0].name
         label_name = sess.get_outputs()[0].name

@@ -9,15 +9,21 @@ class ONNXEnsemble(Model):
         self.params = params
 
     def _extract_number(self, filename):
-        match = re.search(r'_(\d+)\.onnx$', filename)
-        return int(match.group(1)) if match else float('inf')
+        match = re.search(r"_(\d+)\.onnx$", filename)
+        return int(match.group(1)) if match else float("inf")
 
     def predict(self, X):
         # n_classes = self.params['n_classes']
-        classes = self.params['classes'][:, np.newaxis]
+        classes = self.params["classes"][:, np.newaxis]
 
-        pred = sum((estimator.predict(X)== classes).T * w  for estimator, w in zip(self.models[:self.params['theta'] ], self.params['alphas'][:self.params['theta']]))
-        pred /= self.params['alphas'][:self.params['theta']].sum()
+        pred = sum(
+            (estimator.predict(X) == classes).T * w
+            for estimator, w in zip(
+                self.models[: self.params["theta"]],
+                self.params["alphas"][: self.params["theta"]],
+            )
+        )
+        pred /= self.params["alphas"][: self.params["theta"]].sum()
         pred[:, 0] *= -1
-        preds=classes.take(pred.sum(axis=1) > 0, axis=0)
-        return np.squeeze(preds,axis=1)
+        preds = classes.take(pred.sum(axis=1) > 0, axis=0)
+        return np.squeeze(preds, axis=1)

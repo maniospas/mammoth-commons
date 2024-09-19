@@ -20,11 +20,13 @@ def test_bias_exploration():
             "poutcome",
         ]
         sensitive = ["marital"]
-        dataset_uri = (
-            "https://archive.ics.uci.edu/static/public/222/bank+marketing.zip/bank/bank.csv"
-        )
+        dataset_uri = "https://archive.ics.uci.edu/static/public/222/bank+marketing.zip/bank/bank.csv"
         dataset = env.data_csv(
-            dataset_uri, categorical=categorical, numeric=numeric, labels="y", delimiter=";"
+            dataset_uri,
+            categorical=categorical,
+            numeric=numeric,
+            labels="y",
+            delimiter=";",
         )
 
         model_path = "file://localhost//" + os.path.abspath("./data/model.onnx")
@@ -32,5 +34,6 @@ def test_bias_exploration():
 
         markdown_result = env.model_card(dataset, model, sensitive)
         markdown_result.show()
+
 
 test_bias_exploration()

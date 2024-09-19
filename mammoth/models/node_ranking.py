@@ -16,7 +16,9 @@ class NodeRanking(Model):
         return self.ranker(x)
 
     def predict_fair(self, x, sensitive):
-        assert len(sensitive) == 1, "fair node ranking algorithms can only account for one sensitive attribute"
+        assert (
+            len(sensitive) == 1
+        ), "fair node ranking algorithms can only account for one sensitive attribute"
         import networkx as nx
         import pygrank as pg
 

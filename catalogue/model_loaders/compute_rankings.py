@@ -1,15 +1,11 @@
 from mammoth.integration import loader
-from mammoth.models.ranking import Ranking
+from mammoth.models.node_ranking import NodeRanking
 
 
-@loader(
-    namespace="mammotheu",
-    version="v003",
-    python="3.11"
-)
-def normal_ranking_model(
+@loader(namespace="maniospas", version="v003", python="3.11")
+def model_normal_ranking(
     path: str,
-) -> Ranking:
+) -> NodeRanking:
     """This is a Ranking loader"""
 
-    return Ranking(path)
+    return NodeRanking(path)

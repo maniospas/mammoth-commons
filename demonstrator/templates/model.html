@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<form method="post" id="task-form-model" enctype="multipart/form-data">
+    <div class="row mt-3">
+        <!-- Model Loader Column -->
+        <div class="col-md-12">
+            <div class="form-group">
+                <select class="form-control form-dropdown" name="model_loader" id="model_loader" onchange="updateModelParameters()">
+                    <option value="" disabled {% if not selected_model_loader %}selected{% endif %}>Choose a model loader</option>
+                    {% for name, fields in model_loaders.items() %}
+                        <option value="{{ name }}" {% if selected_model_loader and selected_model_loader == name %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="card card-body">
+                <p id="model-description">The model's parameters will appear here.</p>
+                <div id="model-parameters"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group card card-body mt-3">
+        <h5>Analysis name</h5>
+        <p>Describe what kind of fairness analysis you are doing. This can be edited at all steps.</p>
+        <input type="text" class="form-control" id="task_name" name="task_name" value="{{ default_task_name }}" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg btn-block mt-5" id="next-button-model" disabled>Next</button>
+</form>
+
+
+<div class="steps d-flex flex-wrap flex-sm-nowrap justify-content-between padding-top-2x padding-bottom-1x mt-3">
+  <div class="step completed">
+    <div class="step-icon-wrap">
+      <div class="step-icon">1</div>
+    </div>
+    <h4 class="step-title">Load data</h4>
+  </div>
+  <div class="step completed">
+    <div class="step-icon-wrap">
+      <div class="step-icon">2</div>
+    </div>
+    <h4 class="step-title">Load model</h4>
+  </div>
+  <div class="step">
+    <div class="step-icon-wrap">
+      <div class="step-icon">3</div>
+    </div>
+    <h4 class="step-title">Analysis type</h4>
+  </div>
+</div>
+
+<script>
+    const modelLoaders = JSON.parse('{{ model_loaders|tojson|safe }}');
+    const selectedParameters = {{ selected_parameters|tojson|safe }};  // Pre-fill parameters from the task
+
+    function updateModelParameters() {
+        const loaderName = document.getElementById('model_loader').value;
+        const parametersContainer = document.getElementById('model-parameters');
+        parametersContainer.innerHTML = '';
+        document.getElementById('model-description').innerHTML = modelLoaders[loaderName].description;
+
+        if (modelLoaders[loaderName]) {
+            const fields = modelLoaders[loaderName].parameters;
+            for (const param of fields) {
+                if(selectedParameters) {
+                    const inputGroup = createInputField(param[0], param[1], param[2], param[3], selectedParameters[param[0]]);
+                    parametersContainer.appendChild(inputGroup);
+                }
+                else {
+                    const inputGroup = createInputField(param[0], param[1], param[2], param[3]);
+                    parametersContainer.appendChild(inputGroup);
+                }
+            }
+        }
+
+        checkFormCompletion();
+    }
+
+    function checkFormCompletion() {
+        const form = document.getElementById('task-form-model');
+        const button = document.getElementById('next-button-model');
+        const modelLoader = document.getElementById('model_loader');
+        const requiredInputs = form.querySelectorAll('input[required]');
+
+        let allFilled = modelLoader.value !== "";
+
+        // Check if all required inputs are filled
+        requiredInputs.forEach(input => {
+            if (!input.value.trim()) {
+                allFilled = false;
+            }
+        });
+
+        // Enable/Disable the button based on form completion
+        button.disabled = !allFilled;
+    }
+
+    function createInputField(param, type, def, title_text, existingValue = null) {
+        const div = document.createElement('div');
+        div.className = 'form-group';
+        div.style.display = 'flex';
+
+        const value = existingValue !== null ? existingValue : def;  // Use existing value if available
+
+        if (type === 'bool') {
+            const label = document.createElement('span');
+            label.innerHTML = title_text;
+            label.htmlFor = param;
+            label.style.marginRight = '10px';
+            label.style.width = '210px';
+
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.name = param;
+            input.id = param;
+            if (value === true) input.checked = true;
+
+            div.appendChild(label);
+            div.appendChild(input);
+        } else if (type === 'url') {
+            const title = document.createElement('span');
+            title.innerHTML = title_text;
+            title.htmlFor = param;
+            title.style.marginRight = '10px';
+            title.style.width = '250px';
+
+            const urlInput = document.createElement('input');
+            urlInput.type = 'text';
+            urlInput.name = param;
+            urlInput.className = 'form-control';
+            urlInput.placeholder = 'Enter a URL or file path';
+            urlInput.required = true;
+            urlInput.value = value !== 'None' ? value : '';
+
+            const browseButton = document.createElement('button');
+            browseButton.type = 'button';
+            browseButton.className = 'btn btn-secondary';
+            browseButton.innerHTML = '<i class="bi bi-folder"></i>';
+            browseButton.style.marginLeft = '10px';
+
+            browseButton.addEventListener('click', () => {
+                const fileInput = document.getElementById('hiddenFileInput');
+                fileInput.click();
+
+                fileInput.addEventListener('change', () => {
+                    if (fileInput.files.length > 0) {
+                        urlInput.value = `file://${fileInput.files[0].name}`;
+                        checkFormCompletion();
+                    }
+                });
+            });
+
+            div.appendChild(title);
+            div.appendChild(urlInput);
+            div.appendChild(browseButton);
+        } else {
+            const title = document.createElement('span');
+            title.innerHTML = title_text;
+            title.htmlFor = param;
+            title.style.marginRight = '10px';
+            title.style.width = '250px';
+
+            const input = document.createElement('input');
+            input.className = 'form-control';
+            input.name = param;
+
+            switch (type) {
+                case 'str':
+                    input.type = 'text';
+                    break;
+                case 'int':
+                    input.type = 'number';
+                    input.step = '1';
+                    break;
+                case 'float':
+                    input.type = 'number';
+                    input.step = 'any';
+                    break;
+                default:
+                    input.type = 'text';
+            }
+            input.value = value !== 'None' ? value : '';
+            input.required = true;
+            input.addEventListener('input', checkFormCompletion);
+
+            div.appendChild(title);
+            div.appendChild(input);
+        }
+
+        return div;
+    }
+
+    // Preload model parameters if a model was previously selected
+    if (selectedParameters) {
+        updateModelParameters();
+    }
+
+</script>
+{% endblock %}
