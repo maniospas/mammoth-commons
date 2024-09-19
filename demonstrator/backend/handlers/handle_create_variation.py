@@ -4,7 +4,7 @@ import traceback
 from datetime import datetime
 
 
-def handle_create_variation_get(database, task_id):
+def handle_create_variation_get(database, task_id, error_title=None, error_message=None):
     base_task = database.get(task_id)
     if not base_task:
         return redirect(url_for("index"))
@@ -20,7 +20,9 @@ def handle_create_variation_get(database, task_id):
         "new_task.html",
         dataset_loaders=dataset_loaders,
         base_task=base_task,
-        default_task_name=base_task.get("name", "Task " + base_task["id"])
+        default_task_name=base_task.get("name", "Task " + base_task["id"]),
+        error_title=error_title,
+        error_message=error_message
     )
 
 
@@ -67,14 +69,10 @@ def handle_create_variation_post(request, database, task_id):
         new_task["modified"] = datetime.now().strftime("%Y-%m-%d %H:%M")
         new_task["status"] = "failed"
         traceback.print_exception(e)
-        return (
-            render_template(
-                "500.html",
-                title="Error loading dataset",
-                message=str(e),
-                task_id=new_task_id,
-            ),
-            500,
+        return handle_create_variation_get(
+            database=database,
+            task_id=new_task_id,
+            error_title="Error loading dataset",
+            error_message=str(e)
         )
-
     return redirect(url_for("select_model", task_id=new_task_id))

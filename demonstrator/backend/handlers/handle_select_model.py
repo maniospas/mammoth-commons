@@ -4,7 +4,7 @@ import traceback
 from datetime import datetime
 
 
-def handle_select_model_get(database, task_id):
+def handle_select_model_get(database, task_id, error_title=None, error_message=None):
     task = database.get(task_id)
     if not task:
         return redirect(url_for("index"))
@@ -24,7 +24,9 @@ def handle_select_model_get(database, task_id):
         task_id=task_id,
         selected_model_loader=selected_model_loader,
         selected_parameters=selected_parameters,
-        default_task_name=task.get("name", "Task " + task["id"])
+        default_task_name=task.get("name", "Task " + task["id"]),
+        error_title=error_title,
+        error_message=error_message
     )
 
 
@@ -51,13 +53,9 @@ def handle_select_model_post(request, database, task_id):
         task["modified"] = datetime.now().strftime("%Y-%m-%d %H:%M")
         task["status"] = "failed"
         traceback.print_exception(e)
-        return (
-            render_template(
-                "500.html",
-                title="Error loading model",
-                message=str(e),
-                task_id=task_id,
-            ),
-            500,
-        )
+        return handle_select_model_get(
+            database=database,
+            task_id=task_id,
+            error_title="Error loading model",
+            error_message=str(e))
     return redirect(url_for("fairness_analysis", task_id=task_id))

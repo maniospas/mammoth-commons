@@ -27,6 +27,13 @@
         <input type="text" class="form-control" id="task_name" name="task_name" value="{{ default_task_name }}" required>
     </div>
 
+    {% if error_title %}
+    <div class="alert alert-danger" role="alert">
+        <h3>{{ error_title }}</h3>
+        {{ error_message }}
+    </div>
+    {% endif %}
+
     <button type="submit" class="btn btn-primary btn-lg btn-block mt-5" id="next-button-model" disabled>Next</button>
 </form>
 

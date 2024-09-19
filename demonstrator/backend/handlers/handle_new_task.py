@@ -43,14 +43,13 @@ def handle_new_task_post(request, database):
         task["modified"] = datetime.now().strftime("%Y-%m-%d %H:%M")
         task["status"] = "failed"
         traceback.print_exception(e)
-        return (
-            render_template(
-                "500.html",
-                title="Error loading dataset",
-                message=str(e),
-                task_id=task_id,
-            ),
-            500,
+        return render_template(
+            "new_task.html",
+            error_title="Error loading dataset",
+            error_message=str(e),
+            dataset_loaders=dataset_loaders,
+            base_task=task,
+            default_task_name=task.get("name", "Task " + task["id"])
         )
 
     return redirect(url_for("select_model", task_id=task_id))

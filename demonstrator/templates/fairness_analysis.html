@@ -35,6 +35,13 @@
         <input type="text" class="form-control" id="task_name" name="task_name" value="{{ default_task_name }}" required>
     </div>
 
+    {% if error_title %}
+    <div class="alert alert-danger" role="alert">
+        <h3>{{ error_title }}</h3>
+        {{ error_message }}
+    </div>
+    {% endif %}
+
     <button type="submit" class="btn btn-success btn-lg btn-block mt-5">Start</button>
 </form>
 
@@ -214,7 +221,6 @@
     // Pre-fill existing sensitive attributes
     const prefilledSensitiveAttributes = JSON.parse('{{ prefilled_sensitive_attributes | tojson | safe }}');
     prefilledSensitiveAttributes.forEach(attr => addSensitiveAttribute(attr));
-</script>
-
+    updateAnalysisParameters();
 </script>
 {% endblock %}
