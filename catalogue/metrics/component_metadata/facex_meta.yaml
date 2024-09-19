@@ -1,7 +1,8 @@
 id: facex
 name: facex
 description: "Write your metric's description here.\n\n    Args:\n        target_class:\
-  \ The target class.\n        target_layer: The layer to be explained.\n    "
+  \ The integer identifier of the target class.\n        target_layer: The layer to\
+  \ be explained.\n    "
 parameter_info: Some parameters are needed.
 component_type: METRIC
 input_types:

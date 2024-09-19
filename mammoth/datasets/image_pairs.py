@@ -11,6 +11,7 @@ class ImagePairs(Dataset):
         data_transform,
         batch_size,
         shuffle,
+        cols,
         img1_path_format: str = "{root}/{col}/{id}.png",
         img2_path_format: str = "{root}/{col}/{id}.png",
     ):
@@ -32,6 +33,7 @@ class ImagePairs(Dataset):
         self.shuffle = shuffle
         self.img1_path_format = img1_path_format
         self.img2_path_format = img2_path_format
+        self.cols = cols
 
     def to_torch(self, sensitive: List[str]):
         # dynamic dependencies here to not force a torch dependency on commons from components that don't need it
