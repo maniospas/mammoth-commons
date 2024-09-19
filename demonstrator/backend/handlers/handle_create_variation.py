@@ -4,7 +4,9 @@ import traceback
 from datetime import datetime
 
 
-def handle_create_variation_get(database, task_id, error_title=None, error_message=None):
+def handle_create_variation_get(
+    database, task_id, error_title=None, error_message=None
+):
     base_task = database.get(task_id)
     if not base_task:
         return redirect(url_for("index"))
@@ -22,7 +24,7 @@ def handle_create_variation_get(database, task_id, error_title=None, error_messa
         base_task=base_task,
         default_task_name=base_task.get("name", "Task " + base_task["id"]),
         error_title=error_title,
-        error_message=error_message
+        error_message=error_message,
     )
 
 
@@ -33,7 +35,9 @@ def handle_create_variation_post(request, database, task_id):
 
     dataset_loader_name = request.form["dataset_loader"]
     dataset_parameters = {
-        key: request.form[key] for key in request.form if key != "dataset_loader" and key != "task_name"
+        key: request.form[key]
+        for key in request.form
+        if key != "dataset_loader" and key != "task_name"
     }
     call_parameters = {
         key: value
@@ -52,7 +56,7 @@ def handle_create_variation_post(request, database, task_id):
         "sensitive_attributes": base_task.get("sensitive_attributes", list()),
         "name": request.form["task_name"],
         "status": "created",
-        "modified": datetime.now().strftime("%Y-%m-%d %H:%M")
+        "modified": datetime.now().strftime("%Y-%m-%d %H:%M"),
     }
 
     if base_task["status"] == "completed":
@@ -73,6 +77,6 @@ def handle_create_variation_post(request, database, task_id):
             database=database,
             task_id=new_task_id,
             error_title="Error loading dataset",
-            error_message=str(e)
+            error_message=str(e),
         )
     return redirect(url_for("select_model", task_id=new_task_id))

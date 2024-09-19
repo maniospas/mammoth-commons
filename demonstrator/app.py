@@ -15,8 +15,9 @@ if __name__ == "__main__":
         initialize_routes(app, database)
         print(f"Running mammoth-commons demonstrator at http://{host}:{port}")
         webbrowser.open(f"http://{host}:{port}", new=0, autoraise=True)
-        app.run(host=host,
-                port=port,
-                debug=False,  # debug mode creates database saving issues due to multiple instances running
-                load_dotenv=False)
-
+        app.run(
+            host=host,
+            port=port,
+            debug=False,  # debug mode creates database saving issues due to multiple instances running
+            load_dotenv=False,
+        )

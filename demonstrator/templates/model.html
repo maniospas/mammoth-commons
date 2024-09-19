@@ -123,7 +123,11 @@
             input.type = 'checkbox';
             input.name = param;
             input.id = param;
-            if (value === true) input.checked = true;
+            input.addEventListener('change', function() {
+                input.value = input.checked ? true : false;
+            });
+            input.checked = def === true;
+            input.value = def === true;
 
             div.appendChild(label);
             div.appendChild(input);

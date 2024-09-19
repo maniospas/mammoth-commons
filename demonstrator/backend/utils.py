@@ -13,6 +13,7 @@ def handle_error(error):
         500,
     )
 
+
 def handle_task_results(database, task_id):
     task = database.get(task_id)
     if not task:

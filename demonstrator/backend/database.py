@@ -41,7 +41,7 @@ class Database:
     def load_from_disk(self):
         with self._lock:
             if os.path.exists(self.path):
-                with open(self.path, 'r') as file:
+                with open(self.path, "r", encoding="utf-8") as file:
                     data = json.load(file)
                     self.tasks = data.get("tasks", dict())
                     self.task_count = data.get("task_count", 0)
@@ -54,11 +54,16 @@ class Database:
             for task in self.tasks.values():
                 for field in self.transient:
                     task[field] = None
-            with open(self.path, 'w') as file:
-                json.dump({
-                    "tasks": self.tasks,
-                    "task_count": self.task_count,
-                }, file, indent=2, ensure_ascii=False)
+            with open(self.path, "w", encoding="utf-8") as file:
+                json.dump(
+                    {
+                        "tasks": self.tasks,
+                        "task_count": self.task_count,
+                    },
+                    file,
+                    indent=2,
+                    ensure_ascii=False,
+                )
 
     def handle_exit(self, signum, frame):
         if self.transient:

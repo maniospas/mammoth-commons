@@ -11,22 +11,22 @@ def model_card(
     dataset: CSV,
     model: ONNX,
     sensitive: List[str],
-    prule: bool = True,
-    worst_accuracy: bool = True,
+    intersectional: bool = True,
+    pairwise_comparison: bool = True,
 ) -> Markdown:
-    """Creates a model card using FairBench.
-    The created model card includes caveats and recommendations from a socio-technical database and
-    may include the evaluation of several fairness stamps. All stamps consider all pairs of population
-    groups or subgraphs.
+    """Creates a model card using FairBench. The card includes as many fairness stamps as
+    applicable, and includes caveats and recommendations from a socio-technical database.
+    All stamps summarize the behavior across population groups or subgraphs,
+    where intersectional subgroups may be created for analysis of edge cases.
 
     Args:
-        prule: The worst ratio between group positive rates.
-        worst_accuracy: The worst accuracy among groups.
+        intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute.
+        pairwise_comparison: Whether to compare groups pairwise. Otherwise, each group is compared to the whole population.
     """
     for attr in sensitive:
         if attr not in dataset.categorical:
             raise Exception(
-                "Fairness analysis not supported on non-categorical attributes"
+                "Fairness analysis is not supported for non-categorical attributes"
             )
 
     # obtain predictions
@@ -43,8 +43,14 @@ def model_card(
         {attr: fb.categories @ dataset.data[attr] for attr in sensitive}
     )
 
+    # change behavior based on arguments
+    if intersectional:
+        sensitive = sensitive.intersectional()
+    report_type = fb.multireport if pairwise_comparison else fb.unireport
+
+    # perform different analysis, dependning on whether labels are provided
     if labels is None:
-        report = fb.multireport(predictions=predictions, sensitive=sensitive)
+        report = report_type(predictions=predictions, sensitive=sensitive)
         stamps = fb.combine(
             fb.stamps.prule(report),
             fb.stamps.four_fifths(report),
@@ -54,8 +60,8 @@ def model_card(
         text = ""
         for label in labels:
             # TODO: the following analysis is only for one class label
-            report = fb.multireport(
-                predictions=predictions, labels=label, sensitive=sensitive
+            report = report_type(
+                predictions=predictions, labels=labels[label].to_numpy(), sensitive=sensitive
             )
             stamps = fb.combine(
                 fb.stamps.prule(report),
@@ -63,8 +69,8 @@ def model_card(
                 fb.stamps.four_fifths(report),
                 fb.stamps.dfpr(report),
                 fb.stamps.dfnr(report),
-                fb.stamps.auc(report),
-                fb.stamps.abroca(report),
+                #fb.stamps.auc(report),
+                #fb.stamps.abroca(report),
             )
         text += fb.modelcards.tomarkdown(stamps)
     return Markdown(text)

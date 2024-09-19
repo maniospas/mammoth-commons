@@ -8,7 +8,9 @@ import traceback
 from datetime import datetime
 
 
-def handle_fairness_analysis_get(database, task_id, error_title=None, error_message=None):
+def handle_fairness_analysis_get(
+    database, task_id, error_title=None, error_message=None
+):
     task = database.get(task_id)
     if not task:
         return redirect(url_for("index"))
@@ -42,9 +44,9 @@ def handle_fairness_analysis_get(database, task_id, error_title=None, error_mess
         prefilled_parameters=prefilled_parameters,
         prefilled_sensitive_attributes=prefilled_sensitive_attributes,
         sensitive_attributes=task["dataset_loaded"].cols,
-        default_task_name=task.get("name", "Task "+task["id"]),
+        default_task_name=task.get("name", "Task " + task["id"]),
         error_title=error_title,
-        error_message=error_message
+        error_message=error_message,
     )
 
 
@@ -58,7 +60,9 @@ def handle_fairness_analysis_post(request, database, task_id):
     analysis_parameters = {
         key: request.form[key]
         for key in request.form
-        if key != "analysis_method" and key != "sensitive_attributes" and key!="task_name"
+        if key != "analysis_method"
+        and key != "sensitive_attributes"
+        and key != "task_name"
     }
 
     task["analysis_method"] = selected_method
@@ -69,12 +73,13 @@ def handle_fairness_analysis_post(request, database, task_id):
     task["modified"] = datetime.now().strftime("%Y-%m-%d %H:%M")
 
     try:
-        task["result"] = name_to_runnable[selected_method](
+        result = name_to_runnable[selected_method](
             task["dataset_loaded"],
             task["model_loaded"],
             sensitive_attributes,
             **analysis_parameters
-        ).text()
+        )
+        task["result"] = result.text()
         task["status"] = "completed"
         task["modified"] = datetime.now().strftime("%Y-%m-%d %H:%M")
     except (Exception, RuntimeError) as e:
@@ -85,6 +90,7 @@ def handle_fairness_analysis_post(request, database, task_id):
             database=database,
             task_id=task_id,
             error_title="Error during fairness analysis",
-            error_message=str(e))
+            error_message=str(e),
+        )
 
     return redirect(url_for("task_results", task_id=task_id))
