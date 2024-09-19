@@ -8,7 +8,7 @@ import traceback
 from datetime import datetime
 
 
-def handle_fairness_analysis_get(database, task_id):
+def handle_fairness_analysis_get(database, task_id, error_title=None, error_message=None):
     task = database.get(task_id)
     if not task:
         return redirect(url_for("index"))
@@ -42,7 +42,9 @@ def handle_fairness_analysis_get(database, task_id):
         prefilled_parameters=prefilled_parameters,
         prefilled_sensitive_attributes=prefilled_sensitive_attributes,
         sensitive_attributes=task["dataset_loaded"].cols,
-        default_task_name=task.get("name", "Task "+task["id"])
+        default_task_name=task.get("name", "Task "+task["id"]),
+        error_title=error_title,
+        error_message=error_message
     )
 
 
@@ -79,14 +81,10 @@ def handle_fairness_analysis_post(request, database, task_id):
         task["modified"] = datetime.now().strftime("%Y-%m-%d %H:%M")
         task["status"] = "failed"
         traceback.print_exception(e)
-        return (
-            render_template(
-                "500.html",
-                title="Error during fairness analysis",
-                message=str(e),
-                task_id=task_id,
-            ),
-            500,
-        )
+        return handle_fairness_analysis_get(
+            database=database,
+            task_id=task_id,
+            error_title="Error during fairness analysis",
+            error_message=str(e))
 
-    return redirect(url_for("index"))
+    return redirect(url_for("task_results", task_id=task_id))
