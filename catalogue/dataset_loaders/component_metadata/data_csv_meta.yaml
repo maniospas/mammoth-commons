@@ -4,16 +4,17 @@ description: "Loads a CSV file that contains numeric, categorical, and predictiv
   \ data columns.\n\n    Args:\n        path: The local file path or a web URL of\
   \ the file.\n        numeric: A list of column names that hold numeric data.\n \
   \       categorical: A list of column names that hold categorical data.\n      \
-  \  labels: A categorical column that holds predictive labels.\n        delimiter:\
-  \ Which character to split loaded csv rows with.\n        skip_invalid_lines: Whether\
-  \ to skip invalid lines being read instead of creating an error.\n    "
+  \  label: The name of the categorical column that holds predictive label for each\
+  \ data sample.\n        delimiter: Which character to split loaded csv rows with.\n\
+  \        skip_invalid_lines: Whether to skip invalid lines being read instead of\
+  \ creating an error.\n    "
 parameter_info: Some parameters are needed.
 component_type: LOADER_DATA
 parameter_default:
   path: ''
   numeric: None
   categorical: None
-  labels: None
+  label: None
   delimiter: ','
   skip_invalid_lines: true
 input_types: []

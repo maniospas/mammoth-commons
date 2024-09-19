@@ -20,10 +20,6 @@ class CSV(Dataset):
         self.categorical = categorical
         self.labels = pd.get_dummies(data[labels])
         self.cols = numeric + categorical
-        if data.shape[1] == 1:
-            raise Exception(
-                "The loaded dataset only has one column. This indicates that the wrong delimiter was used."
-            )
 
     def to_features(self):
         return _features(self.data, self.numeric, self.categorical).astype(np.float64)

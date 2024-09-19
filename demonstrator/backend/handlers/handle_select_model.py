@@ -26,7 +26,7 @@ def handle_select_model_get(database, task_id, error_title=None, error_message=N
         selected_parameters=selected_parameters,
         default_task_name=task.get("name", "Task " + task["id"]),
         error_title=error_title,
-        error_message=error_message
+        error_message=error_message,
     )
 
 
@@ -37,7 +37,9 @@ def handle_select_model_post(request, database, task_id):
 
     model_loader_name = request.form["model_loader"]
     model_parameters = {
-        key: request.form[key] for key in request.form if key != "model_loader" and key != "task_name"
+        key: request.form[key]
+        for key in request.form
+        if key != "model_loader" and key != "task_name"
     }
     task["model_loader"] = model_loader_name
     task["model_parameters"] = model_parameters
@@ -45,9 +47,7 @@ def handle_select_model_post(request, database, task_id):
     task["name"] = request.form["task_name"]
 
     try:
-        task["model_loaded"] = name_to_runnable[model_loader_name](
-            **model_parameters
-        )
+        task["model_loaded"] = name_to_runnable[model_loader_name](**model_parameters)
         task["modified"] = datetime.now().strftime("%Y-%m-%d %H:%M")
     except (Exception, RuntimeError) as e:
         task["modified"] = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -57,5 +57,6 @@ def handle_select_model_post(request, database, task_id):
             database=database,
             task_id=task_id,
             error_title="Error loading model",
-            error_message=str(e))
+            error_message=str(e),
+        )
     return redirect(url_for("fairness_analysis", task_id=task_id))

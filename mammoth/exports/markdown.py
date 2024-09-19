@@ -5,7 +5,7 @@ class Markdown:
     integration = "dsl.Markdown"
 
     def __init__(self, text):
-        self.text = text
+        self._text = text
 
     def show(self, title="MAMMOth-commons Markdown", port=8000, shutdown=True):
         import markdown2
@@ -20,7 +20,7 @@ class Markdown:
             <title>{title}</title>
         </head>
         <body>
-            {markdown2.markdown(self.text, extras=["tables", "fenced-code-blocks", "code-friendly"])}
+            {markdown2.markdown(self._text, extras=["tables", "fenced-code-blocks", "code-friendly"])}
         </body>
         </html>
         """
@@ -28,12 +28,13 @@ class Markdown:
 
     def text(self):
         import markdown2
+        from mammoth.exports.HTML import HTML
 
-        return markdown2.markdown(
-            self.text, extras=["tables", "fenced-code-blocks", "code-friendly"]
-        )
+        return HTML(markdown2.markdown(
+            self._text, extras=["tables", "fenced-code-blocks", "code-friendly"]
+        )).text()
 
     def export(self, output: dsl.Output[integration]):
         with open(output.path, "w") as f:
             output.name = "result.md"
-            f.write(self.text)
+            f.write(self._text)

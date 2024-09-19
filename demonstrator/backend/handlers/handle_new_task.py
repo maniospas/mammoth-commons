@@ -9,14 +9,16 @@ def handle_new_task_get(database):
         "new_task.html",
         dataset_loaders=dataset_loaders,
         base_task=dict(),
-        default_task_name="Unnamed task"
+        default_task_name="Unnamed task",
     )
 
 
 def handle_new_task_post(request, database):
     dataset_loader_name = request.form["dataset_loader"]
     dataset_parameters = {
-        key: request.form[key] for key in request.form if key != "dataset_loader" and key != "task_name"
+        key: request.form[key]
+        for key in request.form
+        if key != "dataset_loader" and key != "task_name"
     }
     call_parameters = {
         key: value
@@ -30,7 +32,7 @@ def handle_new_task_post(request, database):
         "dataset_parameters": dataset_parameters,
         "name": request.form["task_name"],
         "status": "created",
-        "modified": datetime.now().strftime("%Y-%m-%d %H:%M")
+        "modified": datetime.now().strftime("%Y-%m-%d %H:%M"),
     }
     task_id = database.register(task)  # automatically assigns id
 
@@ -49,7 +51,7 @@ def handle_new_task_post(request, database):
             error_message=str(e),
             dataset_loaders=dataset_loaders,
             base_task=task,
-            default_task_name=task.get("name", "Task " + task["id"])
+            default_task_name=task.get("name", "Task " + task["id"]),
         )
 
     return redirect(url_for("select_model", task_id=task_id))
