@@ -12,7 +12,8 @@ def interactive_report(
     model: ONNX,
     sensitive: List[str],
 ) -> HTML:
-    """Creates a model card using FairBench."""
+    """Creates an interactive report using the FairBench library. The report creates traceable evaluations that
+    you can shift through to find actual sources of unfairness."""
     for attr in sensitive:
         if attr not in dataset.categorical:
             raise Exception(
@@ -40,7 +41,7 @@ def interactive_report(
             {
                 label
                 + " class ": fb.multireport(
-                    predictions=predictions, labels=label, sensitive=sensitive
+                    predictions=predictions, labels=labels[label].to_numpy(), sensitive=sensitive
                 )
                 for label in labels
             }

@@ -1,6 +1,8 @@
 id: interactive_report
 name: interactive report
-description: Creates a model card using FairBench.
+description: "Creates an interactive report using the FairBench library. The report\
+  \ creates traceable evaluations that\n    you can shift through to find actual sources\
+  \ of unfairness."
 parameter_info: No parameters needed.
 component_type: METRIC
 input_types:
