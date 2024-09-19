@@ -20,8 +20,11 @@ def image_bias_analysis(
 ) -> Markdown:
     """
     Performs analysis of image bias, and recommends mitigation strategies.
+
+    Args:
+        task: The type of predictive task. It should be either face verification or image classification.
     """
 
-    assert task in ["face verification", "image classification"]
+    assert task in ["face verification", "image classification"], "The provided task should be either face verification or image classification"
     md = analysis(dataset.path, task, dataset.target, sensitive)
     return Markdown(md)

@@ -21,7 +21,12 @@ def facex(
     target_class: int = None,
     target_layer: str = None,
 ) -> Markdown:
-    """Write your metric's description here."""
+    """Write your metric's description here.
+
+    Args:
+        target_class: The target class.
+        target_layer: The layer to be explained.
+    """
 
     html = run_mammoth(dataset, sensitive[0], target_class, model, target_layer)
 

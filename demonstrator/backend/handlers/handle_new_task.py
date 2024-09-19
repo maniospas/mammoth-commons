@@ -41,6 +41,8 @@ def handle_new_task_post(request, database):
             **call_parameters
         )
         task["modified"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+        if not hasattr(task["dataset_loaded"], "cols"):
+            raise Exception("Invalid dataset loader: the selected dataset loader failed to create an initial estimation of sensitive attribute candidates (it must initialize the `cols` attribute).")
     except (Exception, RuntimeError) as e:
         task["modified"] = datetime.now().strftime("%Y-%m-%d %H:%M")
         task["status"] = "failed"

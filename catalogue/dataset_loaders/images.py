@@ -7,11 +7,11 @@ from mammoth.externals import safeexec
     namespace="gsarridis",
     version="v003",
     python="3.11",
-    packages=("torch", "torchvision"),
+    packages=("torch", "torchvision", "pandas"),
 )
 def data_images(
     path: str = "",
-    root_dir: str = "./",
+    image_root_dir: str = "",
     target: str = "",
     batch_size: int = 4,
     shuffle: bool = False,
@@ -25,7 +25,7 @@ def data_images(
 
     Args:
         path: The path to the CSV file containing information about the dataset.
-        root_dir: The root directory where the actual image files are stored.
+        image_root_dir: The root directory where the actual image files are stored.
         target: Indicates the predictive attribute in the dataset.
         batch_size: The batch size at which images should be loaded.
         shuffle: Whether to shuffle loaded images.
@@ -33,6 +33,8 @@ def data_images(
         transform_variable: The transformation target variable.
         safe_libraries: A comma-separated list of safe libraries.
     """
+    import pandas as pd
+    premature_data = pd.read_csv(path, nrows=1)  # just read one row for verification
 
     data_transform = safeexec(
         data_transform_path,
@@ -42,11 +44,12 @@ def data_images(
 
     dataset = Image(
         path=path,
-        root_dir=root_dir,
+        root_dir=image_root_dir,
         target=target,
         data_transform=data_transform,
         batch_size=batch_size,
         shuffle=shuffle,
+        cols=[col for col in premature_data]
     )
 
     return dataset

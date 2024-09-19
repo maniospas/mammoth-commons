@@ -3,7 +3,9 @@
 {% block content %}
 <div class="jumbotron text-center">
     <h1>MAMMOth-commons</h1>
-    <p>Fairness analysis of models and datasets. This application demonstrates base functionality offered by the modules of the MAMMOth <a href="https://github.com/mammoth-eu/mammoth-toolkit-releases">bias toolkit</a>.</p>
+    <p>Fairness analysis of models and datasets.
+        This application demonstrates base functionality offered by the modules of the
+        MAMMOth bias <a href="https://github.com/mammoth-eu/mammoth-toolkit-releases">toolkit</a>.</p>
 </div>
 
 <p>
@@ -14,6 +16,7 @@
     <thead>
         <tr>
             <th>Fairness analysis</th>
+            <th>Involved modules</th>
             <th>Last update</th>
             <th></th>
         </tr>
@@ -23,6 +26,25 @@
         <tr>
             <td>
                 {{ task.name }}
+            </td>
+            <td>
+                {% if task.dataset_loader %}
+                  <span class="badge badge-pill badge-secondary">{{ task.dataset_loader }}</span>
+                {% else %}
+
+                {% endif %}
+
+                {% if task.model_loader %}
+                  <span class="badge badge-pill badge-secondary">{{ task.model_loader }}</span>
+                {% else %}
+
+                {% endif %}
+
+                {% if task.analysis_method %}
+                  <span class="badge badge-pill badge-secondary">{{ task.analysis_method }}</span>
+                {% else %}
+
+                {% endif %}
             </td>
             <td>
                 {{ task.modified }}

@@ -3,8 +3,8 @@ name: data images
 description: "\n    Loads image data from a CSV file holding their sensitive and predictive\
   \ attribute\n    data, as well as paths relative to a root directory. Loaded images\
   \ are subjected to a Python transformation.\n\n    Args:\n        path: The path\
-  \ to the CSV file containing information about the dataset.\n        root_dir: The\
-  \ root directory where the actual image files are stored.\n        target: Indicates\
+  \ to the CSV file containing information about the dataset.\n        image_root_dir:\
+  \ The root directory where the actual image files are stored.\n        target: Indicates\
   \ the predictive attribute in the dataset.\n        batch_size: The batch size at\
   \ which images should be loaded.\n        shuffle: Whether to shuffle loaded images.\n\
   \        data_transform_path: A path or implementation of a torchvision data transform.\
@@ -15,7 +15,7 @@ parameter_info: Some parameters are needed.
 component_type: LOADER_DATA
 parameter_default:
   path: ''
-  root_dir: ./
+  image_root_dir: ''
   target: ''
   batch_size: 4
   shuffle: false

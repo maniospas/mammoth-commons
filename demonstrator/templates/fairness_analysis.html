@@ -89,6 +89,25 @@
     }
 
 
+    function checkFormCompletion() {
+        const form = document.getElementById('task-form-model');
+        const button = document.getElementById('next-button-model');
+        const modelLoader = document.getElementById('model_loader');
+        const requiredInputs = form.querySelectorAll('input[required]');
+
+        let allFilled = modelLoader.value !== "";
+
+        // Check if all required inputs are filled
+        requiredInputs.forEach(input => {
+            if (!input.value.trim()) {
+                allFilled = false;
+            }
+        });
+
+        // Enable/Disable the button based on form completion
+        button.disabled = !allFilled;
+    }
+
 
     function createInputField(param, type, def, title_text) {
         const div = document.createElement('div');
