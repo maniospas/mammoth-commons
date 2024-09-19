@@ -7,11 +7,11 @@ from mammoth.externals import safeexec
     namespace="gsarridis",
     version="v001",
     python="3.11",
-    packages=("torch", "torchvision"),
+    packages=("torch", "torchvision", "pandas"),
 )
 def data_image_pairs(
     path: str = "",
-    root_dir: str = "./",
+    image_root_dir: str = "./",
     target: str = "",
     data_transform: str = "",
     batch_size: int = 4,
@@ -30,7 +30,7 @@ def data_image_pairs(
 
     Args:
         path: The path to the CSV file containing information about the dataset.
-        root_dir: The root directory where the actual image files are stored.
+        image_root_dir: The root directory where the actual image files are stored.
         target Indicates the predictive attribute in the dataset.
         data_transform: A path or implementation of a torchvision data transform.
         batch_size: The number of image pairs in each batch. Default is 4.
@@ -39,19 +39,23 @@ def data_image_pairs(
         img2_path_format: The second image path format. Default is "{root}/{col}/{id}.png".
     """
 
+    import pandas as pd
+    premature_data = pd.read_csv(path, nrows=1)  # just read one row for verification
+
     data_transform = safeexec(
         data_transform, out="transform", whitelist=["torchvision"]
     )
 
     dataset = ImagePairs(
         path=path,
-        root_dir=root_dir,
+        root_dir=image_root_dir,
         target=target,
         data_transform=data_transform,
         batch_size=batch_size,
         shuffle=shuffle,
         img1_path_format=img1_path_format,
         img2_path_format=img2_path_format,
+        cols=[col for col in premature_data]
     )
 
     return dataset

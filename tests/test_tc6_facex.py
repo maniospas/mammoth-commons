@@ -32,7 +32,7 @@ def test_facex():
         )
 
         markdown_result = env.facex(
-            dataset, model.model, [protected], target_class, target_layer
+            dataset, model, [protected], target_class, target_layer
         )
         markdown_result.show()
 
