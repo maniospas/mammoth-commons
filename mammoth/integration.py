@@ -10,7 +10,9 @@ _default_packages = ()  # appended to ["mammoth-commons[deployment]"]
 def _path(method):
     running_path = os.path.abspath(os.getcwd()).lower()
     method_path = os.path.abspath(inspect.getfile(method)).lower()
-    assert method_path.startswith(running_path), f"Running path is not a super-path of the path of module {method.__name__}:\nRunning path : {running_path}\nModule path: {method_path}\nHOW TO FIX:-\n- If you are running tests, create a launch configuration from the top level of mammoth-commons.\n- If you are building, change the console's folder (CD) to the top directory of mammoth-commons."
+    assert method_path.startswith(
+        running_path
+    ), f"Running path is not a super-path of the path of module {method.__name__}:\nRunning path : {running_path}\nModule path: {method_path}\nHOW TO FIX:-\n- If you are running tests, create a launch configuration from the top level of mammoth-commons.\n- If you are building, change the console's folder (CD) to the top directory of mammoth-commons."
     method_path = method_path[len(running_path) :]
     method_path = os.path.join(".", *method_path.split(os.sep)[:-1])
     return method_path
@@ -61,9 +63,7 @@ def metric(namespace, version, python=_default_python, packages=_default_package
             arg_type = type_hints.get(pname, parameter.annotation)
             if parameter.default is not inspect.Parameter.empty:  # ignore kwargs
                 defaults[pname] = (
-                    "None"
-                    if parameter.default is None
-                    else parameter.default
+                    "None" if parameter.default is None else parameter.default
                 )
                 continue
             if pname not in ["dataset", "model"]:
@@ -101,9 +101,10 @@ def metric(namespace, version, python=_default_python, packages=_default_package
 
         exec_context = globals().copy()
         exec_context.update(locals())
-        param_name = name+"__params"
+        param_name = name + "__params"
         # create the kfp method to be wrapped
-        exec(f"""
+        exec(
+            f"""
 from kfp import dsl
 def kfp_method(
     model: dsl.Input[dsl.Model],
@@ -113,7 +114,8 @@ def kfp_method(
     {param_name}: Dict[str, any] = defaults
 ):
     parameters = {param_name}
-    """+"""
+    """
+            + """
     with open(dataset.path, "rb") as f:
         dataset_instance = pickle.load(f)
     with open(model.path, "rb") as f:
@@ -129,7 +131,9 @@ def kfp_method(
     ret = method(dataset_instance, model_instance, sensitive, **parameters)
     assert isinstance(ret, return_type)
     ret.export(output)
-        """, exec_context)
+        """,
+            exec_context,
+        )
 
         kfp_method = exec_context["kfp_method"]
 
@@ -194,21 +198,19 @@ def loader(
         # keep type hint names, keeping default kwargs (these will be kwarg parameters)
         type_hints = get_type_hints(method)
         defaults = dict()
-        #input_types = list()
+        # input_types = list()
         for pname, parameter in signature.parameters.items():
             arg_type = type_hints.get(pname, parameter.annotation)
             if parameter.default is not inspect.Parameter.empty:  # ignore kwargs
                 defaults[pname] = (
-                    "None"
-                    if parameter.default is None
-                    else parameter.default
+                    "None" if parameter.default is None else parameter.default
                 )
                 continue
             raise Exception(
                 f"Add both a type annotation and default value in method {name} for the argument: {pname}"
             )
-            #input_types.append(_class_to_name(arg_type))
-        #if len(input_types) != 1:
+            # input_types.append(_class_to_name(arg_type))
+        # if len(input_types) != 1:
         #    raise Exception("Your loader should have a 'path' argument")
 
         # create component_metadata/{name}_meta.yaml
@@ -228,18 +230,20 @@ def loader(
             os.makedirs(_path(method) + "/component_metadata/")
         with open(f"{_path(method)}/component_metadata/{name}_meta.yaml", "w") as file:
             yaml.dump(metadata, file, sort_keys=False)
-        param_name = name+"__params"
+        param_name = name + "__params"
         exec_context = globals().copy()
         exec_context.update(locals())
         # create the kfp method to be wrapped
-        exec(f"""
+        exec(
+            f"""
 from kfp import dsl
 def kfp_method(
     output: dsl.Output[{return_type.integration}],
     {param_name}: Dict[str, any] = defaults,
 ) -> str:
     parameters = {param_name}
-    """+"""
+    """
+            + """
     parameters = {
         **defaults,
         **parameters,
@@ -253,7 +257,9 @@ def kfp_method(
     with open(output.path, "wb") as file:
         pickle.dump(ret, file)
     return output.path
-        """, exec_context)
+        """,
+            exec_context,
+        )
         kfp_method = exec_context["kfp_method"]
         # rename the kfp_method so that kfp will create an appropriate name for it
         kfp_method.__name__ = name

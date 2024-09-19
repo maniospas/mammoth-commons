@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="card card-body mt-3">
+    <p>{{ task.name }}</p>
+    <p><i>Finished at {{ task.modified }}</i></p>
+    <p><a href="{{ url_for('create_variation', task_id=task['id']) }}" class="btn btn-primary bi bi-file-plus"> New variation</a></p>
+</div>
+
+<div class="task-result card card-body mt-3">
+    {% if "result" in task %}
+        {{ task.result | safe }}
+    {% else %}
+        <p>The task has no result or failed.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

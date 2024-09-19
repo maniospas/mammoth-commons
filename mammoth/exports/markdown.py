@@ -5,7 +5,7 @@ class Markdown:
     integration = "dsl.Markdown"
 
     def __init__(self, text):
-            self.text = text
+        self.text = text
 
     def show(self, title="MAMMOth-commons Markdown", port=8000, shutdown=True):
         import markdown2
@@ -27,7 +27,11 @@ class Markdown:
         HTML(html).show(port=port, shutdown=shutdown)
 
     def text(self):
-        return self.text
+        import markdown2
+
+        return markdown2.markdown(
+            self.text, extras=["tables", "fenced-code-blocks", "code-friendly"]
+        )
 
     def export(self, output: dsl.Output[integration]):
         with open(output.path, "w") as f:

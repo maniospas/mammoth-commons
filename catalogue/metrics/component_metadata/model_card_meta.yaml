@@ -1,10 +1,17 @@
 id: model_card
 name: model card
-description: Creates a model card using FairBench.
-parameter_info: No parameters needed.
+description: "Creates a model card using FairBench.\n    The created model card includes\
+  \ caveats and recommendations from a socio-technical database and\n    may include\
+  \ the evaluation of several fairness stamps. All stamps consider all pairs of population\n\
+  \    groups or subgraphs.\n\n    Args:\n        prule: The worst ratio between group\
+  \ positive rates.\n        worst_accuracy: The worst accuracy among groups.\n  \
+  \  "
+parameter_info: Some parameters are needed.
 component_type: METRIC
 input_types:
 - CSV
 - ONNX
-parameter_default: {}
+parameter_default:
+  prule: true
+  worst_accuracy: true
 output_types: []

@@ -6,7 +6,6 @@ from catalogue.metrics.xai_analysis import facex
 
 def test_facex():
     with testing.Env(data_images, model_torch, facex) as env:
-
         target = "task"
         protected = "protected"
         model_path = "./data/torch_model/torch_model.py"
@@ -32,7 +31,10 @@ def test_facex():
             model_dict,
         )
 
-        markdown_result = env.facex(dataset, model.model, [protected], target_class, target_layer)
+        markdown_result = env.facex(
+            dataset, model.model, [protected], target_class, target_layer
+        )
         markdown_result.show()
+
 
 test_facex()

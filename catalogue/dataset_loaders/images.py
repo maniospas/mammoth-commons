@@ -7,31 +7,38 @@ from mammoth.externals import safeexec
     namespace="gsarridis",
     version="v003",
     python="3.11",
-    packages=("torch", "torchvision")
+    packages=("torch", "torchvision"),
 )
 def data_images(
     path: str = "",
     root_dir: str = "./",
     target: str = "",
-    data_transform: str = "",
     batch_size: int = 4,
     shuffle: bool = False,
+    data_transform_path: str = "",
+    transform_variable: str = "transform",
+    safe_libraries="torchvision",
 ) -> Image:
     """
-    Creates a Dataset for loading image data from a CSV file.
+    Loads image data from a CSV file holding their sensitive and predictive attribute
+    data, as well as paths relative to a root directory. Loaded images are subjected to a Python transformation.
 
     Args:
-        path (str): The path to the CSV file containing information about the dataset.
-        root_dir (str): The root directory where the actual image files are stored.
-        target (str): Indicates the predictive attribute in the dataset.
-        data_transform (str): A path or implementation of a torchvision data transform.
-    Returns:
-        Image dataset.
+        path: The path to the CSV file containing information about the dataset.
+        root_dir: The root directory where the actual image files are stored.
+        target: Indicates the predictive attribute in the dataset.
+        batch_size: The batch size at which images should be loaded.
+        shuffle: Whether to shuffle loaded images.
+        data_transform_path: A path or implementation of a torchvision data transform. Alternatively, paste the transformation code here.
+        transform_variable: The transformation target variable.
+        safe_libraries: A comma-separated list of safe libraries.
     """
 
-    data_transform = safeexec(data_transform,
-                              out="transform",
-                              whitelist=["torchvision"])
+    data_transform = safeexec(
+        data_transform_path,
+        out=transform_variable,
+        whitelist=[lib.strip() for lib in safe_libraries.split(",")],
+    )
 
     dataset = Image(
         path=path,

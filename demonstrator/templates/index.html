@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="jumbotron text-center">
+    <h1>MAMMOth-commons</h1>
+    <p>Fairness analysis of models and datasets. This application demonstrates base functionality offered by the modules of the MAMMOth <a href="https://github.com/mammoth-eu/mammoth-toolkit-releases">bias toolkit</a>.</p>
+</div>
+
+<p>
+    <a href="{{ url_for('new_task') }}" class="btn btn-primary bi bi-file-plus"> New</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Fairness analysis</th>
+            <th>Last update</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for task in tasks %}
+        <tr>
+            <td>
+                {{ task.name }}
+            </td>
+            <td>
+                {{ task.modified }}
+            </td>
+            <td>
+                {% if task.status == 'completed' %}
+                    <a href="{{ url_for('task_results', task_id=task.id) }}" class="btn btn-sm btn-success bi bi-eye-fill" style="width: 140px;text-align: left;"> View</a>
+                {% elif task.status == 'created' %}
+                    <a href="{{ url_for('create_variation', task_id=task.id) }}" class="btn btn-sm btn-warning bi bi-exclamation-triangle-fill" style="width: 140px;text-align: left;"> Edit (incomplete)</a>
+                {% elif task.status == 'failed' %}
+                    <a href="{{ url_for('create_variation', task_id=task.id) }}" class="btn btn-sm btn-danger bi bi-exclamation-triangle-fill" style="width: 140px;text-align: left;"> Edit (fix errors)</a>
+                {% else %}
+                    <a href="{{ url_for('task_results', task_id=task.id) }}" class="btn btn-sm btn-info bi bi-eye-fill" style="width: 220px;text-align: left;"> Running - show status</a>
+                {% endif %}
+
+                <!-- Delete button -->
+                <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-danger bi bi-trash" style="margin-left: 10px;"></button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -6,3 +6,13 @@ kfp
 onnxruntime
 markdown2
 dill
+timm
+torch
+torchvision
+cvbiasmitigation
+facextool
+pygrank
+flask
+Flask-Bootstrap
+Flask-WTF
+Flask-Session

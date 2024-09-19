@@ -10,7 +10,7 @@ from cvbiasmitigation.suggest import analysis
     namespace="mammotheu",
     version="v003",
     python="3.11",
-    packages=("torch", "torchvision", "cvbiasmitigation")
+    packages=("torch", "torchvision", "cvbiasmitigation"),
 )
 def image_bias_analysis(
     dataset: Image,
