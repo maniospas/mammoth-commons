@@ -1,11 +1,9 @@
-import traceback
-
 from flask import request
 from demonstrator.backend.utils import *
-from demonstrator.backend.handle_fairness_analysis import *
-from demonstrator.backend.handle_select_model import *
-from demonstrator.backend.handle_new_task import *
-from demonstrator.backend.handle_create_variation import *
+from demonstrator.backend.handlers.handle_fairness_analysis import *
+from demonstrator.backend.handlers.handle_select_model import *
+from demonstrator.backend.handlers.handle_new_task import *
+from demonstrator.backend.handlers.handle_create_variation import *
 
 
 def initialize_routes(app, database):

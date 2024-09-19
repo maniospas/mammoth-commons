@@ -9,7 +9,13 @@ needing to add a decorator.
 ## :microscope: Investigate fairness
 
 This repo includes a thinned down variation of the MAMMOth toolkit
-that you can quickly install and run locally.
+that you can quickly install and run locally. Instructions to launch
+the web application locally in your machine:
+
+1. Download this repository.
+2. Create a virtual environment. This is optional but recommended.
+3. Install dependencies with `pip install -r requirements.txt`. This can take a bit of time to download and install everything, but you will be able to run all modules and interface with most popular data types.
+4. Launch the local app server with `python demonstrator/app.py`. When everything is ready, this script will also open a browser window to the app's serving page at `http://localhost:5050`.
 
 ## :clipboard: Catalogue
 
