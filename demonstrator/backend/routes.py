@@ -39,6 +39,14 @@ def initialize_routes(app, database):
             return handle_create_variation_post(request, database, task_id)
         return handle_create_variation_get(database, task_id)
 
+    @app.route("/edit_task/<int:task_id>", methods=["GET", "POST"])
+    def edit_task(task_id):
+        task = database.get(task_id)
+        if not task:
+            return redirect(url_for("index"))
+        task["status"] = "created"
+        return redirect(url_for("create_variation", task_id=task_id))
+
     @app.route("/logout")
     def logout():
         return redirect(url_for("index"))

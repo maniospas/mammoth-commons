@@ -7,7 +7,9 @@
     <p><i>Finished at {{ task.modified }}</i></p>
     <p>
         <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST">
-            <a href="{{ url_for('create_variation', task_id=task.id) }}" class="btn btn-primary bi bi-file-plus"> New variation</a><button type="submit" class="btn btn-danger bi bi-trash" style="margin-left: 10px;"></button>
+            <a href="{{ url_for('create_variation', task_id=task.id) }}" class="btn btn-primary bi bi-file-plus"> New variation</a>
+            <a href="{{ url_for('edit_task', task_id=task.id) }}" class="btn btn-warning bi bi-pencil-square"> Edit</a>
+            <button type="submit" class="btn btn-danger bi bi-trash" style="margin-left: 10px;"></button>
         </form>
     </p>
 </div>

@@ -7,7 +7,7 @@ description: "\n    Loads image pairs declared in a CSV file.\n    The expected 
   \   are transformed to loading paths by string specifications that can contain the\n\
   \    symbols: {root} to refer to the root directory, {col} to refer to the column\
   \ name, and {id}\n    to refer to the column entry.\n\n    Args:\n        path:\
-  \ The path to the CSV file containing information about the dataset.\n        root_dir:\
+  \ The path to the CSV file containing information about the dataset.\n        image_root_dir:\
   \ The root directory where the actual image files are stored.\n        target Indicates\
   \ the predictive attribute in the dataset.\n        data_transform: A path or implementation\
   \ of a torchvision data transform.\n        batch_size: The number of image pairs\
@@ -19,7 +19,7 @@ parameter_info: Some parameters are needed.
 component_type: LOADER_DATA
 parameter_default:
   path: ''
-  root_dir: ./
+  image_root_dir: ./
   target: ''
   data_transform: ''
   batch_size: 4
