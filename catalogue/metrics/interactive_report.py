@@ -40,10 +40,10 @@ def interactive_report(
         report = fb.Fork(
             {
                 label
-                + " class ": fb.multireport(
+                + " ": fb.multireport(
                     predictions=predictions, labels=labels[label].to_numpy(), sensitive=sensitive
                 )
                 for label in labels
             }
         )
-    return HTML(fb.interactive_html(report, show=False))
+    return HTML(fb.interactive_html(report, show=False, name="Classes"))

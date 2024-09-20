@@ -9,6 +9,7 @@ from catalogue.dataset_loaders.images import data_images
 from catalogue.dataset_loaders.image_pairs import data_image_pairs
 
 # model loaders
+from catalogue.model_loaders.no_model import no_model
 from catalogue.model_loaders.onnx import model_onnx
 from catalogue.model_loaders.onnx_ensemble import model_onnx_ensemble
 from catalogue.model_loaders.pytorch import model_torch
@@ -119,10 +120,16 @@ register(dataset_loaders, data_graph)
 register(dataset_loaders, data_images)
 # register(dataset_loaders, data_image_pairs)
 
-register(model_loaders, model_onnx, compatible=[data_csv])
-register(model_loaders, model_onnx_ensemble, compatible=[data_csv])
-register(model_loaders, model_torch, compatible=[data_images])
-register(model_loaders, model_fair_node_ranking, compatible=[data_graph])
+register(model_loaders, no_model,
+         compatible=[data_csv, data_images])
+register(model_loaders, model_onnx,
+         compatible=[data_csv])
+register(model_loaders, model_onnx_ensemble,
+         compatible=[data_csv])
+register(model_loaders, model_torch,
+         compatible=[data_images])
+register(model_loaders, model_fair_node_ranking,
+         compatible=[data_graph])
 
 register(analysis_methods, model_card)
 register(analysis_methods, interactive_report)

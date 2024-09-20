@@ -7,7 +7,7 @@ parameter_info: Some parameters are needed.
 component_type: METRIC
 input_types:
 - Image
-- Pytorch
+- EmptyModel
 parameter_default:
   task: ''
 output_types: []
