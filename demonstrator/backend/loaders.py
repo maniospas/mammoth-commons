@@ -118,7 +118,7 @@ analysis_methods = dict()
 register(dataset_loaders, data_csv)
 register(dataset_loaders, data_graph)
 register(dataset_loaders, data_images)
-# register(dataset_loaders, data_image_pairs)
+register(dataset_loaders, data_image_pairs)
 
 register(model_loaders, no_model,
          compatible=[data_csv, data_images])

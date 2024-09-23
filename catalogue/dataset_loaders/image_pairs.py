@@ -31,12 +31,12 @@ def data_image_pairs(
     Args:
         path: The path to the CSV file containing information about the dataset.
         image_root_dir: The root directory where the actual image files are stored.
-        target Indicates the predictive attribute in the dataset.
+        target: Indicates the predictive attribute in the dataset.
         data_transform: A path or implementation of a torchvision data transform.
-        batch_size: The number of image pairs in each batch. Default is 4.
-        shuffle: Whether to shuffle the dataset. Default is False.
-        img1_path_format: The first image path format. Default is "{root}/{col}/{id}.png".
-        img2_path_format: The second image path format. Default is "{root}/{col}/{id}.png".
+        batch_size: The number of image pairs in each batch.
+        shuffle: Whether to shuffle the dataset.
+        img1_path_format: The first image path format.
+        img2_path_format: The second image path format.
     """
 
     import pandas as pd
