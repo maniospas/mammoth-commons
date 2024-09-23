@@ -16,9 +16,9 @@ def test_facex():
 
         dataset = env.data_images(
             path=csv_dir,
-            root_dir=data_dir,
+            image_root_dir=data_dir,
             target=target,
-            data_transform="./data/xai_images/torch_transform.py",
+            data_transform_path="./data/xai_images/torch_transform.py",
             batch_size=1,
             shuffle=False,
         )

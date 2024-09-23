@@ -25,7 +25,7 @@ def test_bias_exploration():
             dataset_uri,
             categorical=categorical,
             numeric=numeric,
-            labels="y",
+            label="y",
             delimiter=";",
         )
 
