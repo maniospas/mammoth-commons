@@ -1,0 +1,12 @@
+id: data_graph_csv
+name: data graph csv
+description: This loads the nodes and edges of a graph.
+parameter_info: Some parameters are needed.
+component_type: LOADER_DATA
+parameter_default:
+  path_nodes: ''
+  path_edges: ''
+  attributes: []
+input_types: []
+output_types:
+- Graph_CSH
