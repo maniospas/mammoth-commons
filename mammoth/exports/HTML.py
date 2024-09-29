@@ -64,41 +64,11 @@ class HTML:
         self.script = script
         self.images = dict() if images is None else images
 
-    def show(self, port=8000, shutdown=True):
-        import http.server
-        import socketserver
+    def show(self):
         import webbrowser
-        import threading
-
-        sself = self
-
-        class CustomHandler(http.server.SimpleHTTPRequestHandler):
-            def do_GET(self):
-                self.send_response(200)
-                self.send_header("Content-type", "text/html")
-                self.end_headers()
-                self.wfile.write(sself.text().encode("utf-8"))
-
-        def run_server():
-            with socketserver.TCPServer(("", port), CustomHandler) as httpd:
-                # Open the web browser after the server starts
-                webbrowser.open(f"http://localhost:{port}")
-                if shutdown:
-                    print(
-                        f"Temporarily serving at port {port} (use shutdown=False to make this permanent)"
-                    )
-                else:
-                    print(
-                        f"Serving at port {port} (use shutdown=True to make this temporary)"
-                    )
-                httpd.serve_forever()
-                if shutdown:
-                    httpd.shutdown()
-
-        server_thread = threading.Thread(target=run_server)
-        server_thread.daemon = True
-        server_thread.start()
-        server_thread.join(1)
+        with open("temp.html", "w", encoding="utf-8") as file:
+            file.write(self.text())
+        webbrowser.open_new(file.name)
 
     def text(self):
         body = self.body
