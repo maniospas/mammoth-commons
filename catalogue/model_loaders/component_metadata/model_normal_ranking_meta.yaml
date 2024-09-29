@@ -1,0 +1,9 @@
+id: model_normal_ranking
+name: model normal ranking
+description: This is a Normal Ranking loader
+parameter_info: No parameters needed.
+component_type: LOADER_MODEL
+parameter_default: {}
+input_types: []
+output_types:
+- ResearcherRanking

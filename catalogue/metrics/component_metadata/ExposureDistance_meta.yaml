@@ -1,0 +1,14 @@
+id: ExposureDistance
+name: ExposureDistance
+description: 'Compute the exposure distance  '
+parameter_info: Some parameters are needed.
+component_type: METRIC
+input_types:
+- Dataset
+- NodeRanking
+parameter_default:
+  protected: female
+  sampling: Nationality_IncomeGroup
+  ranking_variable: Degree
+  intro: ''
+output_types: []
