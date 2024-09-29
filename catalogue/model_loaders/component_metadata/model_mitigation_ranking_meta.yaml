@@ -1,0 +1,9 @@
+id: model_mitigation_ranking
+name: model mitigation ranking
+description: This is a fair Ranking loader
+parameter_info: No parameters needed.
+component_type: LOADER_MODEL
+parameter_default: {}
+input_types: []
+output_types:
+- ResearcherRanking
