@@ -1,64 +1,86 @@
 from mammoth.exports import Markdown
 from mammoth.integration import metric
-from loader_data_csv_rankings import data_csv_rankings
-from Rankings import RANKINGS
+from mammoth.models.node_ranking import NodeRanking
+from catalogue.dataset_loaders.data_csv_rankings import data_csv_rankings
+from mammoth.datasets.csv import Dataset
 import numpy as np
 
+def b(k):
+    '''Function defining the position bias: the highest ranked candidates receive more attention from users than candidates at lower ranks, and here is adoptedwith algorithmic discount with smooth reduction and favorable theoretical properties (https://proceedings.mlr.press/v30/Wang13.html).'''
+    return 1 / np.log2(k + 1)
 
-class Fairness_metrics_in_rankings:
-    def __init__(self, path: str, EDr):
-        self.model_url = path
-        self.EDr = EDr
+def Exposure_distance(
+                        dataset,
+                        model,
+                        ranking_variable,
+                        sensitive_attribute,
+                        protected_attirbute):
+    '''Exposure distance to see where are the two groups located in the ranking'''
+    Dataframe_ranking = model.rank(dataset, ranking_variable)
 
-    def b(k):
-        """Function defining the position bias: the highest ranked candidates receive more attention from users than candidates at lower ranks, and here is adoptedwith algorithmic discount with smooth reduction and favorable theoretical properties (https://proceedings.mlr.press/v30/Wang13.html)."""
-        return 1 / np.log2(k + 1)
+    # Remove rows with missing values in the sensitive attribute
+    # e.g.: If sensitive_attribute is "Gender", remove rows where Gender is missing or NaN or None
+    Dataframe_ranking = Dataframe_ranking[
+        ~Dataframe_ranking[sensitive_attribute].isnull()
+    ]
 
-    def Exposure_distance(self, path, model, sensitive):
-        """Exposure distance to see where are the two groups located in the ranking"""
+    rankings_per_attribute = {}
+    sensitive = list(set(Dataframe_ranking[sensitive_attribute]))
+    try:
         assert len(sensitive) == 2
 
-        dataset = data_csv_rankings(path)
-        Dataframe_ranking = model(dataset, "Value")
-
-        rankings_per_attribute = {}
         for attribute_value in sensitive:
-            rankings_per_attribute[attribute] = list(
-                Dataframe_ranking[
-                    Dataframe_ranking[attribute] == attribute_value
-                ].Ranking
+            rankings_per_attribute[attribute_value] = list(
+                Dataframe_ranking[Dataframe_ranking[sensitive_attribute] == attribute_value][
+                    ranking_variable
+                ]
             )
 
-        self.EDr = np.round(
+        non_protected_attribute = [i for i in sensitive if i != protected_attirbute][0]
+
+        ranking_position_protected_attribute = [
+            b(1 / (r + 1)) for r in rankings_per_attribute[protected_attirbute]
+        ]
+        ranking_position_non_protected_attribute = [
+            b(1 / (r + 1)) for r in rankings_per_attribute[non_protected_attribute]
+        ]
+
+        Min_size = min(
+            len(ranking_position_protected_attribute),
+            len(ranking_position_non_protected_attribute),
+        )
+        EDr = np.round(
             (
-                sum(
-                    [
-                        self.b(1 / (r + 1))
-                        for r in Rankings_per_attribute[Protected_attirbute]
-                    ]
-                )
-                - sum(
-                    [
-                        self.b(1 / (r + 1))
-                        for r in Rankings_per_attribute[Non_protected_attribute]
-                    ]
-                )
-            )
-            / 2000,
+                sum(ranking_position_protected_attribute[:Min_size])
+                - sum(ranking_position_non_protected_attribute[:Min_size])
+            ),
             2,
         )
+    except:
+        EDr = np.nan
+    return EDr
 
-        return self.EDr
-
-
+    
 @metric(namespace="mammotheu", version="v003", python="3.11")
 def ExposureDistance(
-    dataset: data_csv_rankings,
-    model: RANKINGS.normal_ranking,
-    sensitive: str = "Gender",
+        dataset: Dataset,
+        model: NodeRanking,
+        sensitive: str = 'Gender',
+        protected: str = 'female',
+        sampling: str = 'Nationality_IncomeGroup',
+        ranking_variable: str = 'Degree',
+        intro: str = ''
 ) -> Markdown:
-    """Compute the exposure distance"""
+    '''Compute the exposure distance  '''
 
-    EDr = Fairness_metrics_in_rankings.Exposure_distance(dataset, model, sensitive)
+    EDr = Exposure_distance(
+        dataset=dataset, 
+        model=model, 
+        protected_attirbute=protected,
+        sensitive_attribute=sensitive,
+        ranking_variable=ranking_variable,
+    )
 
-    return Markdown(text=str(EDr))
+    the_text = f"{intro} is {str(EDr)}"
+
+    return Markdown(text=str(the_text))
