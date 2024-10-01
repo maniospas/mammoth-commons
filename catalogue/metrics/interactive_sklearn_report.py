@@ -14,9 +14,9 @@ def interactive_sklearn_report(
     dataset: CSV,
     model: EmptyModel,
     sensitive: List[str],
-    predictor: Options('logistic regression', 'Gaussian naive Bayes') = None,
-    intersectional: bool = True,
-    pairwise_comparison: bool = True,
+    predictor: Options('Logistic regression', 'Gaussian naive Bayes') = None,
+    intersectional: bool = False,
+    compare_groups: Options("Pairwise", "To the total population") = None
 ) -> HTML:
     """Creates an interactive report using the FairBench library, after running an internal training-test split
     on a basic sklearn model. The report creates traceable evaluations that you can shift through to find sources
@@ -25,12 +25,12 @@ def interactive_sklearn_report(
     Args:
         predictor: Which sklearn predictor should be used.
         intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute.
-        pairwise_comparison: Whether to compare groups pairwise. Otherwise, each group is compared to the whole population.
+        compare_groups: Whether to compare groups pairwise, or each group to the whole population.
     """
     for attr in sensitive:
         if attr not in dataset.categorical:
             raise Exception(
-                "Fairness analysis not supported on non-categorical attributes"
+                "Fairness analysis is not supported for non-categorical sensitive attributes."
             )
 
 
@@ -40,7 +40,7 @@ def interactive_sklearn_report(
     y = y[y.columns[-1]]
 
     X_train, X_test, y_train, y_test, _, idx_test = sklearn.model_selection.train_test_split(X, y, np.arange(0, y.shape[0], dtype=np.int64), test_size=0.2)
-    if predictor == "logistic regression":
+    if predictor == "Logistic regression":
         from sklearn.linear_model import LogisticRegression
         model = LogisticRegression(max_iter=1000)
     elif predictor == "Gaussian naive Bayes":
@@ -60,7 +60,7 @@ def interactive_sklearn_report(
     # change behavior based on arguments
     if intersectional:
         sensitive = sensitive.intersectional()
-    report_type = fb.multireport if pairwise_comparison else fb.unireport
+    report_type = fb.multireport if compare_groups == "Pairwise" else fb.unireport
 
     report = report_type(predictions=predictions, labels=y_test.to_numpy(), scores=scores, sensitive=sensitive)
-    return HTML(fb.interactive_html(report, show=False, name="Report"))
+    return HTML(fb.interactive_html(report, show=False, name=predictor))
