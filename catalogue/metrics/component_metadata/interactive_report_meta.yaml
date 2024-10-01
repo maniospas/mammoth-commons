@@ -2,11 +2,16 @@ id: interactive_report
 name: interactive report
 description: "Creates an interactive report using the FairBench library. The report\
   \ creates traceable evaluations that\n    you can shift through to find actual sources\
-  \ of unfairness."
-parameter_info: No parameters needed.
+  \ of unfairness.\n\n    Args:\n        intersectional: Whether to consider all non-empty\
+  \ group intersections during analysis. This does nothing if there is only one sensitive\
+  \ attribute.\n        pairwise_comparison: Whether to compare groups pairwise. Otherwise,\
+  \ each group is compared to the whole population.\n    "
+parameter_info: Some parameters are needed.
 component_type: METRIC
 input_types:
 - CSV
 - ONNX
-parameter_default: {}
+parameter_default:
+  intersectional: true
+  pairwise_comparison: true
 output_types: []
