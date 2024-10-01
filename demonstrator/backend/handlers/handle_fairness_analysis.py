@@ -73,7 +73,7 @@ def handle_fairness_analysis_post(request, database, task_id):
         value = request.form[key]
         param_type = param_types.get(key, 'str')  # Default to 'str' if type not found
         if param_type == 'bool':
-            value = value == 'True'  # Convert to boolean
+            value = value == 'true'
         elif param_type == 'int':
             value = int(value)
         elif param_type == 'float':
