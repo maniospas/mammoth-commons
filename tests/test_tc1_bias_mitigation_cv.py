@@ -23,7 +23,7 @@ def test_facex():
             shuffle=False,
         )
         model = env.model_torch(
-            "./data/torch_model/model.py", "./data/torch_model/model.pth"
+            model_path="./data/torch_model/model.py", state_path="./data/torch_model/model.pth"
         )
         html_result = env.image_bias_analysis(dataset, model, [protected], task)
         html_result.show()
