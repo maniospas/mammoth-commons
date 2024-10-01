@@ -2,7 +2,7 @@ from mammoth.datasets import Image
 from mammoth.models import EmptyModel
 from mammoth.exports import Markdown
 from typing import List
-from mammoth.integration import metric
+from mammoth.integration import metric, Options
 from cvbiasmitigation.suggest import analysis
 
 
@@ -16,7 +16,7 @@ def image_bias_analysis(
     dataset: Image,
     model: EmptyModel,
     sensitive: List[str],
-    task: str = "",
+    task: Options("face verification", "image classification") = None
 ) -> Markdown:
     """
     Performs analysis of image bias, and recommends mitigation strategies.

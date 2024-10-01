@@ -22,6 +22,11 @@ def _class_to_name(arg_type):
     return arg_type.__name__
 
 
+class Options:
+    def __init__(self, *args):
+        self.values = list(args)
+
+
 def metric(namespace, version, python=_default_python, packages=_default_packages):
     import kfp.dsl.executor
     from kfp import dsl
@@ -55,12 +60,18 @@ def metric(namespace, version, python=_default_python, packages=_default_package
         type_hints = get_type_hints(method)
         defaults = dict()
         input_types = list()
+        options = ""
         for pname, parameter in signature.parameters.items():
             if (
                 pname == "sensitive"
             ):  # do not consider the sensitive attributes for component types
                 continue
             arg_type = type_hints.get(pname, parameter.annotation)
+            if arg_type.__class__ == Options:
+                arg_type.__name__ = pname
+                options += "\n        "+pname+": "
+                options += ", ".join(arg_type.values)
+                arg_type = str
             if parameter.default is not inspect.Parameter.empty:  # ignore kwargs
                 defaults[pname] = (
                     "None" if parameter.default is None else parameter.default
@@ -68,11 +79,11 @@ def metric(namespace, version, python=_default_python, packages=_default_package
                 continue
             if pname not in ["dataset", "model"]:
                 raise Exception(
-                    "Only `dataset`, `model`, `sensitive` and keyword arguments are supported for metrics"
+                    f"Only `dataset`, `model`, `sensitive` and positional arguments are supported for metrics: provide a default (e.g., None) for `{pname}`"
                 )
             if arg_type is inspect.Signature.empty:
                 raise Exception(
-                    f"Add a type annotation in method {name} for the argument: {pname}"
+                    f"Add a type annotation in method {name} for the argument `{pname}`"
                 )
             input_types.append(_class_to_name(arg_type))
             # print(f"Argument: {pname}, Type: {arg_type.__name__}")
@@ -80,6 +91,9 @@ def metric(namespace, version, python=_default_python, packages=_default_package
             raise Exception(
                 "Your metric should have both a `dataset` and `model` arguments"
             )
+
+        if options:
+            method.__doc__ += "\n    Options:"+options
 
         # create component_metadata/{name}_meta.yaml
         metadata = {

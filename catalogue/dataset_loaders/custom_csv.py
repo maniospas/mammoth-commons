@@ -28,6 +28,9 @@ def data_custom_csv(
     skip_invalid_lines: bool = True,
 ) -> CSV:
     """Loads a CSV file that contains numeric, categorical, and predictive data columns.
+    To use all data in the file and automate discovery of numerical and categorical columns,
+    as well as of delimiters, use the auto csv loader instead. Otherwise, set here all loading
+    parameters.
 
     Args:
         path: The local file path or a web URL of the file.
