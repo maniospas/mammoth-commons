@@ -36,5 +36,4 @@ def test_facex():
         )
         markdown_result.show()
 
-
 test_facex()

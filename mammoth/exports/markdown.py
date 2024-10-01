@@ -7,7 +7,7 @@ class Markdown:
     def __init__(self, text):
         self._text = text
 
-    def show(self, title="MAMMOth-commons Markdown", port=8000, shutdown=True):
+    def show(self, title="MAMMOth-commons Markdown"):
         import markdown2
         from mammoth.exports.HTML import HTML
 
@@ -24,7 +24,7 @@ class Markdown:
         </body>
         </html>
         """
-        HTML(html).show(port=port, shutdown=shutdown)
+        HTML(html).show()
 
     def text(self):
         import markdown2

@@ -1,6 +1,6 @@
 from mammoth.datasets import Image
 from mammoth.models.pytorch import Pytorch
-from mammoth.exports import Markdown
+from mammoth.exports import HTML
 from typing import List
 from mammoth.integration import metric
 
@@ -20,7 +20,7 @@ def facex(
     sensitive: List[str],
     target_class: int = None,
     target_layer: str = None,
-) -> Markdown:
+) -> HTML:
     """Write your metric's description here.
 
     Args:
@@ -31,4 +31,4 @@ def facex(
     target_class = int(target_class)
     html = run_mammoth(dataset, sensitive[0], target_class, model.model, target_layer)
 
-    return html
+    return HTML(html)
