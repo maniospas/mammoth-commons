@@ -11,9 +11,16 @@ def interactive_report(
     dataset: CSV,
     model: ONNX,
     sensitive: List[str],
+    intersectional: bool = True,
+    pairwise_comparison: bool = True,
 ) -> HTML:
     """Creates an interactive report using the FairBench library. The report creates traceable evaluations that
-    you can shift through to find actual sources of unfairness."""
+    you can shift through to find actual sources of unfairness.
+
+    Args:
+        intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute.
+        pairwise_comparison: Whether to compare groups pairwise. Otherwise, each group is compared to the whole population.
+    """
     for attr in sensitive:
         if attr not in dataset.categorical:
             raise Exception(
@@ -34,13 +41,18 @@ def interactive_report(
         {attr + " ": fb.categories @ dataset.data[attr] for attr in sensitive}
     )
 
+    # change behavior based on arguments
+    if intersectional:
+        sensitive = sensitive.intersectional()
+    report_type = fb.multireport if pairwise_comparison else fb.unireport
+
     if labels is None:
-        report = fb.multireport(predictions=predictions, sensitive=sensitive)
+        report = report_type(predictions=predictions, sensitive=sensitive)
     else:
         report = fb.Fork(
             {
                 label
-                + " ": fb.multireport(
+                + " ": report_type(
                     predictions=predictions, labels=labels[label].to_numpy(), sensitive=sensitive
                 )
                 for label in labels

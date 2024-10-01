@@ -15,7 +15,7 @@ from typing import List, Optional
         "pandas",
     ),
 )
-def data_csv(
+def data_custom_csv(
     path: str = "",
     numeric: Optional[
         List[str]
