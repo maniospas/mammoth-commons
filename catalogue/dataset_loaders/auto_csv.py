@@ -104,7 +104,9 @@ def data_auto_csv(
 ) -> CSV:
     """Loads a CSV file that contains numeric, categorical, and predictive data columns.
     Automatic detection methods for the delimiter and column types are applied.
-    The last categorical column is considered the dataset label.
+    The last categorical column is considered the dataset label. To load the file using
+    different options (e.g., a subset of columns, different label column) use the
+    custom csv loader instead.
 
     Args:
         path: The local file path or a web URL of the file.
