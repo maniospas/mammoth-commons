@@ -6,9 +6,9 @@ description: "Creates an interactive report using the FairBench library, after r
   \ on a common task.\n\n    Args:\n        predictor: Which sklearn predictor should\
   \ be used.\n        intersectional: Whether to consider all non-empty group intersections\
   \ during analysis. This does nothing if there is only one sensitive attribute.\n\
-  \        pairwise_comparison: Whether to compare groups pairwise. Otherwise, each\
-  \ group is compared to the whole population.\n    \n    Options:\n        predictor:\
-  \ logistic regression, Gaussian naive Bayes"
+  \        compare_groups: Whether to compare groups pairwise, or each group to the\
+  \ whole population.\n    \n    Options:\n        predictor: Logistic regression,\
+  \ Gaussian naive Bayes\n        compare_groups: Pairwise, To the total population"
 parameter_info: Some parameters are needed.
 component_type: METRIC
 input_types:
@@ -16,6 +16,6 @@ input_types:
 - EmptyModel
 parameter_default:
   predictor: None
-  intersectional: true
-  pairwise_comparison: true
+  intersectional: false
+  compare_groups: None
 output_types: []
