@@ -19,6 +19,7 @@ def handle_fairness_analysis_get(
         method: {
             "parameters": entries["parameters"][3:],
             "description": entries["description"],
+            "parameter_options": entries["parameter_options"]
         }
         for method, entries in analysis_methods.items()
         if issubclass(
@@ -49,25 +50,40 @@ def handle_fairness_analysis_get(
         error_message=error_message,
     )
 
-
 def handle_fairness_analysis_post(request, database, task_id):
+    from demonstrator.backend.loaders import name_to_runnable, analysis_methods
+
     task = database.get(task_id)
     if not task:
         return redirect(url_for("index"))
 
     selected_method = request.form["analysis_method"]
-    sensitive_attributes = request.form.getlist("sensitive_attributes")
-    analysis_parameters = {
-        key: request.form[key]
-        for key in request.form
-        if key != "analysis_method"
-        and key != "sensitive_attributes"
-        and key != "task_name"
-    }
+
+    # Get parameter types
+    method_info = analysis_methods[selected_method]
+    parameters = method_info['parameters']
+
+    # Create a dict mapping parameter names to types
+    param_types = {param[0]: param[1] for param in parameters}
+
+    analysis_parameters = {}
+    for key in request.form:
+        if key in ("analysis_method", "sensitive_attributes", "task_name"):
+            continue
+        value = request.form[key]
+        param_type = param_types.get(key, 'str')  # Default to 'str' if type not found
+        if param_type == 'bool':
+            value = value == 'true'
+        elif param_type == 'int':
+            value = int(value)
+        elif param_type == 'float':
+            value = float(value)
+        # else keep as string
+        analysis_parameters[key] = value
 
     task["analysis_method"] = selected_method
     task["analysis_parameters"] = analysis_parameters
-    task["sensitive_attributes"] = sensitive_attributes
+    task["sensitive_attributes"] = request.form.getlist("sensitive_attributes")
     task["status"] = "running"
     task["name"] = request.form["task_name"]
     task["modified"] = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -76,8 +92,8 @@ def handle_fairness_analysis_post(request, database, task_id):
         result = name_to_runnable[selected_method](
             task["dataset_loaded"],
             task["model_loaded"],
-            sensitive_attributes,
-            **analysis_parameters
+            task["sensitive_attributes"],
+            **task["analysis_parameters"]
         )
         task["result"] = result.text()
         task["status"] = "completed"

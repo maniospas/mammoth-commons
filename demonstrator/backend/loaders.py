@@ -3,7 +3,8 @@ from typing import get_type_hints
 import markdown2
 
 # data loaders
-from catalogue.dataset_loaders.autocsv import data_csv
+from catalogue.dataset_loaders.custom_csv import data_custom_csv
+from catalogue.dataset_loaders.auto_csv import data_auto_csv
 from catalogue.dataset_loaders.graph import data_graph
 from catalogue.dataset_loaders.images import data_images
 from catalogue.dataset_loaders.image_pairs import data_image_pairs
@@ -18,6 +19,7 @@ from catalogue.model_loaders.fair_node_ranking import model_fair_node_ranking
 # metrics
 from catalogue.metrics.model_card import model_card
 from catalogue.metrics.interactive_report import interactive_report
+from catalogue.metrics.interactive_sklearn_report import interactive_sklearn_report
 from catalogue.metrics.image_bias_analysis import image_bias_analysis
 from catalogue.metrics.xai_analysis import facex
 
@@ -40,18 +42,25 @@ def register(catalogue: dict, component, compatible=None):
     # find argument descriptions
     doc = ""
     args_desc = dict()
+    args_options = dict()
     started_args = False
     separator_title = " "
     sep_title = separator_title
+    started_options = False
     for line in component.__doc__.split("\n"):
         line = line.strip()
-        if line.startswith("Args:"):
+        if line.startswith("Options:"):
+            started_options = True
+        elif line.startswith("Args:"):
             started_args = True
         elif line.endswith(" args:"):
             separator_title = line[:-5].strip()
             sep_title = separator_title
             if separator_title:
                 separator_title = "<br><h3>" + separator_title + "</h3>"
+        elif started_options and ":" in line:
+            splt = line.split(":", maxsplit=2)
+            args_options[splt[0]] = [option.strip() for option in splt[1].split(",")]
         elif started_args and ":" in line:
             splt = line.split(":", maxsplit=2)
             name = format_name(splt[0]).replace(sep_title + " ", "")
@@ -98,6 +107,7 @@ def register(catalogue: dict, component, compatible=None):
             )
         ).replace("\n", " "),
         "parameters": args,
+        "parameter_options": args_options,
         "name": component.__name__,
         "compatible": []
         if compatible is None
@@ -115,17 +125,18 @@ model_loaders = dict()
 analysis_methods = dict()
 
 
-register(dataset_loaders, data_csv)
+register(dataset_loaders, data_auto_csv)
+register(dataset_loaders, data_custom_csv)
 register(dataset_loaders, data_graph)
 register(dataset_loaders, data_images)
 register(dataset_loaders, data_image_pairs)
 
 register(model_loaders, no_model,
-         compatible=[data_csv, data_images])
+         compatible=[data_auto_csv, data_custom_csv, data_images])
 register(model_loaders, model_onnx,
-         compatible=[data_csv])
+         compatible=[data_auto_csv, data_custom_csv])
 register(model_loaders, model_onnx_ensemble,
-         compatible=[data_csv])
+         compatible=[data_auto_csv, data_custom_csv])
 register(model_loaders, model_torch,
          compatible=[data_images])
 register(model_loaders, model_fair_node_ranking,
@@ -133,5 +144,6 @@ register(model_loaders, model_fair_node_ranking,
 
 register(analysis_methods, model_card)
 register(analysis_methods, interactive_report)
+register(analysis_methods, interactive_sklearn_report)
 register(analysis_methods, image_bias_analysis)
 register(analysis_methods, facex)

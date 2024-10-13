@@ -72,12 +72,13 @@
         if (modelLoaders[loaderName]) {
             const fields = modelLoaders[loaderName].parameters;
             for (const param of fields) {
+                const options = modelLoaders[loaderName].parameter_options[param] || null;
                 if(selectedParameters) {
-                    const inputGroup = createInputField(param[0], param[1], param[2], param[3], selectedParameters[param[0]]);
+                    const inputGroup = createInputField(param[0], param[1], param[2], param[3], selectedParameters[param[0]], options);
                     parametersContainer.appendChild(inputGroup);
                 }
                 else {
-                    const inputGroup = createInputField(param[0], param[1], param[2], param[3]);
+                    const inputGroup = createInputField(param[0], param[1], param[2], param[3], null, options);
                     parametersContainer.appendChild(inputGroup);
                 }
             }
@@ -105,14 +106,38 @@
         button.disabled = !allFilled;
     }
 
-    function createInputField(param, type, def, title_text, existingValue = null) {
+    function createInputField(param, type, def, title_text, existingValue = null, options = null) {
         const div = document.createElement('div');
         div.className = 'form-group';
         div.style.display = 'flex';
 
         const value = existingValue !== null ? existingValue : def;  // Use existing value if available
 
-        if (type === 'bool') {
+        if (options) {
+            const title = document.createElement('span');
+            title.innerHTML = title_text;
+            title.htmlFor = param;
+            title.style.marginRight = '10px'; // Add some margin for spacing
+            title.style.width = '250px';
+
+            // Create a select element
+            const select = document.createElement('select');
+            select.name = param;
+            select.className = 'form-control';
+
+            options.forEach(optionValue => {
+                const option = document.createElement('option');
+                option.value = optionValue;
+                option.textContent = optionValue;
+                if (optionValue == def) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+
+            div.appendChild(title);
+            div.appendChild(select);
+        } else if (type === 'bool') {
             const label = document.createElement('span');
             label.innerHTML = title_text;
             label.htmlFor = param;

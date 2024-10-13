@@ -15,7 +15,7 @@ from typing import List, Optional
         "pandas",
     ),
 )
-def data_csv(
+def data_custom_csv(
     path: str = "",
     numeric: Optional[
         List[str]
@@ -28,6 +28,9 @@ def data_csv(
     skip_invalid_lines: bool = True,
 ) -> CSV:
     """Loads a CSV file that contains numeric, categorical, and predictive data columns.
+    To use all data in the file and automate discovery of numerical and categorical columns,
+    as well as of delimiters, use the auto csv loader instead. Otherwise, set here all loading
+    parameters.
 
     Args:
         path: The local file path or a web URL of the file.
@@ -45,7 +48,7 @@ def data_csv(
         delimiter=delimiter,
     )
     if raw_data.shape[1] == 1:
-        raise Exception( "Only one column was found. This often indicates that the wrong delimiter was specified.")
+        raise Exception("Only one column was found. This often indicates that the wrong delimiter was specified.")
     if label not in raw_data:
         raise Exception(f"The dataset has no column name `{label}` to set as a label."
                         f"\nAvailable columns are: {', '.join(raw_data.columns)}")

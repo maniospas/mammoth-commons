@@ -27,14 +27,13 @@ def test_facex():
         )
 
         model = env.model_torch(
-            model_dict,
-            model_path,
+            state_path=model_dict,
+            model_path=model_path,
         )
 
         markdown_result = env.facex(
             dataset, model, [protected], target_class, target_layer
         )
         markdown_result.show()
-
 
 test_facex()
