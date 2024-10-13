@@ -1,13 +1,13 @@
 import os
 
 from mammoth import testing
-from catalogue.dataset_loaders.autocsv import data_csv
+from catalogue.dataset_loaders.custom_csv import data_custom_csv
 from catalogue.model_loaders.onnx import model_onnx
 from catalogue.metrics.model_card import model_card
 
 
 def test_bias_exploration():
-    with testing.Env(data_csv, model_onnx, model_card) as env:
+    with testing.Env(data_custom_csv, model_onnx, model_card) as env:
         numeric = ["age", "duration", "campaign", "pdays", "previous"]
         categorical = [
             "job",

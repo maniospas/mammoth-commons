@@ -82,7 +82,8 @@
             const fields = analysisMethods[methodName].parameters;
             for (const [param, type, def, title_text] of fields) {
                 const existingValue = "{{ prefilled_parameters[param] | default('None') }}";  // Pull pre-filled value from backend
-                const inputGroup = createInputField(param, type, existingValue !== 'None' ? existingValue : def, title_text);
+                const options = analysisMethods[methodName].parameter_options[param] || null;
+                const inputGroup = createInputField(param, type, existingValue !== 'None' ? existingValue : def, title_text, options);
                 parametersContainer.appendChild(inputGroup);
             }
         }
@@ -109,12 +110,35 @@
     }
 
 
-    function createInputField(param, type, def, title_text) {
+    function createInputField(param, type, def, title_text, options=null) {
         const div = document.createElement('div');
         div.className = 'form-group';
         div.style.display = 'flex'; // Use flexbox to arrange elements horizontally
+        if (options) {
+            const title = document.createElement('span');
+            title.innerHTML = title_text;
+            title.htmlFor = param;
+            title.style.marginRight = '10px'; // Add some margin for spacing
+            title.style.width = '250px';
 
-        if (type === 'bool') {
+            // Create a select element
+            const select = document.createElement('select');
+            select.name = param;
+            select.className = 'form-control';
+
+            options.forEach(optionValue => {
+                const option = document.createElement('option');
+                option.value = optionValue;
+                option.textContent = optionValue;
+                if (optionValue == def) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+
+            div.appendChild(title);
+            div.appendChild(select);
+        } else if (type === 'bool') {
             const label = document.createElement('span');
             label.innerHTML = title_text;
             label.htmlFor = param;

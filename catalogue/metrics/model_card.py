@@ -2,7 +2,7 @@ from mammoth.datasets import CSV
 from mammoth.models import ONNX
 from mammoth.exports import Markdown
 from typing import Dict, List
-from mammoth.integration import metric
+from mammoth.integration import metric, Options
 import fairbench as fb
 
 
@@ -11,8 +11,8 @@ def model_card(
     dataset: CSV,
     model: ONNX,
     sensitive: List[str],
-    intersectional: bool = True,
-    pairwise_comparison: bool = True,
+    intersectional: bool = False,
+    compare_groups: Options("Pairwise", "To the total population") = None
 ) -> Markdown:
     """Creates a model card using FairBench. The card includes as many fairness stamps as
     applicable, and includes caveats and recommendations from a socio-technical database.
@@ -21,12 +21,12 @@ def model_card(
 
     Args:
         intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute.
-        pairwise_comparison: Whether to compare groups pairwise. Otherwise, each group is compared to the whole population.
+        compare_groups: Whether to compare groups pairwise, or each group to the whole population.
     """
     for attr in sensitive:
         if attr not in dataset.categorical:
             raise Exception(
-                "Fairness analysis is not supported for non-categorical attributes"
+                "Fairness analysis is not supported for non-categorical sensitive attributes."
             )
 
     # obtain predictions
@@ -46,7 +46,7 @@ def model_card(
     # change behavior based on arguments
     if intersectional:
         sensitive = sensitive.intersectional()
-    report_type = fb.multireport if pairwise_comparison else fb.unireport
+    report_type = fb.multireport if compare_groups == "Pairwise" else fb.unireport
 
     # perform different analysis, dependning on whether labels are provided
     if labels is None:
