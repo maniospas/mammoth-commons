@@ -90,15 +90,15 @@ def mitigation_ranking(dataset, ranking_variable, mitigation_method="Statistical
         protected_attribute
     )
 
-@loader(namespace="csh", version="v003", python="3.11")
+@loader(namespace="csh", version="v001", python="3.11")
 def model_normal_ranking() -> ResearcherRanking:
     """This is a Normal Ranking loader"""
 
     return ResearcherRanking(normal_ranking)
 
 
-@loader(namespace="csh", version="v003", python="3.11")
-def model_mitigation_ranking() -> ResearcherRanking:
-    """This is a fair Ranking loader"""
+@loader(namespace="csh", version="v001", python="3.11")
+def model_mitigation_ranking(sampling_attribute: str = None) -> ResearcherRanking:
+    """This is a fair Ranking loader without Sampling"""
 
     return ResearcherRanking(mitigation_ranking)
