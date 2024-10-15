@@ -1,0 +1,11 @@
+id: connection_properties
+name: connection properties
+description: "\n    Performs analysis of connection properties in a graph.\n    "
+parameter_info: Some parameters are needed.
+component_type: METRIC
+input_types:
+- Graph_CSH
+- EmptyModel
+parameter_default:
+  attributes: []
+output_types: []
