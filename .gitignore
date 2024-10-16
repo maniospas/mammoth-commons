@@ -8,6 +8,7 @@ build
 Dockerfile
 kfp_config.ini
 runtime-requirements.txt
+**/__pycache__/
 *.pyc
 __pycache__/
 fairbench.log
