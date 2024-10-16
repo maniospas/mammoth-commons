@@ -11,7 +11,7 @@ from mammoth.integration import metric
     namespace="mauritzniklas",
     version="v001",
     python="3.11",
-    packages=("multisoc")
+    packages=("multisoc",)
 )
 def connection_properties(
     dataset: Graph_CSH,

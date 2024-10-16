@@ -1,6 +1,7 @@
 temp.html
 .idea
-MAMMOth_commons.egg-info
+MAMMOth_commons.egg-info/
+MAMMOth_commons_deployment.egg-info/
 venv
 dist
 build
