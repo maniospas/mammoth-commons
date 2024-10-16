@@ -21,7 +21,7 @@ def test_bias_exploration():
         ]
         sensitive = ["marital"]
         dataset_uri = "https://archive.ics.uci.edu/static/public/222/bank+marketing.zip/bank/bank.csv"
-        dataset = env.data_csv(
+        dataset = env.data_custom_csv(
             dataset_uri,
             categorical=categorical,
             numeric=numeric,

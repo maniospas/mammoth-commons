@@ -6,7 +6,7 @@ from mammoth.integration import metric, Options
 import fairbench as fb
 
 
-@metric(namespace="maniospas", version="v003", python="3.11", packages=("fairbench",))
+@metric(namespace="maniospas", version="v004", python="3.11", packages=("fairbench",))
 def interactive_report(
     dataset: CSV,
     model: ONNX,
