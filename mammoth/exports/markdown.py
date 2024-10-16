@@ -30,9 +30,11 @@ class Markdown:
         import markdown2
         from mammoth.exports.HTML import HTML
 
-        return HTML(markdown2.markdown(
-            self._text, extras=["tables", "fenced-code-blocks", "code-friendly"]
-        )).text()
+        return HTML(
+            markdown2.markdown(
+                self._text, extras=["tables", "fenced-code-blocks", "code-friendly"]
+            )
+        ).text()
 
     def export(self, output: dsl.Output[integration]):
         with open(output.path, "w") as f:

@@ -6,7 +6,9 @@ from catalogue.metrics.ma_graph_connection import connection_properties
 
 
 def test_fair_graph_filtering():
-    with testing.Env(data_graph_csv, model_fair_node_ranking, connection_properties) as env:
+    with testing.Env(
+        data_graph_csv, model_fair_node_ranking, connection_properties
+    ) as env:
         graph = env.data_graph_csv(
             path_nodes="./data/multisoc/nodes_dummy.csv",
             path_edges="./data/multisoc/edges_dummy.csv",

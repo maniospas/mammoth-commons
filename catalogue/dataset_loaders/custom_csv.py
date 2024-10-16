@@ -48,18 +48,26 @@ def data_custom_csv(
         delimiter=delimiter,
     )
     if raw_data.shape[1] == 1:
-        raise Exception("Only one column was found. This often indicates that the wrong delimiter was specified.")
+        raise Exception(
+            "Only one column was found. This often indicates that the wrong delimiter was specified."
+        )
     if label not in raw_data:
-        raise Exception(f"The dataset has no column name `{label}` to set as a label."
-                        f"\nAvailable columns are: {', '.join(raw_data.columns)}")
+        raise Exception(
+            f"The dataset has no column name `{label}` to set as a label."
+            f"\nAvailable columns are: {', '.join(raw_data.columns)}"
+        )
     for col in categorical:
         if col not in raw_data:
-            raise Exception(f"The dataset has no column name `{col}` to add to categorical attributes."
-                            f"\nAvailable column are: {', '.join(raw_data.columns)}")
+            raise Exception(
+                f"The dataset has no column name `{col}` to add to categorical attributes."
+                f"\nAvailable column are: {', '.join(raw_data.columns)}"
+            )
     for col in numeric:
         if col not in raw_data:
-            raise Exception(f"The dataset has no column name `{col}` to add to numerical attributes."
-                            f"\nAvailable columns are: {', '.join(raw_data.columns)}")
+            raise Exception(
+                f"The dataset has no column name `{col}` to add to numerical attributes."
+                f"\nAvailable columns are: {', '.join(raw_data.columns)}"
+            )
     csv_dataset = CSV(
         raw_data,
         numeric=numeric,

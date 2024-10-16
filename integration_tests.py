@@ -23,7 +23,9 @@ cov.start()
 
 def run_test(file_path):
     try:
-        with open(os.devnull, 'w') as devnull, redirect_stdout(devnull), redirect_stderr(devnull):
+        with open(os.devnull, "w") as devnull, redirect_stdout(
+            devnull
+        ), redirect_stderr(devnull):
             with open(file_path, "r") as file:
                 exec(file.read(), globals())
         print(f"{file_path.ljust(60)}: {GREEN}PASS{RESET}")
@@ -38,7 +40,9 @@ def run_tests_in_folder(path):
     for file_name in os.listdir(path):
         if file_name.endswith(".py") and file_name.startswith("test_"):
             file_path = os.path.join(path, file_name)
-            success = run_test(file_path) and success  # careful of the order (run everything on failure too)
+            success = (
+                run_test(file_path) and success
+            )  # careful of the order (run everything on failure too)
     return success
 
 
@@ -46,9 +50,10 @@ if __name__ == "__main__":
     # monkey patch mammoth classes for tests to run quietly
     import matplotlib
     from mammoth.exports import HTML, Markdown
+
     HTML.show = lambda self: self.text()
     Markdown.show = lambda self: self.text()
-    matplotlib.use('Agg')  # disable window visualization
+    matplotlib.use("Agg")  # disable window visualization
 
     # run the actual tests
     folder_path = "tests"

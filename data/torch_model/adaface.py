@@ -201,7 +201,6 @@ class Bottleneck(namedtuple("Block", ["in_channel", "depth", "stride"])):
 
 
 def get_block(in_channel, depth, num_units, stride=2):
-
     return [Bottleneck(in_channel, depth, stride)] + [
         Bottleneck(depth, depth, 1) for i in range(num_units - 1)
     ]
@@ -323,7 +322,6 @@ class Backbone(Module):
         self.cos = torch.nn.CosineSimilarity()
 
     def forward(self, x):
-
         # current code only supports one extra image
         # it comes with a extra dimension for number of extra image. We will just squeeze it out for now
         x = self.input_layer(x)
@@ -338,7 +336,6 @@ class Backbone(Module):
         return output
 
     def _forward(self, x_pair):
-
         x1, x2 = x_pair[:1], x_pair[-1:]
         # print(x1.shape)
         # print(x2.shape)

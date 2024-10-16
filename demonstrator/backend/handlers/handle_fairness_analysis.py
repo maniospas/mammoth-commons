@@ -19,7 +19,7 @@ def handle_fairness_analysis_get(
         method: {
             "parameters": entries["parameters"][3:],
             "description": entries["description"],
-            "parameter_options": entries["parameter_options"]
+            "parameter_options": entries["parameter_options"],
         }
         for method, entries in analysis_methods.items()
         if issubclass(
@@ -50,6 +50,7 @@ def handle_fairness_analysis_get(
         error_message=error_message,
     )
 
+
 def handle_fairness_analysis_post(request, database, task_id):
     from demonstrator.backend.loaders import name_to_runnable, analysis_methods
 
@@ -61,7 +62,7 @@ def handle_fairness_analysis_post(request, database, task_id):
 
     # Get parameter types
     method_info = analysis_methods[selected_method]
-    parameters = method_info['parameters']
+    parameters = method_info["parameters"]
 
     # Create a dict mapping parameter names to types
     param_types = {param[0]: param[1] for param in parameters}
@@ -71,12 +72,12 @@ def handle_fairness_analysis_post(request, database, task_id):
         if key in ("analysis_method", "sensitive_attributes", "task_name"):
             continue
         value = request.form[key]
-        param_type = param_types.get(key, 'str')  # Default to 'str' if type not found
-        if param_type == 'bool':
-            value = value == 'true'
-        elif param_type == 'int':
+        param_type = param_types.get(key, "str")  # Default to 'str' if type not found
+        if param_type == "bool":
+            value = value == "true"
+        elif param_type == "int":
             value = int(value)
-        elif param_type == 'float':
+        elif param_type == "float":
             value = float(value)
         # else keep as string
         analysis_parameters[key] = value

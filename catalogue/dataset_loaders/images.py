@@ -34,6 +34,7 @@ def data_images(
         safe_libraries: A comma-separated list of safe libraries.
     """
     import pandas as pd
+
     premature_data = pd.read_csv(path, nrows=1)  # just read one row for verification
 
     data_transform = safeexec(
@@ -49,7 +50,7 @@ def data_images(
         data_transform=data_transform,
         batch_size=batch_size,
         shuffle=shuffle,
-        cols=[col for col in premature_data]
+        cols=[col for col in premature_data],
     )
 
     return dataset

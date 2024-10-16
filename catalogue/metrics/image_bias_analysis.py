@@ -16,7 +16,7 @@ def image_bias_analysis(
     dataset: Image,
     model: EmptyModel,
     sensitive: List[str],
-    task: Options("face verification", "image classification") = None
+    task: Options("face verification", "image classification") = None,
 ) -> Markdown:
     """
     Performs analysis of image bias, and recommends mitigation strategies.
@@ -25,6 +25,9 @@ def image_bias_analysis(
         task: The type of predictive task. It should be either face verification or image classification.
     """
 
-    assert task in ["face verification", "image classification"], "The provided task should be either face verification or image classification"
+    assert task in [
+        "face verification",
+        "image classification",
+    ], "The provided task should be either face verification or image classification"
     md = analysis(dataset.path, task, dataset.target, sensitive)
     return Markdown(md)

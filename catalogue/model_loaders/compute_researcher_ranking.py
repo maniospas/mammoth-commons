@@ -1,6 +1,7 @@
 from mammoth.integration import loader
 from mammoth.models.researcher_ranking import ResearcherRanking
 
+
 def normal_ranking(dataset, ranking_variable):
     ranked_dataset = dataset.sort_values(ranking_variable, ascending=False)
     ranked_dataset[f"Ranking_{ranking_variable}"] = [
@@ -8,7 +9,14 @@ def normal_ranking(dataset, ranking_variable):
     ]
     return ranked_dataset
 
-def Compute_mitigation_strategy(dataset, mitigation_method, ranking_variable, sensitive_attribute, protected_attribute):
+
+def Compute_mitigation_strategy(
+    dataset,
+    mitigation_method,
+    ranking_variable,
+    sensitive_attribute,
+    protected_attribute,
+):
     from random import choices
 
     """Function for several mitigation strategies"""
@@ -81,14 +89,21 @@ def Compute_mitigation_strategy(dataset, mitigation_method, ranking_variable, se
     return Dataframe_ranking
 
 
-def mitigation_ranking(dataset, ranking_variable, mitigation_method="Statistical_parity", sensitive_attribute="Gender", protected_attribute="female"):
+def mitigation_ranking(
+    dataset,
+    ranking_variable,
+    mitigation_method="Statistical_parity",
+    sensitive_attribute="Gender",
+    protected_attribute="female",
+):
     return Compute_mitigation_strategy(
         dataset,
         mitigation_method,
         ranking_variable,
         sensitive_attribute,
-        protected_attribute
+        protected_attribute,
     )
+
 
 @loader(namespace="csh", version="v001", python="3.11")
 def model_normal_ranking() -> ResearcherRanking:

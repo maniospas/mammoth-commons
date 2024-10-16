@@ -69,7 +69,7 @@ def metric(namespace, version, python=_default_python, packages=_default_package
             arg_type = type_hints.get(pname, parameter.annotation)
             if arg_type.__class__ == Options:
                 arg_type.__name__ = pname
-                options += "\n        "+pname+": "
+                options += "\n        " + pname + ": "
                 options += ", ".join(arg_type.values)
                 arg_type = str
             if parameter.default is not inspect.Parameter.empty:  # ignore kwargs
@@ -93,7 +93,7 @@ def metric(namespace, version, python=_default_python, packages=_default_package
             )
 
         if options:
-            method.__doc__ += "\n    Options:"+options
+            method.__doc__ += "\n    Options:" + options
 
         # create component_metadata/{name}_meta.yaml
         metadata = {
