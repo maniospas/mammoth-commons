@@ -6,6 +6,16 @@ The library holds common datatypes that are shared between
 components, and automates the integration strategy by only
 needing to add a decorator.
 
+*Some demonstration data are large and stored with LFS.
+To clone this repo without retrieve those files and only
+later retrieve them use:*
+
+```bash
+GIT_LFS_SKIP_SMUDGE=1 git clone https://github.com/mammoth-eu/mammoth-commons.git
+git lfs pull --include "./data/torch_model/ir50_adaface.pth"  # get a large file from lfs
+```
+
+
 ## :microscope: Investigate fairness
 
 This repo includes a thinned down variation of the MAMMOth toolkit

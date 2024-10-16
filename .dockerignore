@@ -20,3 +20,5 @@ setup.py
 .git
 history.json
 integration_tests.py
+.lfsconfig
+.gitattributes

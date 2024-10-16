@@ -1,2 +1,2 @@
-echo "[lfs]" > .lfsconfig
-echo "fetchexclude = *.pth" >> .lfsconfig
+[lfs]
+fetchexclude = *.pth

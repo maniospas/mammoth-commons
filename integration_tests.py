@@ -34,7 +34,7 @@ if __name__ == "__main__":
     from mammoth.exports import HTML, Markdown
     HTML.show = lambda self: self.text()
     Markdown.show = lambda self: self.text()
-    matplotlib.use('Agg') # disable window visualization
+    matplotlib.use('Agg')  # disable window visualization
 
     # run the actual tests
     folder_path = "tests"
