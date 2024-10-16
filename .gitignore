@@ -12,3 +12,4 @@ runtime-requirements.txt
 __pycache__/
 fairbench.log
 history.json
+ir50_adaface.pth
