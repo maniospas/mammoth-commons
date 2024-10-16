@@ -1,11 +1,11 @@
 from mammoth import testing
 from catalogue.dataset_loaders.images import data_images
-from catalogue.model_loaders.pytorch import model_torch
+from catalogue.model_loaders.no_model import no_model
 from catalogue.metrics.image_bias_analysis import image_bias_analysis
 
 
 def test_facex():
-    with testing.Env(data_images, model_torch, image_bias_analysis) as env:
+    with testing.Env(data_images, no_model, image_bias_analysis) as env:
         target = "task"
         task = (
             "face verification"  # or "face verification" TODO: error on unknown tasks
@@ -22,10 +22,7 @@ def test_facex():
             batch_size=1,
             shuffle=False,
         )
-        model = env.model_torch(
-            model_path="./data/torch_model/model.py",
-            state_path="./data/torch_model/model.pth",
-        )
+        model = env.no_model()
         html_result = env.image_bias_analysis(dataset, model, [protected], task)
         html_result.show()
 

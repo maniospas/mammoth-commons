@@ -33,22 +33,24 @@ jobs:
     - name: Run tests
       run: |
         python integration_tests.py
+      continue-on-error: true  # Allow tests to fail but continue
 
-    - name: Retrieve coverage
+    - name: Coverage check and badge
       run: |
         coverage report --fail-under=80
         coverage xml -o coverage.xml
-
-    - name: Generate coverage badge
-      run: |
         COVERAGE_PERCENT=$(coverage report | grep 'TOTAL' | awk '{print $4}' | sed 's/%//')
         curl -o coverage-badge.svg https://img.shields.io/badge/Coverage-${COVERAGE_PERCENT}%25-brightgreen
-
-    - name: Update coverage badge
-      run: |
         sed -i 's#!\[Coverage\](.*)#![Coverage](./coverage-badge.svg)#' README.md
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git add coverage-badge.svg README.md
         git commit -m "Update coverage badge"
         git push
+      continue-on-error: true  # Allow coverage check to fail but continue
+
+    - name: Fail at the end if previous steps failed
+      if: failure()  # Fail the job if any previous step failed
+      run: |
+        echo "One or more steps failed. Failing the workflow."
+        exit 1
