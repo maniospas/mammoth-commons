@@ -1,6 +1,6 @@
 id: ExposureDistance
 name: ExposureDistance
-description: 'Compute the exposure distance  '
+description: Compute the exposure distance
 parameter_info: Some parameters are needed.
 component_type: METRIC
 input_types:
