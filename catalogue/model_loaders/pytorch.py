@@ -29,6 +29,7 @@ def model_torch(
         whitelist=[lib.strip() for lib in safe_libraries.split(",")],
     )
 
-    model.load_state_dict(torch.load(state_path))
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.load_state_dict(torch.load(state_path, map_location=device))
 
     return Pytorch(model)
