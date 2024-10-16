@@ -1,5 +1,7 @@
 # MAMMOth-commons
 
+[![Integration Tests](https://github.com/mammoth-eu/mammoth-commons/actions/workflows/integration.yml/badge.svg)](https://github.com/mammoth-eu/mammoth-commons/actions/workflows/integration.yml)
+
 Fast component development for the MAMMOth fairness toolkit.
 Components refer to model loaders, dataset loaders, or metrics.
 The library holds common datatypes that are shared between
