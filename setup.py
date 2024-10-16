@@ -10,15 +10,15 @@ import setuptools
 with open("README.md", "r") as file:
     long_description = file.read()
 
-with open("requirements[deployment].txt", "r") as file:
+with open("requirements.txt", "r") as file:
     deployment_requirements = file.read().splitlines()
 
-with open("requirements.txt", "r") as file:
-    requirements = file.read().splitlines()
+with open("requirements[test].txt", "r") as file:
+    test_requirements = file.read().splitlines()
 
 setuptools.setup(
     name="MAMMOth-commons",
-    version="0.0.26",
+    version="0.0.27",
     author="Emmanouil (Manios) Krasanakis",
     author_email="maniospas@hotmail.com",
     description="Component interfaces of the MAMMOth fairness toolkit.",
@@ -31,6 +31,6 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=requirements,
-    extras_require={"deployment": deployment_requirements},
+    install_requires=deployment_requirements,
+    extras_require={"deployment": deployment_requirements, "test": test_requirements},
 )
