@@ -28,17 +28,19 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install -r requirements[test].txt
-        python -m pip install coverage
 
     - name: Run tests
       run: |
         python integration_tests.py
       continue-on-error: true  # Allow tests to fail but continue
 
-    - name: Coverage check and badge
+    - name: Coverage check
       run: |
-        coverage report --fail-under=80
         coverage xml -o coverage.xml
+        coverage report --fail-under=80
+
+    - name: Coverage badge
+      run: |
         COVERAGE_PERCENT=$(coverage report | grep 'TOTAL' | awk '{print $4}' | sed 's/%//')
         curl -o coverage-badge.svg https://img.shields.io/badge/Coverage-${COVERAGE_PERCENT}%25-brightgreen
         sed -i 's#!\[Coverage\](.*)#![Coverage](./coverage-badge.svg)#' README.md
