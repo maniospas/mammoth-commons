@@ -30,9 +30,11 @@ def run_tests_in_folder(path):
 
 if __name__ == "__main__":
     # monkey patch mammoth classes for tests to run quietly
+    import matplotlib
     from mammoth.exports import HTML, Markdown
     HTML.show = lambda self: self.text()
     Markdown.show = lambda self: self.text()
+    matplotlib.use('Agg') # disable window visualization
 
     # run the actual tests
     folder_path = "tests"
