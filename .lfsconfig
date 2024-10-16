@@ -1,0 +1,2 @@
+echo "[lfs]" > .lfsconfig
+echo "fetchexclude = *.pth" >> .lfsconfig
