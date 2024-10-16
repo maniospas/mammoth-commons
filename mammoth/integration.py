@@ -100,9 +100,11 @@ def metric(namespace, version, python=_default_python, packages=_default_package
             "id": name,
             "name": " ".join(name.split("_")),
             "description": method.__doc__,
-            "parameter_info": "No parameters needed."
-            if not defaults
-            else "Some parameters are needed.",
+            "parameter_info": (
+                "No parameters needed."
+                if not defaults
+                else "Some parameters are needed."
+            ),
             "component_type": "METRIC",
             "input_types": input_types,
             "parameter_default": defaults,
@@ -232,9 +234,11 @@ def loader(
             "id": name,
             "name": " ".join(name.split("_")),
             "description": method.__doc__,
-            "parameter_info": "No parameters needed."
-            if not defaults
-            else "Some parameters are needed.",
+            "parameter_info": (
+                "No parameters needed."
+                if not defaults
+                else "Some parameters are needed."
+            ),
             "component_type": ltype,
             "parameter_default": defaults,
             "input_types": [],  # input_types would just be ["str"] instead
