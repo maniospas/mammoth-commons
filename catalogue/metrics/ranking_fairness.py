@@ -10,17 +10,16 @@ import seaborn as sns
 from io import BytesIO
 import base64
 
+
 def b(k):
-    '''Function defining the position bias: the highest ranked candidates receive more attention from users than candidates at lower ranks, and here is adoptedwith algorithmic discount with smooth reduction and favorable theoretical properties (https://proceedings.mlr.press/v30/Wang13.html).'''
+    """Function defining the position bias: the highest ranked candidates receive more attention from users than candidates at lower ranks, and here is adoptedwith algorithmic discount with smooth reduction and favorable theoretical properties (https://proceedings.mlr.press/v30/Wang13.html)."""
     return 1 / np.log2(k + 1)
 
+
 def Exposure_distance(
-                        dataset,
-                        model,
-                        ranking_variable,
-                        sensitive_attribute,
-                        protected_attirbute):
-    '''Exposure distance to see where are the two groups located in the ranking'''
+    dataset, model, ranking_variable, sensitive_attribute, protected_attirbute
+):
+    """Exposure distance to see where are the two groups located in the ranking"""
 
     Dataframe_ranking = model.rank(dataset, ranking_variable)
 
@@ -37,9 +36,9 @@ def Exposure_distance(
 
         for attribute_value in sensitive:
             rankings_per_attribute[attribute_value] = list(
-                Dataframe_ranking[Dataframe_ranking[sensitive_attribute] == attribute_value][
-                    ranking_variable
-                ]
+                Dataframe_ranking[
+                    Dataframe_ranking[sensitive_attribute] == attribute_value
+                ][ranking_variable]
             )
 
         non_protected_attribute = [i for i in sensitive if i != protected_attirbute][0]
@@ -67,31 +66,32 @@ def Exposure_distance(
         EDr = np.nan
     return EDr
 
-    
+
 @metric(namespace="csh", version="v001", python="3.11")
 def ExposureDistance(
-        dataset: Dataset,
-        model: NodeRanking,
-        sensitive: str = 'Gender',
-        protected: str = 'female',
-        sampling_attribute: str = 'Nationality_IncomeGroup',
-        ranking_variable: str = 'Degree',
-        intro: str = ''
+    dataset: Dataset,
+    model: NodeRanking,
+    sensitive: str = "Gender",
+    protected: str = "female",
+    sampling_attribute: str = "Nationality_IncomeGroup",
+    ranking_variable: str = "Degree",
+    intro: str = "",
 ) -> Markdown:
-    '''Compute the exposure distance  '''
+    """Compute the exposure distance"""
 
     EDr = Exposure_distance(
-        dataset=dataset, 
-        model=model, 
+        dataset=dataset,
+        model=model,
         protected_attirbute=protected,
         sensitive_attribute=sensitive,
         ranking_variable=ranking_variable,
-        sampling_attribute=sampling_attribute
+        sampling_attribute=sampling_attribute,
     )
 
     the_text = f"{intro} is {str(EDr)}"
 
     return Markdown(text=str(the_text))
+
 
 # Plotting exposure ratio:
 def boxplots_mitigation_strategies(
@@ -130,7 +130,7 @@ def boxplots_mitigation_strategies(
             saturation=0.3,
             linewidth=0.75,
             ax=axes,
-            **PROPS
+            **PROPS,
         )
     else:
         ER_Mitigation_DF = pd.DataFrame(
@@ -150,7 +150,7 @@ def boxplots_mitigation_strategies(
             saturation=0.3,
             linewidth=0.75,
             ax=axes,
-            **PROPS
+            **PROPS,
         )
 
     if sampling_attribute == None:
@@ -187,25 +187,26 @@ def boxplots_mitigation_strategies(
 # Function to generate a base64 string from a matplotlib plot
 def get_base64_encoded_image(fig):
     buffer = BytesIO()
-    fig.savefig(buffer, format='png')
+    fig.savefig(buffer, format="png")
     buffer.seek(0)
-    img_str = base64.b64encode(buffer.read()).decode('utf-8')
+    img_str = base64.b64encode(buffer.read()).decode("utf-8")
     buffer.close()
     return img_str
 
+
 @metric(namespace="csh", version="v001", python="3.11")
 def ExposureDistanceComparison(
-        dataset: Dataset,
-        model: NodeRanking,
-        model_baseline: NodeRanking = None,
-        n_runs: int = 1,
-        sensitive: str = 'Gender',
-        protected: str = 'female',
-        sampling_attribute: str = 'Nationality_IncomeGroup',
-        ranking_variable: str = 'Degree',
-        intro: str = ''
+    dataset: Dataset,
+    model: NodeRanking,
+    model_baseline: NodeRanking = None,
+    n_runs: int = 1,
+    sensitive: str = "Gender",
+    protected: str = "female",
+    sampling_attribute: str = "Nationality_IncomeGroup",
+    ranking_variable: str = "Degree",
+    intro: str = "",
 ) -> HTML:
-    '''Compute the exposure distance and return it without any markup'''
+    """Compute the exposure distance and return it without any markup"""
 
     if not model_baseline:
         raise ValueError("provide a baseline model for comparison")
@@ -215,22 +216,24 @@ def ExposureDistanceComparison(
 
     sampling_attribute = "Nationality_IncomeGroup"
     Old_ranking_variable = "Degree"
-    sensitive_attribute ='Gender'
-    protected_attribute = 'female'
+    sensitive_attribute = "Gender"
+    protected_attribute = "female"
     ER_Old = {}
     ER_Mitigation = {}
     New_ranking_DDBB = {}
-        
+
     for category in set(dataframe_sampling[sampling_attribute]):
-        dataframe_filtered = dataframe_sampling[dataframe_sampling[sampling_attribute]==category]
+        dataframe_filtered = dataframe_sampling[
+            dataframe_sampling[sampling_attribute] == category
+        ]
 
         # Compute the exposure distance for the normal ranking
         ER_Old[category] = Exposure_distance(
-            dataframe_filtered, 
-            model_baseline, 
+            dataframe_filtered,
+            model_baseline,
             ranking_variable=Old_ranking_variable,
             sensitive_attribute=sensitive_attribute,
-            protected_attirbute=protected_attribute
+            protected_attirbute=protected_attribute,
         )
 
         ER_Mitigation[category] = {}
@@ -238,22 +241,22 @@ def ExposureDistanceComparison(
         for r in range(n_runs):
             ER_Mitigation[category][r] = Exposure_distance(
                 dataframe_filtered,
-                model, 
+                model,
                 ranking_variable=Old_ranking_variable,
                 sensitive_attribute=sensitive_attribute,
-                protected_attirbute=protected_attribute
+                protected_attirbute=protected_attribute,
             )
-    
+
     # We now have three dictionaries: ER_Old, ER_Mitigation, New_ranking_DDBB
     img_str = boxplots_mitigation_strategies(
-        ER_Old, 
-        ER_Mitigation, 
+        ER_Old,
+        ER_Mitigation,
         Method="Statistical_parity",
         sampling_attribute=sampling_attribute,
-        n_runs=n_runs
-    ) 
+        n_runs=n_runs,
+    )
 
-    print('Mitigation experiments_done')
+    print("Mitigation experiments_done")
     # Embed the image into an HTML tag
     html_img = f'<img src="data:image/png;base64,{img_str}" />'
     return HTML(body=html_img)

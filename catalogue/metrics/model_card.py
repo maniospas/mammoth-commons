@@ -12,7 +12,7 @@ def model_card(
     model: ONNX,
     sensitive: List[str],
     intersectional: bool = False,
-    compare_groups: Options("Pairwise", "To the total population") = None
+    compare_groups: Options("Pairwise", "To the total population") = None,
 ) -> Markdown:
     """Creates a model card using FairBench. The card includes as many fairness stamps as
     applicable, and includes caveats and recommendations from a socio-technical database.
@@ -61,7 +61,9 @@ def model_card(
         for label in labels:
             # TODO: the following analysis is only for one class label
             report = report_type(
-                predictions=predictions, labels=labels[label].to_numpy(), sensitive=sensitive
+                predictions=predictions,
+                labels=labels[label].to_numpy(),
+                sensitive=sensitive,
             )
             stamps = fb.combine(
                 fb.stamps.prule(report),
@@ -69,8 +71,8 @@ def model_card(
                 fb.stamps.four_fifths(report),
                 fb.stamps.dfpr(report),
                 fb.stamps.dfnr(report),
-                #fb.stamps.auc(report),
-                #fb.stamps.abroca(report),
+                # fb.stamps.auc(report),
+                # fb.stamps.abroca(report),
             )
         text += fb.modelcards.tomarkdown(stamps)
     return Markdown(text)

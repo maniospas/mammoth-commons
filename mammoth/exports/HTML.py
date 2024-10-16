@@ -66,6 +66,7 @@ class HTML:
 
     def show(self):
         import webbrowser
+
         with open("temp.html", "w", encoding="utf-8") as file:
             file.write(self.text())
         webbrowser.open_new(file.name)

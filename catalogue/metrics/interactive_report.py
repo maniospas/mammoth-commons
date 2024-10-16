@@ -53,7 +53,9 @@ def interactive_report(
             {
                 label
                 + " ": report_type(
-                    predictions=predictions, labels=labels[label].to_numpy(), sensitive=sensitive
+                    predictions=predictions,
+                    labels=labels[label].to_numpy(),
+                    sensitive=sensitive,
                 )
                 for label in labels
             }

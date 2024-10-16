@@ -5,6 +5,7 @@ import os
 
 def _download(url, path=None):
     import urllib.request
+
     # Get the file name from the URL
     if path is None:
         file_name = os.path.basename(url)
@@ -83,7 +84,7 @@ def read_csv(url, **kwargs):
     if "delimiter" in kwargs:
         return pd.read_csv(path, **kwargs)
 
-    with open(path, 'r') as file:
+    with open(path, "r") as file:
         sample = file.read(1024)
         sniffer = csv.Sniffer()
         delimiter = sniffer.sniff(sample).delimiter
@@ -95,9 +96,7 @@ def read_csv(url, **kwargs):
     namespace="maniospas",
     version="v001",
     python="3.11",
-    packages=(
-        "pandas",
-    ),
+    packages=("pandas",),
 )
 def data_auto_csv(
     path: str = "",
@@ -119,7 +118,9 @@ def data_auto_csv(
     )
     import pandas as pd
 
-    numeric = [col for col in raw_data if pd.api.types.is_any_real_numeric_dtype(raw_data[col])]
+    numeric = [
+        col for col in raw_data if pd.api.types.is_any_real_numeric_dtype(raw_data[col])
+    ]
     numeric_set = set(numeric)
     categorical = [col for col in raw_data if col not in numeric_set]
     if len(categorical) < 1:

@@ -71,7 +71,8 @@ def handle_create_variation_post(request, database, task_id):
         new_task["modified"] = datetime.now().strftime("%Y-%m-%d %H:%M")
         if not hasattr(new_task["dataset_loaded"], "cols"):
             raise Exception(
-                "Invalid dataset loader: the selected dataset loader failed to create an initial estimation of sensitive attribute candidates (it must initialize a data type with a `cols` attribute).")
+                "Invalid dataset loader: the selected dataset loader failed to create an initial estimation of sensitive attribute candidates (it must initialize a data type with a `cols` attribute)."
+            )
     except (Exception, RuntimeError) as e:
         new_task["modified"] = datetime.now().strftime("%Y-%m-%d %H:%M")
         new_task["status"] = "failed"

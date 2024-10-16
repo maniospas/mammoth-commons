@@ -3,7 +3,9 @@ from mammoth.datasets import Dataset
 
 
 class Image(Dataset):
-    def __init__(self, path, root_dir, target, data_transform, batch_size, shuffle, cols):
+    def __init__(
+        self, path, root_dir, target, data_transform, batch_size, shuffle, cols
+    ):
         """
         Args:
             path (str): Path to the CSV file with annotations (should involve the columns path|attribute1|...|attributeN).
