@@ -36,7 +36,7 @@ class PytorchImageDataset(Dataset):
 
     def __getitem__(self, idx):
         img_name = self.data.iloc[idx, 0]
-        img_path = self.root_dir + "/" + img_name
+        img_path = os.path.join(self.root_dir, img_name)
         image = PILImage.open(img_path).convert("RGB")
         target = self.data.iloc[idx][self.target]
         protected = [self.data.iloc[idx][attr] for attr in self.sensitive]
@@ -53,8 +53,6 @@ class PytorchImagePairsDataset(Dataset):
         target: str,
         sensitive: List[str],
         data_transform: transforms.Compose,
-        img1_path_format: str = "{root}/{col}/{id}.png",
-        img2_path_format: str = "{root}/{col}/{id}.png",
     ):
         """
         PyTorch dataset for image data.
@@ -71,8 +69,6 @@ class PytorchImagePairsDataset(Dataset):
         self.target = target
         self.sensitive = sensitive
         self.data_transform = (data_transform,)
-        self.img1_path = img1_path_format
-        self.img2_path = img2_path_format
 
     def __len__(self):
         return len(self.data)
@@ -80,19 +76,9 @@ class PytorchImagePairsDataset(Dataset):
     def __getitem__(self, idx):
         img1_name = self.data.iloc[idx, 0]  # ref
         img2_name = self.data.iloc[idx, 1]  # motion
-        first_column_name = self.data.columns[0]
-        second_column_name = self.data.columns[1]
 
-        id1_image_path = (
-            self.img1_path.replace("{root}", self.root_dir)
-            .replace("{col}", first_column_name)
-            .replace("{img}", img1_name)
-        )
-        id2_image_path = (
-            self.img2_path.replace("{root}", self.root_dir)
-            .replace("{col}", second_column_name)
-            .replace("{img}", img2_name)
-        )
+        id1_image_path = os.path.join(self.root_dir, img1_name)
+        id2_image_path = os.path.join(self.root_dir, img2_name)
 
         image1 = PILImage.open(id1_image_path).convert("RGB")
         image2 = PILImage.open(id2_image_path).convert("RGB")
