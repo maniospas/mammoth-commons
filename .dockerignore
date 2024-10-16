@@ -19,3 +19,4 @@ fairbench.log
 setup.py
 .git
 history.json
+integration_tests.py

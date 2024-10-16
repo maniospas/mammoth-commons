@@ -54,7 +54,7 @@ deploymentSpec:
         - python3
         - -m
         - kfp.dsl.executor_main
-        image: maniospas/interactive_report:v003
+        image: maniospas/interactive_report:v004
 pipelineInfo:
   name: interactive-report
 root:
