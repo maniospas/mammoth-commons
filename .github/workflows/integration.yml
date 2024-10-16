@@ -1,4 +1,4 @@
-name: Integration tests with coverage
+name: Integration tests
 
 on:
   push:
@@ -49,10 +49,5 @@ jobs:
         git add coverage-badge.svg README.md
         git commit -m "Update coverage badge"
         git push
-      continue-on-error: true  # Allow coverage check to fail but continue
-
-    - name: Fail at the end if previous steps failed
-      if: failure()  # Fail the job if any previous step failed
-      run: |
-        echo "One or more steps failed. Failing the workflow."
-        exit 1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GITHUB_TOKEN for authentication
