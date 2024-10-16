@@ -1,7 +1,6 @@
 # MAMMOth-commons
 
-[Coverage](./coverage-badge.svg)
-
+![Coverage](./coverage-badge.svg)
 [![Integration Tests](https://github.com/mammoth-eu/mammoth-commons/actions/workflows/integration.yml/badge.svg)](https://github.com/mammoth-eu/mammoth-commons/actions/workflows/integration.yml)
 
 Fast component development for the MAMMOth fairness toolkit.
