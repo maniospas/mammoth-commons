@@ -58,6 +58,8 @@ if __name__ == "__main__":
     # run the actual tests
     folder_path = "tests"
     if not run_tests_in_folder(folder_path):
+        cov.stop()
+        cov.save()
         sys.exit(1)  # fail github actions
 
     # Stop coverage, save, and print report
