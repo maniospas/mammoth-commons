@@ -6,7 +6,7 @@ from mammoth.integration import metric, Options
 import fairbench as fb
 
 
-@metric(namespace="maniospas", version="v007", python="3.11", packages=("fairbench",))
+@metric(namespace="maniospas", version="v008", python="3.11", packages=("fairbench",))
 def model_card(
     dataset: CSV,
     model: ONNX,

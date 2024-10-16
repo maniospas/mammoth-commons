@@ -3,7 +3,7 @@
 # Inputs:
 #    dataset: system.Dataset
 #    model: system.Model
-#    model_card__params: dict [Default: {}]
+#    model_card__params: dict [Default: {'compare_groups': 'None', 'intersectional': False}]
 #    sensitive: list
 # Outputs:
 #    output: system.Markdown
@@ -22,7 +22,9 @@ components:
             schemaVersion: 0.0.1
       parameters:
         model_card__params:
-          defaultValue: {}
+          defaultValue:
+            compare_groups: None
+            intersectional: false
           isOptional: true
           parameterType: STRUCT
         sensitive:
@@ -52,7 +54,7 @@ deploymentSpec:
         - python3
         - -m
         - kfp.dsl.executor_main
-        image: maniospas/model_card:v007
+        image: maniospas/model_card:v008
 pipelineInfo:
   name: model-card
 root:
@@ -94,7 +96,9 @@ root:
           schemaVersion: 0.0.1
     parameters:
       model_card__params:
-        defaultValue: {}
+        defaultValue:
+          compare_groups: None
+          intersectional: false
         isOptional: true
         parameterType: STRUCT
       sensitive:
@@ -106,4 +110,4 @@ root:
           schemaTitle: system.Markdown
           schemaVersion: 0.0.1
 schemaVersion: 2.1.0
-sdkVersion: kfp-2.8.0
+sdkVersion: kfp-2.9.0
