@@ -12,8 +12,6 @@ class ImagePairs(Dataset):
         batch_size,
         shuffle,
         cols,
-        img1_path_format: str = "{root}/{col}/{id}.png",
-        img2_path_format: str = "{root}/{col}/{id}.png",
     ):
         """
         Args:
@@ -31,8 +29,6 @@ class ImagePairs(Dataset):
         self.data_transform = data_transform
         self.batch_size = batch_size
         self.shuffle = shuffle
-        self.img1_path_format = img1_path_format
-        self.img2_path_format = img2_path_format
         self.cols = cols
 
     def to_torch(self, sensitive: List[str]):
@@ -48,8 +44,6 @@ class ImagePairs(Dataset):
             target=self.target,
             sensitive=sensitive,
             data_transform=self.data_transform,
-            img1_path_format=self.img1_path_format,
-            img2_path_format=self.img2_path_format,
         )
 
         return DataLoader(
