@@ -40,9 +40,11 @@ def handle_create_variation_post(request, database, task_id):
         if key != "dataset_loader" and key != "task_name"
     }
     call_parameters = {
-        key: value
-        if not isinstance(value, str) or "," not in value or len(value.strip()) == 1
-        else [val.strip() for val in value.split(",")]
+        key: (
+            value
+            if not isinstance(value, str) or "," not in value or len(value.strip()) == 1
+            else [val.strip() for val in value.split(",")]
+        )
         for key, value in dataset_parameters.items()
     }
 
