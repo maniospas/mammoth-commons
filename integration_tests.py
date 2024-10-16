@@ -1,11 +1,25 @@
+# This file implements manual integration tests and coverage computations.
+# This is so that GitHub action results remain comprehensive and the respective
+# test's developer can see that further action is needed.
+#
+# To run the tests, you need to install all module requirements with `pip install -r requirements[test].txt`
+#
+# After running the file locally, run  `coverage report` to see a console summary and `coverage html codecov`
+# to generate interactive html for exploring tracked files from the `mammoth/` and `catalogue/` directories.
 import os
 import sys
 from contextlib import redirect_stdout, redirect_stderr
+import coverage
 
-
+# some constants for pretty printing
 GREEN = "\033[92m"
 RED = "\033[91m"
 RESET = "\033[0m"
+
+# need this as globals passed to execs
+cov = coverage.Coverage(source=["mammoth", "catalogue"])
+cov.start()
+
 
 def run_test(file_path):
     try:
@@ -40,3 +54,8 @@ if __name__ == "__main__":
     folder_path = "tests"
     if not run_tests_in_folder(folder_path):
         sys.exit(1)  # fail github actions
+
+    # Stop coverage, save, and print report
+    cov.stop()
+    cov.save()
+    # cov.report()

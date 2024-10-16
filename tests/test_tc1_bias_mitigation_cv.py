@@ -28,5 +28,5 @@ def test_facex():
         html_result = env.image_bias_analysis(dataset, model, [protected], task)
         html_result.show()
 
-
-test_facex()
+if __name__ == "__main__":
+    test_facex()

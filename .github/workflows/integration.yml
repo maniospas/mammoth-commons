@@ -1,4 +1,4 @@
-name: Integration Tests
+name: Integration tests with coverage
 
 on:
   push:
@@ -25,16 +25,30 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Pull git LFS data
-      run: |
-        git lfs install
-        git lfs pull --include "data/torch_model/model.pth"
-        git lfs pull --include "data/torch_model/ir50_adaface.pth"
-
     - name: Install dependencies
       run: |
         python -m pip install -r requirements[test].txt
+        python -m pip install coverage
 
-    - name: Run test suite
+    - name: Run tests
       run: |
         python integration_tests.py
+
+    - name: Retrieve coverage
+      run: |
+        coverage report --fail-under=80
+        coverage xml -o coverage.xml
+
+    - name: Generate coverage badge
+      run: |
+        COVERAGE_PERCENT=$(coverage report | grep 'TOTAL' | awk '{print $4}' | sed 's/%//')
+        curl -o coverage-badge.svg https://img.shields.io/badge/Coverage-${COVERAGE_PERCENT}%25-brightgreen
+
+    - name: Update coverage badge
+      run: |
+        sed -i 's#!\[Coverage\](.*)#![Coverage](./coverage-badge.svg)#' README.md
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git add coverage-badge.svg README.md
+        git commit -m "Update coverage badge"
+        git push

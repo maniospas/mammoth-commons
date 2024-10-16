@@ -13,3 +13,7 @@ runtime-requirements.txt
 __pycache__/
 fairbench.log
 history.json
+.coverage
+coverage.xml
+coverage.html
+htmlcov/
