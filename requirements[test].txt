@@ -18,3 +18,4 @@ Flask-WTF
 Flask-Session
 multisoc
 seaborn
+coverage

@@ -36,4 +36,5 @@ def test_bias_exploration():
         markdown_result.show()
 
 
-test_bias_exploration()
+if __name__ == "__main__":
+    test_bias_exploration()

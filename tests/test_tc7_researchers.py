@@ -52,11 +52,10 @@ def test_researchers_ranking_comparison():
             intro="ED for the mitigation ranking"
         )
         analysis_outcome_mitigation.show()
-        
-
-test_researchers_ranking_comparison()
 
 
+if __name__ == "__main__":
+    test_researchers_ranking_comparison()
 
-#test_researchers_ranking_unfair()
-#test_researchers_ranking_fair()
+    #test_researchers_ranking_unfair()
+    #test_researchers_ranking_fair()

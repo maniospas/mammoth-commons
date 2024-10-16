@@ -36,4 +36,6 @@ def test_facex():
         )
         markdown_result.show()
 
-test_facex()
+
+if __name__ == "__main__":
+    test_facex()

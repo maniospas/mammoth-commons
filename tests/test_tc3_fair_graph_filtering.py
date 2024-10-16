@@ -14,4 +14,5 @@ def test_fair_graph_filtering():
         analysis_outcome.show()
 
 
-test_fair_graph_filtering()
+if __name__ == "__main__":
+    test_fair_graph_filtering()

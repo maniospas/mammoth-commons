@@ -9,4 +9,5 @@ def test_multiattribute_bias_mitigation():
         print(model)
 
 
-test_multiattribute_bias_mitigation()
+if __name__ == "__main__":
+    test_multiattribute_bias_mitigation()

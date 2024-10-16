@@ -22,3 +22,8 @@ history.json
 integration_tests.py
 .lfsconfig
 .gitattributes
+.coverage
+coverage.xml
+coverage.html
+htmlcov/
+temp.html
