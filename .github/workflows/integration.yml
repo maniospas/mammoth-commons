@@ -25,10 +25,11 @@ jobs:
       with:
         python-version: '3.11'
 
-    - name: Install Git LFS
+    - name: Pull git LFS data
       run: |
         git lfs install
-        git lfs pull --include "./data/torch_model/ir50_adaface.pth"
+        git lfs pull --include "data/torch_model/model.pth"
+        git lfs pull --include "data/torch_model/ir50_adaface.pth"
 
     - name: Install dependencies
       run: |
