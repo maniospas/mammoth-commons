@@ -1,5 +1,0 @@
-numpy==1.*
-pandas
-PyYAML
-kfp
-markdown2
