@@ -27,3 +27,4 @@ coverage.xml
 coverage.html
 htmlcov/
 temp.html
+coverage-badge.svg
