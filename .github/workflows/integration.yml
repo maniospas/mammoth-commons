@@ -32,7 +32,6 @@ jobs:
     - name: Run tests
       run: |
         python integration_tests.py
-      continue-on-error: true  # Allow tests to fail but continue
 
     - name: Coverage check
       run: |
