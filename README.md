@@ -7,16 +7,33 @@ Fast component development for the MAMMOth fairness toolkit.
 Components refer to model loaders, dataset loaders, or metrics.
 The library holds common datatypes that are shared between
 components, and automates the integration strategy by only
-needing to add a decorator.
+needing to add a decorator. It also provides integration
+tests, as well as a lightweight demonstrator that is a thinned
+down version of the toolkit.
 
-*Some demonstration data are large and stored with LFS.
-To clone this repo without retrieve those files and only
-later retrieve them use:*
 
+<details>
+<summary>
+<i>Some demonstration data are large and stored with LFS.
+Here is how to clone this repo without retrieving 
+those files. You can pull them on demand.</i>
+</summary>
+
+*Linux*
 ```bash
 GIT_LFS_SKIP_SMUDGE=1 git clone https://github.com/mammoth-eu/mammoth-commons.git
 git lfs pull --include "./data/torch_model/ir50_adaface.pth"  # get a large file from lfs
 ```
+
+*Windows*
+```bash
+set set GIT_LFS_SKIP_SMUDGE=1
+git clone https://github.com/mammoth-eu/mammoth-commons.git
+git lfs pull --include "./data/torch_model/ir50_adaface.pth"  # get a large file from lfs
+```
+
+</details>
+
 
 
 ## :microscope: Investigate fairness
