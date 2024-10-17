@@ -1,5 +1,3 @@
-import os.path
-
 from mammoth.datasets import CSV
 from mammoth.integration import loader
 import fairbench as fb
