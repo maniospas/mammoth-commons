@@ -1,11 +1,17 @@
 import inspect
-from typing import get_type_hints, Dict, List
+from typing import get_type_hints, Dict, List, get_origin, get_args, Union
 import os
 
 
 _default_python = "3.11"
 _default_packages = ()  # appended to ["mammoth-commons[deployment]"]
 
+def unpack_optionals(arg_type):
+    # Check if the type is Optional (which is the same as Union[type, None])
+    if get_origin(arg_type) is Union and type(None) in get_args(arg_type):
+        # Return the internal type (excluding None)
+        return [arg for arg in get_args(arg_type) if arg is not type(None)][0]
+    return arg_type
 
 def _path(method):
     running_path = os.path.abspath(os.getcwd()).lower()
@@ -25,6 +31,10 @@ def _class_to_name(arg_type):
 class Options:
     def __init__(self, *args):
         self.values = list(args)
+
+    def __call__(self):
+        # the existence of this method introduces comptability with typehints for Python 3.10 or earlier
+        pass
 
 
 def metric(namespace, version, python=_default_python, packages=_default_packages):
@@ -66,7 +76,7 @@ def metric(namespace, version, python=_default_python, packages=_default_package
                 pname == "sensitive"
             ):  # do not consider the sensitive attributes for component types
                 continue
-            arg_type = type_hints.get(pname, parameter.annotation)
+            arg_type = unpack_optionals(type_hints.get(pname, parameter.annotation))
             if arg_type.__class__ == Options:
                 arg_type.__name__ = pname
                 options += "\n        " + pname + ": "

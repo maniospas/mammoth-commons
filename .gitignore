@@ -3,6 +3,7 @@ temp.html
 MAMMOth_commons.egg-info/
 MAMMOth_commons_deployment.egg-info/
 venv
+venv_test
 dist
 build
 Dockerfile
