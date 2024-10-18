@@ -6,12 +6,14 @@ import os
 _default_python = "3.11"
 _default_packages = ()  # appended to ["mammoth-commons[deployment]"]
 
+
 def unpack_optionals(arg_type):
     # Check if the type is Optional (which is the same as Union[type, None])
     if get_origin(arg_type) is Union and type(None) in get_args(arg_type):
         # Return the internal type (excluding None)
         return [arg for arg in get_args(arg_type) if arg is not type(None)][0]
     return arg_type
+
 
 def _path(method):
     running_path = os.path.abspath(os.getcwd()).lower()
