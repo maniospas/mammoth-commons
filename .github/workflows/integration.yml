@@ -20,10 +20,6 @@ jobs:
       with:
         lfs: true  # Enable LFS
 
-    - name: Verify LFS download
-      run: |
-        git lfs pull
-
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
