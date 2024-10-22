@@ -141,7 +141,7 @@ register(model_loaders, model_onnx, compatible=[data_auto_csv, data_custom_csv])
 register(
     model_loaders, model_onnx_ensemble, compatible=[data_auto_csv, data_custom_csv]
 )
-register(model_loaders, model_torch, compatible=[data_images])
+register(model_loaders, model_torch, compatible=[data_images, data_image_pairs])
 register(model_loaders, model_fair_node_ranking, compatible=[data_graph])
 
 register(analysis_methods, model_card)

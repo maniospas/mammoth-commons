@@ -18,7 +18,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        lfs: true  # Enable LFS
+        lfs: false  # Disable LFS
 
     - name: Set up Python
       uses: actions/setup-python@v4
