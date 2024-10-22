@@ -39,6 +39,7 @@ jobs:
         coverage report --fail-under=80
 
     - name: Coverage badge
+      if: github.event_name == 'push'  # Only run on push, not pull_request
       run: |
         COVERAGE_PERCENT=$(coverage report | grep 'TOTAL' | awk '{print $4}' | sed 's/%//')
         curl -o coverage-badge.svg https://img.shields.io/badge/Coverage-${COVERAGE_PERCENT}%25-brightgreen
