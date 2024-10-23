@@ -12,30 +12,6 @@ tests, as well as a lightweight demonstrator that is a thinned
 down version of the toolkit.
 
 
-<details>
-<summary>
-<i>Some demonstration data are large and stored with LFS.
-Here is how to clone this repo without retrieving 
-those files. You can pull them on demand.</i>
-</summary>
-
-*Linux*
-```bash
-GIT_LFS_SKIP_SMUDGE=1 git clone https://github.com/mammoth-eu/mammoth-commons.git
-git lfs pull --include "./data/torch_model/ir50_adaface.pth"  # get a large file from lfs
-```
-
-*Windows*
-```bash
-set set GIT_LFS_SKIP_SMUDGE=1
-git clone https://github.com/mammoth-eu/mammoth-commons.git
-git lfs pull --include "./data/torch_model/ir50_adaface.pth"  # get a large file from lfs
-```
-
-</details>
-
-
-
 ## :microscope: Investigate fairness
 
 Instructions to quickly launch and install the demonstrator 

@@ -6,15 +6,7 @@ description: "Write your metric's description here.\n\n    Args:\n        target
 parameter_info: Some parameters are needed.
 component_type: METRIC
 input_types:
-<<<<<<< HEAD
-<<<<<<< HEAD
 - ImagePairs
-=======
-- Image
->>>>>>> 0d50f192b02c4dac26015ffcb2afc77f4b78fb51
-=======
-- ImagePairs
->>>>>>> 1dbc46cd988b99564027b57810a9df69f2dda3ec
 - Pytorch
 parameter_default:
   target_class: None

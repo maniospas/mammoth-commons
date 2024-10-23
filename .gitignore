@@ -18,3 +18,4 @@ history.json
 coverage.xml
 coverage.html
 htmlcov/
+__pycache__/**

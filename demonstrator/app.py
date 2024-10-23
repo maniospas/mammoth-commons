@@ -11,6 +11,9 @@ if __name__ == "__main__":
     host = "127.0.0.1"
     port = 5050
 
+    import matplotlib
+    matplotlib.use("Agg")  # forcefully disable any popups
+
     with Database() as database:
         initialize_routes(app, database)
         print(f"Running mammoth-commons demonstrator at http://{host}:{port}")
