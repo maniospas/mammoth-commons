@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 from mammoth.datasets import ImagePairs
-=======
-from mammoth.datasets import Image
->>>>>>> 0d50f192b02c4dac26015ffcb2afc77f4b78fb51
 from mammoth.models.pytorch import Pytorch
 from mammoth.exports import HTML
 from typing import List
@@ -19,11 +15,7 @@ from facex.component import run_embeddings_mammoth
     packages=("torch", "torchvision", "timm", "facextool"),
 )
 def facex_embeddings(
-<<<<<<< HEAD
     dataset: ImagePairs,
-=======
-    dataset: Image,
->>>>>>> 0d50f192b02c4dac26015ffcb2afc77f4b78fb51
     model: Pytorch,
     sensitive: List[str],
     target_class: int = None,
