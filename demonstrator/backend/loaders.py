@@ -22,6 +22,7 @@ from catalogue.metrics.interactive_report import interactive_report
 from catalogue.metrics.interactive_sklearn_report import interactive_sklearn_report
 from catalogue.metrics.image_bias_analysis import image_bias_analysis
 from catalogue.metrics.xai_analysis import facex
+from catalogue.metrics.xai_analysis_embeddings import facex_embeddings
 
 
 def format_name(name):
@@ -66,9 +67,9 @@ def register(catalogue: dict, component, compatible=None):
             name = format_name(splt[0]).replace(sep_title + " ", "")
             name = name[0].upper() + name[1:]
             # args_desc[splt[0]] = f"{separator_title}<i>{name} - </i> {splt[1]}"
-            args_desc[
-                splt[0]
-            ] = f"{separator_title}<button type='button' class='btn btn-light' data-toggle='tooltip' data-placement='top' title='{splt[1]}'><i class='bi bi-info-circle'></i> {name}</button>"
+            args_desc[splt[0]] = (
+                f"{separator_title}<button type='button' class='btn btn-light' data-toggle='tooltip' data-placement='top' title='{splt[1]}'><i class='bi bi-info-circle'></i> {name}</button>"
+            )
             separator_title = ""
         else:
             doc += line + "\n"
@@ -149,3 +150,4 @@ register(analysis_methods, interactive_report)
 register(analysis_methods, interactive_sklearn_report)
 register(analysis_methods, image_bias_analysis)
 register(analysis_methods, facex)
+register(analysis_methods, facex_embeddings)
