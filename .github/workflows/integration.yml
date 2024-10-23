@@ -47,7 +47,12 @@ jobs:
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git add coverage-badge.svg README.md
-        git commit -m "Update coverage badge"
-        git push
+        if git diff --cached --exit-code; then
+          echo "No changes to commit."
+        else
+          git commit -m "Update coverage badge"
+          git push
+        fi
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use GITHUB_TOKEN for authentication
+
