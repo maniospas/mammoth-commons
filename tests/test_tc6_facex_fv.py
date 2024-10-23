@@ -9,14 +9,20 @@ def test_facex():
     with testing.Env(data_image_pairs, model_torch, facex_embeddings) as env:
         target = "is_same"
         protected = "race"
-        model_path = "./data/torch_model/adaface.py"
-        model_dict = "./data/torch_model/ir50_adaface.pth"
+
         data_dir = "./data/xai_images/race_per_7000"
         csv_dir = "./data/xai_images/bupt_pairs_anno.csv"
 
         # additional arguements needed for faceX
         target_class = 1  # 1 if we want to find the activations indicating the same person. 0 if we want to find the activations indicating the diference between diferent persons.
-        target_layer = "body.23.res_layer.4"
+
+        # model_path = "./data/torch_model/adaface.py"
+        # model_dict = "./data/torch_model/ir50_adaface.pth"
+        # target_layer = "body.23.res_layer.4"
+
+        model_path = "./data/torch_model/adaface_toy.py"
+        model_dict = "./data/torch_model/toy_adaface.pth"
+        target_layer = "conv3"
 
         dataset = env.data_image_pairs(
             path=csv_dir,
