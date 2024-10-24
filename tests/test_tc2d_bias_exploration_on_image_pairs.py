@@ -1,11 +1,11 @@
 from mammoth import testing
 from catalogue.dataset_loaders.image_pairs import data_image_pairs
 from catalogue.model_loaders.pytorch import model_torch
-from catalogue.metrics.xai_analysis_embeddings import facex_embeddings
+from catalogue.metrics.interactive_report import interactive_report
 
 
-def test_facex():
-    with testing.Env(data_image_pairs, model_torch, facex_embeddings) as env:
+def test_bias_exploration():
+    with testing.Env(data_image_pairs, model_torch, interactive_report) as env:
         target = "is_same"
         protected = "race"
 
@@ -37,10 +37,9 @@ def test_facex():
             model_path=model_path,
         )
 
-        markdown_result = env.facex_embeddings(
-            dataset, model, [protected], target_class, target_layer
-        )
-        markdown_result.show()
+        html_result = env.interactive_report(dataset, model, [protected])
+        html_result.show()
 
 
-test_facex()
+if __name__ == "__main__":
+    test_bias_exploration()
