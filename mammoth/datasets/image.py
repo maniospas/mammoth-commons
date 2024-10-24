@@ -40,3 +40,6 @@ class Image(Dataset):
         return DataLoader(
             dataset=torch_dataset, batch_size=self.batch_size, shuffle=self.shuffle
         )
+
+    def to_features(self):
+        return

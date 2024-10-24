@@ -3,11 +3,9 @@ from mammoth.datasets.dataset import Dataset
 
 class Graph_CSH(Dataset):
     def __init__(self, nodes_df, edges_df, attributes_list):
-        import networkx as nx
-
         self.nodes_df = nodes_df
         self.edges_df = edges_df
-        self.attributes_list = attributes_list
+        self.cols = attributes_list
         self.G = None
 
     def create_graph(self):
@@ -19,7 +17,7 @@ class Graph_CSH(Dataset):
                 int(i),
                 {
                     attribute: self.nodes_df.loc[i, attribute]
-                    for attribute in self.attributes_list
+                    for attribute in self.cols
                 },
             )
             for i in self.nodes_df.index

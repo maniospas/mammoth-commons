@@ -1,12 +1,11 @@
-from mammoth.models.model import Model
+from mammoth.models.predictor import Predictor
 
 
-class ResearcherRanking(Model):
+class ResearcherRanking(Predictor):
     def __init__(self, ranking_function):
-        self.ranking_function = ranking_function
+        self.rank = ranking_function
 
-    def rank(self, dataset, ranking_variable):
-        """
-        A column called Ranking_{ranking_variable} is added to the dataset
-        """
-        return self.ranking_function(dataset, ranking_variable)
+    def predict(self, dataset, sensitive):
+        if len(sensitive) != 1:
+            raise Exception("Researcher ranking data cannot have ")
+        return self.rank(dataset, sensitive[0])

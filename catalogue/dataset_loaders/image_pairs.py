@@ -35,7 +35,11 @@ def data_image_pairs(
         data_transform: A path or implementation of a torchvision data transform.
         batch_size: The number of image pairs in each batch.
         shuffle: Whether to shuffle the dataset.
+        data_transform_path: A path or implementation of a torchvision data transform. Alternatively, paste the transformation code here.
+        transform_variable: The transformation target variable that should be extracted after the namesake code runs.
+        safe_libraries: A comma-separated list of safe libraries that are allowed in the transformation code.
     """
+    batch_size = int(batch_size)
 
     import pandas as pd
 

@@ -1,5 +1,5 @@
-from mammoth.datasets import CSV
-from mammoth.models import ONNX
+from mammoth.datasets import Dataset
+from mammoth.models import Predictor
 from mammoth.exports import Markdown
 from typing import Dict, List
 from mammoth.integration import metric, Options
@@ -8,8 +8,8 @@ import fairbench as fb
 
 @metric(namespace="maniospas", version="v008", python="3.11", packages=("fairbench",))
 def model_card(
-    dataset: CSV,
-    model: ONNX,
+    dataset: Dataset,
+    model: Predictor,
     sensitive: List[str],
     intersectional: bool = False,
     compare_groups: Options("Pairwise", "To the total population") = None,
@@ -23,19 +23,9 @@ def model_card(
         intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute.
         compare_groups: Whether to compare groups pairwise, or each group to the whole population.
     """
-    for attr in sensitive:
-        if attr not in dataset.categorical:
-            raise Exception(
-                "Fairness analysis is not supported for non-categorical sensitive attributes."
-            )
 
     # obtain predictions
-    if hasattr(model, "predict_fair"):
-        predictions = model.predict_fair(
-            dataset.to_features(), dataset.to_features(sensitive)
-        )
-    else:
-        predictions = model.predict(dataset.to_features())
+    predictions = model.predict(dataset, sensitive)
 
     # declare sensitive attributes
     labels = dataset.labels
@@ -48,7 +38,7 @@ def model_card(
         sensitive = sensitive.intersectional()
     report_type = fb.multireport if compare_groups == "Pairwise" else fb.unireport
 
-    # perform different analysis, dependning on whether labels are provided
+    # perform different analysis, depending on whether labels are provided
     if labels is None:
         report = report_type(predictions=predictions, sensitive=sensitive)
         stamps = fb.combine(
@@ -62,7 +52,7 @@ def model_card(
             # TODO: the following analysis is only for one class label
             report = report_type(
                 predictions=predictions,
-                labels=labels[label].to_numpy(),
+                labels=labels[label].to_numpy() if hasattr(labels[label], "to_numpy") else labels[label],
                 sensitive=sensitive,
             )
             stamps = fb.combine(

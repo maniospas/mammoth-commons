@@ -1,5 +1,5 @@
-id: facex
-name: facex
+id: facex_regions
+name: facex regions
 description: "Analyses 19 facial regions and accessories to provide explanations.\n\
   \n    Args:\n        target_class: The integer identifier of the target class.\n\
   \        target_layer: The layer to be explained.\n    "

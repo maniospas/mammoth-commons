@@ -8,6 +8,7 @@ from catalogue.dataset_loaders.auto_csv import data_auto_csv
 from catalogue.dataset_loaders.graph import data_graph
 from catalogue.dataset_loaders.images import data_images
 from catalogue.dataset_loaders.image_pairs import data_image_pairs
+from catalogue.dataset_loaders.graph_from_csv import data_graph_csv
 
 # model loaders
 from catalogue.model_loaders.no_model import no_model
@@ -15,14 +16,17 @@ from catalogue.model_loaders.onnx import model_onnx
 from catalogue.model_loaders.onnx_ensemble import model_onnx_ensemble
 from catalogue.model_loaders.pytorch import model_torch
 from catalogue.model_loaders.fair_node_ranking import model_fair_node_ranking
+from catalogue.model_loaders.compute_researcher_ranking import model_mitigation_ranking, model_normal_ranking
 
 # metrics
 from catalogue.metrics.model_card import model_card
 from catalogue.metrics.interactive_report import interactive_report
 from catalogue.metrics.interactive_sklearn_report import interactive_sklearn_report
 from catalogue.metrics.image_bias_analysis import image_bias_analysis
-from catalogue.metrics.xai_analysis import facex
+from catalogue.metrics.xai_analysis import facex_regions
 from catalogue.metrics.xai_analysis_embeddings import facex_embeddings
+from catalogue.metrics.ma_graph_connection import connection_properties
+from catalogue.metrics.ranking_fairness import exposure_distance_comparison
 
 
 def format_name(name):
@@ -130,26 +134,26 @@ dataset_loaders = dict()
 model_loaders = dict()
 analysis_methods = dict()
 
-
 register(dataset_loaders, data_auto_csv)
 register(dataset_loaders, data_custom_csv)
 register(dataset_loaders, data_graph)
+register(dataset_loaders, data_graph_csv)
 register(dataset_loaders, data_images)
 register(dataset_loaders, data_image_pairs)
 
-register(
-    model_loaders, no_model, compatible=[data_auto_csv, data_custom_csv, data_images]
-)
+register(model_loaders, no_model, compatible=[data_auto_csv, data_custom_csv, data_images, data_graph_csv])
 register(model_loaders, model_onnx, compatible=[data_auto_csv, data_custom_csv])
-register(
-    model_loaders, model_onnx_ensemble, compatible=[data_auto_csv, data_custom_csv]
-)
+register(model_loaders, model_onnx_ensemble, compatible=[data_auto_csv, data_custom_csv])
 register(model_loaders, model_torch, compatible=[data_images, data_image_pairs])
 register(model_loaders, model_fair_node_ranking, compatible=[data_graph])
+register(model_loaders, model_normal_ranking, compatible=[data_graph_csv])
+register(model_loaders, model_mitigation_ranking, compatible=[data_graph_csv])
 
 register(analysis_methods, model_card)
 register(analysis_methods, interactive_report)
 register(analysis_methods, interactive_sklearn_report)
 register(analysis_methods, image_bias_analysis)
-register(analysis_methods, facex)
+register(analysis_methods, facex_regions)
 register(analysis_methods, facex_embeddings)
+register(analysis_methods, connection_properties)
+register(analysis_methods, exposure_distance_comparison)

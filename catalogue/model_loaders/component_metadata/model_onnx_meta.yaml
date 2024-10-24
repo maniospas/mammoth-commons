@@ -1,7 +1,7 @@
 id: model_onnx
 name: model onnx
 description: "Loads an inference model stored in ONNx format.\n\n    Args:\n     \
-  \   path: A url pointing to the loaded file.\n    "
+  \   path: A local path or url pointing to the loaded file.\n    "
 parameter_info: Some parameters are needed.
 component_type: LOADER_MODEL
 parameter_default:

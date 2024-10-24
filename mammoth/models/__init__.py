@@ -1,4 +1,5 @@
 from mammoth.models.model import Model
+from mammoth.models.predictor import Predictor
 from mammoth.models.empty import EmptyModel
 from mammoth.models.onnx import ONNX
 from mammoth.models.pytorch import Pytorch

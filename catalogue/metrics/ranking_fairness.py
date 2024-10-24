@@ -195,7 +195,7 @@ def get_base64_encoded_image(fig):
 
 
 @metric(namespace="csh", version="v001", python="3.11")
-def ExposureDistanceComparison(
+def exposure_distance_comparison(
     dataset: Dataset,
     model: NodeRanking,
     model_baseline: NodeRanking = None,

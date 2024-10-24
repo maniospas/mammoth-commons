@@ -12,7 +12,7 @@ class Graph(Dataset):
         self.labels = None
         self.categorical = set(self.communities.keys())
 
-    def to_features(self, sensitive=None):
+    def to_features(self, sensitive):
         if sensitive is not None:
             return [self.communities[attr] for attr in sensitive]
         return self.graph

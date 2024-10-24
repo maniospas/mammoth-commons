@@ -35,13 +35,7 @@ def interactive_sklearn_report(
         intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute.
         compare_groups: Whether to compare groups pairwise, or each group to the whole population.
     """
-    for attr in sensitive:
-        if attr not in dataset.categorical:
-            raise Exception(
-                "Fairness analysis is not supported for non-categorical sensitive attributes."
-            )
-
-    X = dataset.to_features()
+    X = dataset.to_features(sensitive)
     y = dataset.labels
     assert (
         y.shape[1] <= 2

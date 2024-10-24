@@ -28,12 +28,13 @@ def data_images(
         image_root_dir: The root directory where the actual image files are stored.
         target: Indicates the predictive attribute in the dataset.
         batch_size: The batch size at which images should be loaded.
-        shuffle: Whether to shuffle loaded images.
+        shuffle: Whether to shuffle the loaded images.
         data_transform_path: A path or implementation of a torchvision data transform. Alternatively, paste the transformation code here.
-        transform_variable: The transformation target variable.
-        safe_libraries: A comma-separated list of safe libraries.
+        transform_variable: The transformation target variable that should be extracted after the namesake code runs.
+        safe_libraries: A comma-separated list of safe libraries that are allowed in the transformation code.
     """
     import pandas as pd
+    batch_size = int(batch_size)
 
     premature_data = pd.read_csv(path, nrows=1)  # just read one row for verification
 

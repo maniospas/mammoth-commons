@@ -14,7 +14,7 @@ from facex.component import run_mammoth
     python="3.11",
     packages=("torch", "torchvision", "timm", "facextool"),
 )
-def facex(
+def facex_regions(
     dataset: Image,
     model: Pytorch,
     sensitive: List[str],

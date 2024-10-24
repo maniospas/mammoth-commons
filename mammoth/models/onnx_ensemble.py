@@ -1,9 +1,9 @@
 import numpy as np
-from mammoth.models.model import Model
+from mammoth.models.predictor import Predictor
 import re
 
 
-class ONNXEnsemble(Model):
+class ONNXEnsemble(Predictor):
     def __init__(self, models, params):
         self.models = models
         self.params = params
@@ -12,7 +12,9 @@ class ONNXEnsemble(Model):
         match = re.search(r"_(\d+)\.onnx$", filename)
         return int(match.group(1)) if match else float("inf")
 
-    def predict(self, X):
+    def predict(self, dataset, sensitive):
+        assert sensitive is None or len(sensitive) == 0, "ONNXEnsemble can only be called with no declared sensitive attributes"
+        X = dataset.to_features()
         # n_classes = self.params['n_classes']
         classes = self.params["classes"][:, np.newaxis]
 

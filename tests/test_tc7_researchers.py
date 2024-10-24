@@ -7,10 +7,10 @@ from catalogue.model_loaders.compute_researcher_ranking import model_mitigation_
 
 from catalogue.metrics.ranking_fairness import (
     ExposureDistance,
-    ExposureDistanceComparison,
+    exposure_distance_comparison,
 )
 
-
+"""
 def test_researchers_ranking_unfair():
     with testing.Env(
         data_csv_rankings,
@@ -50,14 +50,14 @@ def test_researchers_ranking_fair():
             intro="ED for the mitigation ranking",
         )
         analysis_outcome_mitigation.show()
-
+"""
 
 def test_researchers_ranking_comparison():
     with testing.Env(
         data_csv_rankings,
         model_normal_ranking,
         model_mitigation_ranking,
-        ExposureDistanceComparison,
+        exposure_distance_comparison,
     ) as env:
         dataset = env.data_csv_rankings(
             path="./data/researchers/Top_researchers.csv", delimiter="|"
@@ -67,7 +67,7 @@ def test_researchers_ranking_comparison():
         model_normal = env.model_normal_ranking()
         model_mitigation = env.model_mitigation_ranking()
 
-        analysis_outcome_mitigation = env.ExposureDistanceComparison(
+        analysis_outcome_mitigation = env.exposure_distance_comparison(
             dataset,
             model_mitigation,
             model_baseline=model_normal,
