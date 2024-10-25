@@ -52,6 +52,7 @@ def test_researchers_ranking_fair():
         analysis_outcome_mitigation.show()
 """
 
+
 def test_researchers_ranking_comparison():
     with testing.Env(
         data_csv_rankings,

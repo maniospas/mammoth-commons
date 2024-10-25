@@ -15,10 +15,7 @@ class Graph_CSH(Dataset):
         nodes_for_graph = [
             (
                 int(i),
-                {
-                    attribute: self.nodes_df.loc[i, attribute]
-                    for attribute in self.cols
-                },
+                {attribute: self.nodes_df.loc[i, attribute] for attribute in self.cols},
             )
             for i in self.nodes_df.index
         ]

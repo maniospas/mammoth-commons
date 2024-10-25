@@ -16,7 +16,10 @@ from catalogue.model_loaders.onnx import model_onnx
 from catalogue.model_loaders.onnx_ensemble import model_onnx_ensemble
 from catalogue.model_loaders.pytorch import model_torch
 from catalogue.model_loaders.fair_node_ranking import model_fair_node_ranking
-from catalogue.model_loaders.compute_researcher_ranking import model_mitigation_ranking, model_normal_ranking
+from catalogue.model_loaders.compute_researcher_ranking import (
+    model_mitigation_ranking,
+    model_normal_ranking,
+)
 
 # metrics
 from catalogue.metrics.model_card import model_card
@@ -141,9 +144,15 @@ register(dataset_loaders, data_graph_csv)
 register(dataset_loaders, data_images)
 register(dataset_loaders, data_image_pairs)
 
-register(model_loaders, no_model, compatible=[data_auto_csv, data_custom_csv, data_images, data_graph_csv])
+register(
+    model_loaders,
+    no_model,
+    compatible=[data_auto_csv, data_custom_csv, data_images, data_graph_csv],
+)
 register(model_loaders, model_onnx, compatible=[data_auto_csv, data_custom_csv])
-register(model_loaders, model_onnx_ensemble, compatible=[data_auto_csv, data_custom_csv])
+register(
+    model_loaders, model_onnx_ensemble, compatible=[data_auto_csv, data_custom_csv]
+)
 register(model_loaders, model_torch, compatible=[data_images, data_image_pairs])
 register(model_loaders, model_fair_node_ranking, compatible=[data_graph])
 register(model_loaders, model_normal_ranking, compatible=[data_graph_csv])

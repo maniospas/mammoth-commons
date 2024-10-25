@@ -34,6 +34,7 @@ def data_images(
         safe_libraries: A comma-separated list of safe libraries that are allowed in the transformation code.
     """
     import pandas as pd
+
     batch_size = int(batch_size)
 
     premature_data = pd.read_csv(path, nrows=1)  # just read one row for verification

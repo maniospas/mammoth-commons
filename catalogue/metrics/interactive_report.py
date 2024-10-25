@@ -43,7 +43,11 @@ def interactive_report(
                 label
                 + " ": report_type(
                     predictions=predictions,
-                    labels=labels[label].to_numpy() if hasattr(labels[label], "to_numpy") else labels[label],
+                    labels=(
+                        labels[label].to_numpy()
+                        if hasattr(labels[label], "to_numpy")
+                        else labels[label]
+                    ),
                     sensitive=sensitive,
                 )
                 for label in labels

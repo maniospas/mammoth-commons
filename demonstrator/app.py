@@ -12,6 +12,7 @@ if __name__ == "__main__":
     port = 5050
 
     import matplotlib
+
     matplotlib.use("Agg")  # forcefully disable any popups
 
     with Database() as database:

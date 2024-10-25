@@ -6,6 +6,7 @@ from catalogue.metrics.xai_analysis import facex_regions
 
 def test_facex():
     import matplotlib
+
     matplotlib.use("Agg")  # disable window visualization
 
     with testing.Env(data_images, model_torch, facex_regions) as env:

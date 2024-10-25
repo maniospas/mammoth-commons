@@ -2,10 +2,7 @@ from mammoth.datasets import Graph_CSH
 from mammoth.integration import loader
 
 
-@loader(namespace="mauritzniklas",
-        version="v002",
-        python="3.11",
-        packages=("pandas",))
+@loader(namespace="mauritzniklas", version="v002", python="3.11", packages=("pandas",))
 def data_graph_csv(
     path_nodes: str = "", path_edges: str = "", attributes: list[str] = ""
 ) -> Graph_CSH:

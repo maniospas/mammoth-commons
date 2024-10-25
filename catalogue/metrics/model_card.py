@@ -52,7 +52,11 @@ def model_card(
             # TODO: the following analysis is only for one class label
             report = report_type(
                 predictions=predictions,
-                labels=labels[label].to_numpy() if hasattr(labels[label], "to_numpy") else labels[label],
+                labels=(
+                    labels[label].to_numpy()
+                    if hasattr(labels[label], "to_numpy")
+                    else labels[label]
+                ),
                 sensitive=sensitive,
             )
             stamps = fb.combine(
