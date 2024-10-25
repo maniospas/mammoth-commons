@@ -68,7 +68,7 @@ class PytorchImagePairsDataset(Dataset):
         self.root_dir = root_dir
         self.target = target
         self.sensitive = sensitive
-        self.data_transform = (data_transform,)
+        self.data_transform = data_transform
 
     def __len__(self):
         return len(self.data)
