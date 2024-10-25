@@ -1,14 +1,14 @@
 from mammoth import testing
 from catalogue.dataset_loaders.images import data_images
 from catalogue.model_loaders.pytorch import model_torch
-from catalogue.metrics.xai_analysis import facex
+from catalogue.metrics.xai_analysis import facex_regions
 
 
 def test_facex():
     import matplotlib
     matplotlib.use("Agg")  # disable window visualization
 
-    with testing.Env(data_images, model_torch, facex) as env:
+    with testing.Env(data_images, model_torch, facex_regions) as env:
         target = "task"
         protected = "protected"
         model_path = "./data/torch_model/torch_model.py"
@@ -34,7 +34,7 @@ def test_facex():
             model_path=model_path,
         )
 
-        markdown_result = env.facex(
+        markdown_result = env.facex_regions(
             dataset, model, [protected], target_class, target_layer
         )
         markdown_result.show()
