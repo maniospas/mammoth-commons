@@ -75,9 +75,9 @@ def register(catalogue: dict, component, compatible=None):
             name = name[0].upper() + name[1:]
             # args_desc[splt[0]] = f"{separator_title}<i>{name} - </i> {splt[1]}"
 
-            args_desc[splt[0]] = (
-                f"{separator_title}<button type='button' class='btn btn-light' data-toggle='tooltip' data-placement='top' title='{splt[1]}'><i class='bi bi-info-circle'></i> {name}</button>"
-            )
+            args_desc[
+                splt[0]
+            ] = f"{separator_title}<button type='button' class='btn btn-light' data-toggle='tooltip' data-placement='top' title='{splt[1]}'><i class='bi bi-info-circle'></i> {name}</button>"
 
             separator_title = ""
         else:
