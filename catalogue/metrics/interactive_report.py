@@ -9,7 +9,7 @@ import numpy as np
 
 @fb.core.Transform
 def categories(iterable):
-    #print(iterable)
+    # print(iterable)
     is_numeric = True
     values = list()
     for value in iterable:
@@ -22,11 +22,13 @@ def categories(iterable):
         values = np.array(values)
         mx = values.max()
         mn = values.min()
-        if mx==mn:
-            raise Exception("Numerical sensitive attribute has the same value everywhere")
-        values = (values-mn) / (mx-mn)
-        return {f"fuzzy min ({mn:.3f})": 1-values, f"fuzzy max ({mx:.3f})": values}
-    return fb.categories@iterable
+        if mx == mn:
+            raise Exception(
+                "Numerical sensitive attribute has the same value everywhere"
+            )
+        values = (values - mn) / (mx - mn)
+        return {f"fuzzy min ({mn:.3f})": 1 - values, f"fuzzy max ({mx:.3f})": values}
+    return fb.categories @ iterable
 
 
 @metric(namespace="maniospas", version="v005", python="3.11", packages=("fairbench",))
