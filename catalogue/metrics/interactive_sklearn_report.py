@@ -7,11 +7,34 @@ from typing import Dict, List
 from mammoth.integration import metric, Options
 import fairbench as fb
 import sklearn
+import numpy as np
+
+
+@fb.core.Transform
+def categories(iterable):
+    #print(iterable)
+    is_numeric = True
+    values = list()
+    for value in iterable:
+        try:
+            values.append(float(value))
+        except Exception:
+            is_numeric = False
+            break
+    if is_numeric:
+        values = np.array(values)
+        mx = values.max()
+        mn = values.min()
+        if mx==mn:
+            raise Exception("Numerical sensitive attribute has the same value everywhere")
+        values = (values-mn) / (mx-mn)
+        return {f"fuzzy min ({mn:.3f})": 1-values, f"fuzzy max ({mx:.3f})": values}
+    return fb.categories@iterable
 
 
 @metric(
     namespace="maniospas",
-    version="v001",
+    version="v002",
     python="3.11",
     packages=(
         "fairbench",
@@ -39,7 +62,7 @@ def interactive_sklearn_report(
     y = dataset.labels
     assert (
         y.shape[1] <= 2
-    ), "Cannot create a logicistic regression interactive report for non-binary predictions"
+    ), "Cannot create a logistic regression interactive report for non-binary predictions"
     y = y[y.columns[-1]]
 
     (
@@ -62,7 +85,7 @@ def interactive_sklearn_report(
         model = GaussianNB()
     else:
         raise Exception(
-            "Available predictors for interactive sklearn reports are only `logistic regression` and `Gaussian naive Bayes`"
+            "Available predictors for interactive sklearn reports are only `Logistic regression` and `Gaussian naive Bayes`"
         )
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
@@ -71,7 +94,7 @@ def interactive_sklearn_report(
     # declare sensitive attributes
     sensitive = fb.Fork(
         {
-            attr + " ": (fb.categories @ dataset.data[attr][idx_test])
+            attr + " ": (categories @ dataset.data[attr][idx_test])
             for attr in sensitive
         }
     )

@@ -22,9 +22,9 @@ class CSV(Dataset):
         self.cols = numeric + categorical
 
     def to_features(self, sensitive):
-        for attr in sensitive:
+        """for attr in sensitive:
             if attr not in self.categorical:
                 raise Exception(
                     "Fairness analysis on CSV datasets is not supported for non-categorical sensitive attributes."
-                )
+                )"""
         return _features(self.data, self.numeric, self.categorical).astype(np.float64)
