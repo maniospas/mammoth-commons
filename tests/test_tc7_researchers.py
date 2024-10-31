@@ -5,10 +5,7 @@ from catalogue.dataset_loaders.data_csv_rankings import data_csv_rankings
 from catalogue.model_loaders.compute_researcher_ranking import model_normal_ranking
 from catalogue.model_loaders.compute_researcher_ranking import model_mitigation_ranking
 
-from catalogue.metrics.ranking_fairness import (
-    ExposureDistance,
-    exposure_distance_comparison,
-)
+from catalogue.metrics.ranking_fairness import exposure_distance_comparison
 
 """
 def test_researchers_ranking_unfair():
@@ -65,18 +62,18 @@ def test_researchers_ranking_comparison():
         )
         n_runs = 10
 
-        model_normal = env.model_normal_ranking()
         model_mitigation = env.model_mitigation_ranking()
 
         analysis_outcome_mitigation = env.exposure_distance_comparison(
             dataset,
             model_mitigation,
-            model_baseline=model_normal,
+            #model_baseline=model_normal,   HACK: without passing in an explicit baseline, model_normal is chosen as default
             n_runs=10,
             sampling_attribute="Nationality_IncomeGroup",
             intro="ED for the mitigation ranking",
         )
         analysis_outcome_mitigation.show()
+
 
 
 if __name__ == "__main__":

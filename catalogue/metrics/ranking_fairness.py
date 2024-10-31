@@ -1,8 +1,8 @@
 from mammoth.exports import Markdown, HTML
 from mammoth.integration import metric
-from mammoth.models.node_ranking import NodeRanking
+from mammoth.models.researcher_ranking import ResearcherRanking
 from catalogue.dataset_loaders.data_csv_rankings import data_csv_rankings
-from mammoth.datasets.csv import Dataset
+from mammoth.datasets.csv import CSV
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,7 +21,10 @@ def Exposure_distance(
 ):
     """Exposure distance to see where are the two groups located in the ranking"""
 
-    Dataframe_ranking = model.rank(dataset, ranking_variable)
+    if callable(model):         # HACK!
+        Dataframe_ranking = model(dataset, ranking_variable)
+    else:
+        Dataframe_ranking = model.rank(dataset, ranking_variable)
 
     # Remove rows with missing values in the sensitive attribute
     # e.g.: If sensitive_attribute is "Gender", remove rows where Gender is missing or NaN or None
@@ -36,9 +39,9 @@ def Exposure_distance(
 
         for attribute_value in sensitive:
             rankings_per_attribute[attribute_value] = list(
-                Dataframe_ranking[
-                    Dataframe_ranking[sensitive_attribute] == attribute_value
-                ][ranking_variable]
+                Dataframe_ranking[Dataframe_ranking[sensitive_attribute] == attribute_value][
+                    "Ranking_" + ranking_variable
+                ]
             )
 
         non_protected_attribute = [i for i in sensitive if i != protected_attirbute][0]
@@ -67,10 +70,10 @@ def Exposure_distance(
     return EDr
 
 
-@metric(namespace="csh", version="v001", python="3.11")
+@metric(namespace="csh", version="v002", python="3.11")
 def ExposureDistance(
-    dataset: Dataset,
-    model: NodeRanking,
+    dataset: CSV,
+    model: ResearcherRanking,
     sensitive: str = "Gender",
     protected: str = "female",
     sampling_attribute: str = "Nationality_IncomeGroup",
@@ -110,7 +113,7 @@ def boxplots_mitigation_strategies(
     fig, axes = plt.subplots(
         ncols=ncols,
         nrows=nrows,
-        figsize=(6 * ncols, 3 * nrows),
+        figsize=(10 * ncols, 5 * nrows),
         sharex=True,
         sharey=False,
         gridspec_kw={"width_ratios": [1]},
@@ -161,7 +164,7 @@ def boxplots_mitigation_strategies(
     for spine in ["right", "top"]:
         axes.spines[spine].set_visible(False)
 
-    axes.tick_params("x", size=3, colors="black", labelsize=13, rotation=90)
+    axes.tick_params("x", size=5, colors="black", labelsize=13, rotation=90)
     axes.tick_params("y", size=2, colors="black", labelsize=12, rotation=0)
 
     axes.set_ylabel("Exposure distance women \n position vs men position", size=13)
@@ -194,11 +197,11 @@ def get_base64_encoded_image(fig):
     return img_str
 
 
-@metric(namespace="csh", version="v001", python="3.11")
+@metric(namespace="csh", version="v002", python="3.11")
 def exposure_distance_comparison(
-    dataset: Dataset,
-    model: NodeRanking,
-    model_baseline: NodeRanking = None,
+    dataset: CSV,
+    model: ResearcherRanking,
+    model_baseline: ResearcherRanking = None,
     n_runs: int = 1,
     sensitive: str = "Gender",
     protected: str = "female",
@@ -209,10 +212,13 @@ def exposure_distance_comparison(
     """Compute the exposure distance and return it without any markup"""
 
     if not model_baseline:
-        raise ValueError("provide a baseline model for comparison")
+        # initialize our own baseline model
+        model_baseline = model.baseline_rank
+        print("Was not provided a baseline model.  Using default")
 
     # Only consider those rows where the sampling attribute is not missing
-    dataframe_sampling = dataset[~dataset[sampling_attribute].isnull()]
+    data = dataset.data
+    dataframe_sampling = data[~data[sampling_attribute].isnull()]
 
     sampling_attribute = "Nationality_IncomeGroup"
     Old_ranking_variable = "Degree"
@@ -221,11 +227,10 @@ def exposure_distance_comparison(
     ER_Old = {}
     ER_Mitigation = {}
     New_ranking_DDBB = {}
-
-    for category in set(dataframe_sampling[sampling_attribute]):
-        dataframe_filtered = dataframe_sampling[
-            dataframe_sampling[sampling_attribute] == category
-        ]
+        
+    for category in sorted(set(dataframe_sampling[sampling_attribute])):
+        dataframe_filtered = dataframe_sampling[dataframe_sampling[sampling_attribute]==category]
+        print(f"{len(dataframe_filtered)} researchers in the category {category}")
 
         # Compute the exposure distance for the normal ranking
         ER_Old[category] = Exposure_distance(

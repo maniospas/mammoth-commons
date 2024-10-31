@@ -3,6 +3,7 @@ from typing import get_type_hints
 import markdown2
 
 # data loaders
+from catalogue.dataset_loaders.data_csv_rankings import data_csv_rankings
 from catalogue.dataset_loaders.custom_csv import data_custom_csv
 from catalogue.dataset_loaders.auto_csv import data_auto_csv
 from catalogue.dataset_loaders.graph import data_graph
@@ -137,6 +138,7 @@ dataset_loaders = dict()
 model_loaders = dict()
 analysis_methods = dict()
 
+register(dataset_loaders, data_csv_rankings)
 register(dataset_loaders, data_auto_csv)
 register(dataset_loaders, data_custom_csv)
 register(dataset_loaders, data_graph)
@@ -155,8 +157,7 @@ register(
 )
 register(model_loaders, model_torch, compatible=[data_images, data_image_pairs])
 register(model_loaders, model_fair_node_ranking, compatible=[data_graph])
-register(model_loaders, model_normal_ranking, compatible=[data_graph_csv])
-register(model_loaders, model_mitigation_ranking, compatible=[data_graph_csv])
+register(model_loaders, model_mitigation_ranking, compatible=[data_csv_rankings])
 
 register(analysis_methods, model_card)
 register(analysis_methods, interactive_report)
@@ -165,4 +166,4 @@ register(analysis_methods, image_bias_analysis)
 register(analysis_methods, facex_regions)
 register(analysis_methods, facex_embeddings)
 register(analysis_methods, connection_properties)
-register(analysis_methods, exposure_distance_comparison)
+register(analysis_methods, exposure_distance_comparison, compatible=[model_mitigation_ranking])

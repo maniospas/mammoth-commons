@@ -82,7 +82,7 @@ def Compute_mitigation_strategy(
 
     New_ranking = {r: i for i, r in Chosen_researchers.items()}
 
-    Dataframe_ranking["New_" + ranking_variable] = [
+    Dataframe_ranking["Ranking_" + ranking_variable] = [
         New_ranking[i] + 1 for i in Dataframe_ranking.id
     ]
 
@@ -105,15 +105,15 @@ def mitigation_ranking(
     )
 
 
-@loader(namespace="csh", version="v001", python="3.11")
+@loader(namespace="csh", version="v002", python="3.11")
 def model_normal_ranking() -> ResearcherRanking:
     """This is a Normal Ranking loader"""
 
     return ResearcherRanking(normal_ranking)
 
 
-@loader(namespace="csh", version="v001", python="3.11")
+@loader(namespace="csh", version="v002", python="3.11")
 def model_mitigation_ranking(sampling_attribute: str = None) -> ResearcherRanking:
     """This is a fair Ranking loader without Sampling"""
 
-    return ResearcherRanking(mitigation_ranking)
+    return ResearcherRanking(mitigation_ranking, normal_ranking)
