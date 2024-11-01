@@ -69,8 +69,7 @@ def test_researchers_ranking_comparison():
             model_mitigation,
             #model_baseline=model_normal,   HACK: without passing in an explicit baseline, model_normal is chosen as default
             n_runs=10,
-            sampling_attribute="Nationality_IncomeGroup",
-            intro="ED for the mitigation ranking",
+            sampling_attribute="Nationality_IncomeGroup"
         )
         analysis_outcome_mitigation.show()
 
