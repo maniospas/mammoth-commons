@@ -96,20 +96,68 @@ def ExposureDistance(
 
     return Markdown(text=str(the_text))
 
+def boxplots_rankings(dataframe, hue_variable, ranking_variable, y_variable):
+    # Set figure size based on number of categories
+    n_categories = len(dataframe[y_variable].unique())
+    height = min(7, max(4, n_categories * 0.5))  # Adaptive height
+    
+    plt.rcParams['figure.autolayout'] = True 
+    
+    # Create figure with adjusted size
+    fig, ax = plt.subplots(
+        figsize=(8, height),
+        constrained_layout=True
+    )
+    
+    # Create boxplot with refined styling
+    sns.boxplot(
+        data=dataframe,
+        x=ranking_variable,
+        y=y_variable,
+        hue=hue_variable,
+        order=sorted(dataframe[y_variable].unique()),
+        saturation=0.7,
+        linewidth=0.75,
+        fliersize=3,  # Smaller outlier points
+        ax=ax
+    )
+    
+    # Refine the plot style
+    ax.spines[['right', 'top']].set_visible(False)
+    
+    # Adjust labels and ticks
+    ax.tick_params(axis='both', labelsize=9)
+    ax.tick_params(axis='x', rotation=0)
+    
+    # Move legend to a better position if there's room
+    if height > 5:
+        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    else:
+        ax.legend(bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=2)
+    
+    # Add grid lines for better readability
+    ax.yaxis.grid(True, linestyle='--', alpha=0.7)
+    
+    # Adjust margins
+    plt.margins(y=0.02)
+    
+    # Save and encode
+    plt.close(fig)
+    return get_base64_encoded_image(fig)
+
 def boxplots_mitigation_strategies_pretty(
     ER_Old, ER_Mitigation, Method, sampling_attribute=None, n_runs=1
 ):
     """Compare the old results with possible mitigation strategies"""
     plt.rcParams["mathtext.fontset"] = "dejavusans"
-    plt.rcParams['figure.autolayout'] = True  # Add this for better layout
+    plt.rcParams['figure.autolayout'] = True 
     
     width = 0.6
     font_size_out = 14
     
-    # Increase figure height to accommodate all elements
     fig, axes = plt.subplots(
-        figsize=(10, 7),  # Increased height from 5 to 7
-        constrained_layout=True  # Use constrained_layout instead of tight_layout
+        figsize=(10, 7),
+        constrained_layout=True
     )
     
     Colors_boxplots = {"Statistical_parity": "darkblue", "Equal_parity": "gold"}
@@ -156,8 +204,7 @@ def boxplots_mitigation_strategies_pretty(
     if sampling_attribute == None:
         plt.scatter(0, ER_Old, color="purple", s=60, alpha=0.7)
     else:
-        plt.scatter(range(len(ER_Old)), list(ER_Old.values()), 
-                   color="purple", s=60, alpha=0.7)
+        plt.scatter(range(len(ER_Old)), list(ER_Old.values()), color="purple", s=60, alpha=0.7)
     
     # Style the axes
     for spine in ["right", "top"]:
@@ -168,8 +215,7 @@ def boxplots_mitigation_strategies_pretty(
     axes.tick_params("y", size=2, colors="black", labelsize=11)
     
     # Label axes
-    axes.set_ylabel("Exposure distance women\nposition vs men position", 
-                   size=12, labelpad=10)
+    axes.set_ylabel("Exposure distance women\nposition vs men position", size=12, labelpad=10)
     axes.set_xlabel(" ", size=0)
     
     # Add grid lines
@@ -187,97 +233,6 @@ def boxplots_mitigation_strategies_pretty(
     plt.close(fig)
     enc_str = get_base64_encoded_image(fig)
     return enc_str
-
-# Plotting exposure ratio:
-def boxplots_mitigation_strategies(
-    ER_Old, ER_Mitigation, Method, sampling_attribute=None, n_runs=1
-):
-    """Compare the old results with possible mitigation strategies"""
-
-    plt.rcParams["mathtext.fontset"] = "dejavusans"
-    width = 0.6
-    font_size_out = 14
-    nrows = 1
-    ncols = 1
-
-    Colors_boxplots = {"Statistical_parity": "darkblue", "Equal_parity": "gold"}
-
-    fig, axes = plt.subplots(
-        ncols=ncols,
-        nrows=nrows,
-        figsize=(10 * ncols, 5 * nrows),
-        sharex=True,
-        sharey=False,
-        gridspec_kw={"width_ratios": [1]},
-    )
-    PROPS = {
-        "boxprops": {"facecolor": "none", "edgecolor": Colors_boxplots[Method]},
-        "medianprops": {"color": Colors_boxplots[Method]},
-        "whiskerprops": {"color": Colors_boxplots[Method]},
-        "capprops": {"color": Colors_boxplots[Method]},
-    }
-    if sampling_attribute == None:
-        ER_Mitigation_DF = pd.DataFrame(ER_Mitigation.values(), columns=["ER_run"])
-        sns.boxplot(
-            data=ER_Mitigation_DF,
-            y="ER_run",
-            color=Colors_boxplots[Method],
-            saturation=0.3,
-            linewidth=0.75,
-            ax=axes,
-            **PROPS,
-        )
-    else:
-        ER_Mitigation_DF = pd.DataFrame(
-            {
-                sampling_attribute: [
-                    c for c in ER_Mitigation.keys() for n in range(n_runs)
-                ],
-                "ER_run": [n for c in ER_Mitigation.values() for n in c.values()],
-            }
-        )
-
-        sns.boxplot(
-            data=ER_Mitigation_DF,
-            x=sampling_attribute,
-            y="ER_run",
-            color=Colors_boxplots[Method],
-            saturation=0.3,
-            linewidth=0.75,
-            ax=axes,
-            **PROPS,
-        )
-
-    if sampling_attribute == None:
-        plt.scatter(0, ER_Old, color="purple", s=60, alpha=0.7)
-    else:
-        plt.scatter(ER_Old.keys(), ER_Old.values(), color="purple", s=60, alpha=0.7)
-
-    for spine in ["right", "top"]:
-        axes.spines[spine].set_visible(False)
-
-    axes.tick_params("x", size=5, colors="black", labelsize=13, rotation=90)
-    axes.tick_params("y", size=2, colors="black", labelsize=12, rotation=0)
-
-    axes.set_ylabel("Exposure distance women \n position vs men position", size=13)
-    axes.set_xlabel(" ", size=0)
-    # axes.set_ylim(0,16)
-
-    # axes.set_title('ERr',  size=30)
-
-    for l in [float(str(i).split(", ")[1]) for i in axes.get_yticklabels()][2:-1]:
-        if sampling_attribute == None:
-            axes.hlines(l, -0.5, 0.5, "darkgrey", lw=1, ls="--")
-
-        else:
-            axes.hlines(l, -0.5, len(ER_Old) - 0.5, "darkgrey", lw=1, ls="--")
-
-    plt.subplots_adjust(wspace=0.5, hspace=0.2)
-    plt.close(fig)
-
-    enc_str = get_base64_encoded_image(fig)
-    return enc_str
-
 
 # Function to generate a base64 string from a matplotlib plot
 def get_base64_encoded_image(fig):
@@ -331,7 +286,7 @@ template = """
             margin: 20px;
             color: #333;
         }}
-        .container {{
+        .csh-container {{
             display: grid;
             grid-template-columns: 250px 1fr 300px;
             gap: 20px;
@@ -421,7 +376,7 @@ template = """
             display: block;
             margin: auto;
         }}
-        .exposure-ratio-visualization img {{
+        .exposure-distance-visualization img {{
             display: block;
             margin-left: auto;
             margin-right: auto;
@@ -448,7 +403,7 @@ template = """
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="csh-container">
         <div class="parameters">
             <h3>Initial parameters</h3>
             <div class="protected-attributes">
@@ -477,30 +432,35 @@ template = """
             </div>
             
             <div class="visualization-full">
-                <h3 class="section-title">2. Regional Citation Distribution</h3>
-                <img src="data:image/png;base64,{distribution_img_str}" alt="Citation Distribution" style="width: 100%;"/>
+                <h3 class="section-title">2. Regional Distribution</h3>
+                <img src="data:image/png;base64,{normal_distribution_img_str}" alt="Regional Citation Distribution" style="width: 100%;"/>
                 <div class="figure-caption">
-                    Distribution of citation rankings across world regions, separated by gender.
+                    Distribution of {ranking_variable} across world regions, separated by gender.
+                </div>
+                <img src="data:image/png;base64,{distribution_img_str}" alt="Regional Distribution" style="width: 100%;"/>
+                <div class="figure-caption">
+                    Post-Mitigation Distribution of {ranking_variable} across world regions, separated by gender.
                 </div>
             </div>
 
-            <h3 class="section-title">3. Exposure Ratio Analysis</h3>
-            <div class="visualization-full exposure-ratio-visualization">
-                <img src="data:image/png;base64,{img_str}" alt="Exposure Ratio Visualization" />
+            <h3 class="section-title">3. Exposure Distance Analysis</h3>
+            <div class="visualization-full exposure-distance-visualization">
+                <img src="data:image/png;base64,{er_viz_str}" alt="Exposure Distance Visualization" />
                 <div class="figure-caption">
                     <div class="caption-definition">
-                        Exposure Ratio measures the visibility of researchers from different demographic groups in rankings, 
-                        comparing their average position to what would be expected under perfect representation.
-                        A ratio of 1.0 indicates equal representation.
+                        The Exposure Distance (ED) measures how fair is the visibility of researchers from different demographic groups in rankings. 
+                        In this plot, we compare the position of each woman vs. each man inside the income group categories, and then we average those values. 
+                        A value of ED closer to 0 means a fairer representation, and we show how using a mitigation strategy (statistical parity in this case) 
+                        improves the metric,, making it smaller.
                     </div>
                     <div class="caption-elements">
                         <div class="caption-element">
                             <span class="element-marker dot-marker"></span>
-                            Purple dots show the Exposure Ratio when researchers are ranked by raw degree centrality
+                            Purple dots show the Exposure Distance when researchers are ranked by raw degree centrality
                         </div>
                         <div class="caption-element">
                             <span class="element-marker boxplot-marker"></span>
-                            Box plots show the distribution of Exposure Ratios across {n_runs} runs of the fairness-aware ranking algorithm
+                            Box plots show the distribution of Exposure Distance across {n_runs} runs of the fairness-aware ranking algorithm
                         </div>
                     </div>
                 </div>
@@ -509,13 +469,13 @@ template = """
             <div class="metrics">
                 <h3>Results</h3>
                 
-                <h4>Exposure Ratios by Group</h4>
+                <h4>Exposure Distance by Group</h4>
                 <table class="metrics-table">
                     <tr>
                         <th>Group</th>
-                        <th>Original ER</th>
-                        <th>Mean Fair ER</th>
-                        <th>Std Dev Fair ER</th>
+                        <th>Original ED</th>
+                        <th>Mean Fair ED</th>
+                        <th>Std Dev Fair ED</th>
                     </tr>
                     {group_metrics_rows}
                 </table>
@@ -528,7 +488,7 @@ template = """
                         <th>Fair (Mean)</th>
                     </tr>
                     <tr>
-                        <td>Max ER Disparity</td>
+                        <td>Max ED Disparity</td>
                         <td>{max_disparity_old:.2f}</td>
                         <td>{max_disparity_new:.2f}</td>
                     </tr>
@@ -554,8 +514,8 @@ template = """
 </html>
 """
 
-def generate_html_report(dataset, ER_Old, ER_Mitigation, img_str, 
-                        network_path, distribution_path,
+def generate_html_report(dataset, ER_Old, ER_Mitigation, boxplot_img_str, 
+                        network_path, normal_distribution_img_str, distribution_img_str,
                         sensitive_attribute, protected_attribute,
                         sampling_attribute, ranking_variable, n_runs):
     # Calculate summary statistics
@@ -568,7 +528,6 @@ def generate_html_report(dataset, ER_Old, ER_Mitigation, img_str,
     
     # Get base64 strings for the images
     network_img_str = image_to_base64(network_path)
-    distribution_img_str = image_to_base64(distribution_path)
     
     # Generate HTML content
     html_content = template.format(
@@ -576,8 +535,9 @@ def generate_html_report(dataset, ER_Old, ER_Mitigation, img_str,
         protected_attribute=protected_attribute,
         sampling_attribute=sampling_attribute,
         ranking_variable=ranking_variable,
-        img_str=img_str,
+        er_viz_str=boxplot_img_str,
         network_img_str=network_img_str,
+        normal_distribution_img_str=normal_distribution_img_str,
         distribution_img_str=distribution_img_str,
         group_metrics_rows=generate_group_metrics_rows(ER_Old, ER_Mitigation, n_runs),
         max_disparity_old=max_disparity_old,
@@ -661,8 +621,24 @@ def exposure_distance_comparison(
                 protected_attirbute=protected_attribute,
             )
 
+
+    # In order to show the boxplots with rankings for the full dataset
+    # i.e., not "per category"
+    if callable(model_baseline):         # HACK!
+        original_dataset_ranked = model_baseline(dataframe_sampling, ranking_variable)
+        mitigation_dataset_ranked = model_baseline(dataframe_filtered, ranking_variable)
+    else:
+        original_dataset_ranked = model_baseline.rank(dataframe_sampling, ranking_variable)
+
+    # In order to show the boxplots with rankings for the full dataset
+    # i.e., not "per category"
+    if callable(model):         # HACK!
+        mitigation_dataset_ranked = model(dataframe_sampling, ranking_variable)
+    else:
+        mitigation_dataset_ranked = model.rank(dataframe_sampling, ranking_variable)
+    
     # We now have three dictionaries: ER_Old, ER_Mitigation
-    img_str = boxplots_mitigation_strategies_pretty(
+    mitigation_strategies_image = boxplots_mitigation_strategies_pretty(
         ER_Old,
         ER_Mitigation,
         Method="Statistical_parity",
@@ -670,20 +646,35 @@ def exposure_distance_comparison(
         n_runs=n_runs,
     )
 
+    normal_distribution_image = boxplots_rankings(
+        original_dataset_ranked,
+        hue_variable=sensitive_attribute,
+        y_variable=sampling_attribute,
+        ranking_variable="Ranking_"+Old_ranking_variable
+    )
+
+    distribution_image = boxplots_rankings(
+        mitigation_dataset_ranked,
+        hue_variable=sensitive_attribute,
+        y_variable=sampling_attribute,
+        ranking_variable="Ranking_"+Old_ranking_variable
+    )
+
+
     print("Mitigation experiments_done")
 
     # HACK
     network_path = "./data/researchers/network.png"
-    distribution_path = "./data/researchers/distribution.png"
 
     # Generate the complete HTML report
     return generate_html_report(
         dataset=data,
         ER_Old=ER_Old,
         ER_Mitigation=ER_Mitigation,
-        img_str=img_str,
+        boxplot_img_str=mitigation_strategies_image,
         network_path=network_path,
-        distribution_path=distribution_path,
+        normal_distribution_img_str=normal_distribution_image,
+        distribution_img_str=distribution_image,
         sensitive_attribute=sensitive,
         protected_attribute=protected,
         sampling_attribute=sampling_attribute,
