@@ -58,9 +58,9 @@ def Compute_mitigation_strategy(
     elif mitigation_method == "Equal_parity":
         P_minority = 0.5
     elif mitigation_method == "Updated_statistical_parity":
-        print("In construction")
+        raise NotImplementedError("Updated_statistical_parity method is not implemented yet.")
     elif mitigation_method == "Internal_group_fairness":
-        print("In construction")
+        raise NotImplementedError("Internal_group_fairness method is not implemented yet.")
 
     Positions = {
         non_protected_attribute: [
@@ -82,7 +82,7 @@ def Compute_mitigation_strategy(
 
     New_ranking = {r: i for i, r in Chosen_researchers.items()}
 
-    Dataframe_ranking["New_" + ranking_variable] = [
+    Dataframe_ranking["Ranking_" + ranking_variable] = [
         New_ranking[i] + 1 for i in Dataframe_ranking.id
     ]
 
@@ -105,15 +105,14 @@ def mitigation_ranking(
     )
 
 
-@loader(namespace="csh", version="v001", python="3.11")
+@loader(namespace="csh", version="v002", python="3.11")
 def model_normal_ranking() -> ResearcherRanking:
     """This is a Normal Ranking loader"""
 
     return ResearcherRanking(normal_ranking)
 
 
-@loader(namespace="csh", version="v001", python="3.11")
-def model_mitigation_ranking(sampling_attribute: str = None) -> ResearcherRanking:
-    """This is a fair Ranking loader without Sampling"""
-
-    return ResearcherRanking(mitigation_ranking)
+@loader(namespace="csh", version="v002", python="3.11")
+def model_mitigation_ranking() -> ResearcherRanking:
+    """This is a fair Ranking loader with Sampling. In this model, we will use a mitigation strategy based on Statistical Parity, and compare it with a normal ranking based on one of the Numerical columns"""
+    return ResearcherRanking(mitigation_ranking, normal_ranking)
