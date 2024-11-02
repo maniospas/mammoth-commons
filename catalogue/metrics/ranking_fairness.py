@@ -544,9 +544,9 @@ def validate_input(
     try:
         sensitive_attr = sensitive[0]
         assert sensitive_attr == "Gender"
-        assert protected == "female"
+        assert protected in ["female","male"]
     except:
-        raise ValueError("Currently, only `Gender` is a valid sensitive attribute, and the protected group is `female`")
+        raise ValueError("Currently, only `Gender` is a valid sensitive attribute, and the protected group is `female` or `male`")
 
     required_columns = [sensitive_attr, sampling_attribute, ranking_variable]
     missing_columns = [
@@ -589,7 +589,7 @@ def exposure_distance_comparison(
     Parameters:  \n
         - `N runs`: Choose a natural number between 1 and 100 \n
         - `Sensitive attributes`: Which attribute is relevant for fairness analysis.  To select this, click the blue '+' and then use the dropdown.  Currently, only *Gender* is supported \n
-        - `Protected`: The protected group for the fairness analysis. Currenly, only *female* is supported \n
+        - `Protected`: The protected group for the fairness analysis. Currenly, only *female* or *male* are supported \n
         - `Sampling Attribute`: The value by which we group the analysis for finer-grained results. One of *Nationality&#95;IncomeGroup* or *Nationality&#95;Region*. \n
         - `Ranking Variable`: This refers to the main criteria by which ranking is done.  One of *Degree*, *Citations* or *Productivity*
     """

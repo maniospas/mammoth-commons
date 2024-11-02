@@ -14,7 +14,7 @@ def data_csv_rankings(
 ) -> CSV:
     """
     This is a Loader to load .csv files with information about researchers
-    The `Path` should be given relative to your locally running instance (e.g.: `./data/researchers/Top_researchers.csv`)
+    The `Path` should be given relative to your locally running instance (e.g.: *./data/researchers/Top&#95;researchers.csv*)
     The `Delimiter` should match the CSV file you have (e.g.: '|')
     """
     try:
