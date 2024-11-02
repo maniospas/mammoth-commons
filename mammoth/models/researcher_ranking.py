@@ -1,7 +1,7 @@
-from mammoth.models.predictor import Predictor
+from mammoth.models.model import Model
 
 
-class ResearcherRanking(Predictor):
+class ResearcherRanking(Model):
     def __init__(self, ranking_function, baseline_ranking_function = None):
         self.rank = ranking_function
         self.baseline_rank = baseline_ranking_function

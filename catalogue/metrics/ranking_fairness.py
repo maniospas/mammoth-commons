@@ -1,3 +1,4 @@
+from typing import List
 from mammoth.exports import Markdown, HTML
 from mammoth.integration import metric
 from mammoth.models.researcher_ranking import ResearcherRanking
@@ -18,29 +19,23 @@ def b(k):
 
 
 def Exposure_distance(
-    dataset, model, ranking_variable, sensitive_attribute, protected_attirbute
+    dataset, ranking_variable, sensitive_attribute, protected_attirbute
 ):
     """Exposure distance to see where are the two groups located in the ranking"""
 
-    if callable(model):         # HACK!
-        Dataframe_ranking = model(dataset, ranking_variable)
-    else:
-        Dataframe_ranking = model.rank(dataset, ranking_variable)
-
     # Remove rows with missing values in the sensitive attribute
     # e.g.: If sensitive_attribute is "Gender", remove rows where Gender is missing or NaN or None
-    Dataframe_ranking = Dataframe_ranking[
-        ~Dataframe_ranking[sensitive_attribute].isnull()
-    ]
+    # TODO: check if this "rank first and then filter" approach is appropriate
+    dataset = dataset[~dataset[sensitive_attribute].isnull()]
 
     rankings_per_attribute = {}
-    sensitive = list(set(Dataframe_ranking[sensitive_attribute]))
+    sensitive = list(set(dataset[sensitive_attribute]))
     try:
         assert len(sensitive) == 2
 
         for attribute_value in sensitive:
             rankings_per_attribute[attribute_value] = list(
-                Dataframe_ranking[Dataframe_ranking[sensitive_attribute] == attribute_value][
+                dataset[dataset[sensitive_attribute] == attribute_value][
                     "Ranking_" + ranking_variable
                 ]
             )
@@ -71,45 +66,15 @@ def Exposure_distance(
     return EDr
 
 
-@metric(namespace="csh", version="v002", python="3.11")
-def ExposureDistance(
-    dataset: CSV,
-    model: ResearcherRanking,
-    sensitive: str = "Gender",
-    protected: str = "female",
-    sampling_attribute: str = "Nationality_IncomeGroup",
-    ranking_variable: str = "Degree",
-    intro: str = "",
-) -> Markdown:
-    """Compute the exposure distance"""
-
-    EDr = Exposure_distance(
-        dataset=dataset,
-        model=model,
-        protected_attirbute=protected,
-        sensitive_attribute=sensitive,
-        ranking_variable=ranking_variable,
-        sampling_attribute=sampling_attribute,
-    )
-
-    the_text = f"{intro} is {str(EDr)}"
-
-    return Markdown(text=str(the_text))
-
 def boxplots_rankings(dataframe, hue_variable, ranking_variable, y_variable):
     # Set figure size based on number of categories
     n_categories = len(dataframe[y_variable].unique())
     height = min(7, max(4, n_categories * 0.5))  # Adaptive height
-    
-    plt.rcParams['figure.autolayout'] = True 
-    
-    # Create figure with adjusted size
-    fig, ax = plt.subplots(
-        figsize=(8, height),
-        constrained_layout=True
-    )
-    
-    # Create boxplot with refined styling
+
+    plt.rcParams["figure.autolayout"] = True
+
+    fig, ax = plt.subplots(figsize=(8, height), constrained_layout=True)
+
     sns.boxplot(
         data=dataframe,
         x=ranking_variable,
@@ -118,57 +83,52 @@ def boxplots_rankings(dataframe, hue_variable, ranking_variable, y_variable):
         order=sorted(dataframe[y_variable].unique()),
         saturation=0.7,
         linewidth=0.75,
-        fliersize=3,  # Smaller outlier points
-        ax=ax
+        fliersize=3,
+        ax=ax,
     )
-    
-    # Refine the plot style
-    ax.spines[['right', 'top']].set_visible(False)
-    
+
+    ax.spines[["right", "top"]].set_visible(False)
+
     # Adjust labels and ticks
-    ax.tick_params(axis='both', labelsize=9)
-    ax.tick_params(axis='x', rotation=0)
-    
+    ax.tick_params(axis="both", labelsize=9)
+    ax.tick_params(axis="x", rotation=0)
+
     # Move legend to a better position if there's room
     if height > 5:
-        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+        ax.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
     else:
-        ax.legend(bbox_to_anchor=(0.5, -0.15), loc='upper center', ncol=2)
-    
-    # Add grid lines for better readability
-    ax.yaxis.grid(True, linestyle='--', alpha=0.7)
-    
-    # Adjust margins
+        ax.legend(bbox_to_anchor=(0.5, -0.15), loc="upper center", ncol=2)
+
+    ax.yaxis.grid(True, linestyle="--", alpha=0.7)
+
     plt.margins(y=0.02)
-    
+
     # Save and encode
     plt.close(fig)
     return get_base64_encoded_image(fig)
+
 
 def boxplots_mitigation_strategies_pretty(
     ER_Old, ER_Mitigation, Method, sampling_attribute=None, n_runs=1
 ):
     """Compare the old results with possible mitigation strategies"""
     plt.rcParams["mathtext.fontset"] = "dejavusans"
-    plt.rcParams['figure.autolayout'] = True 
-    
+    plt.rcParams["figure.autolayout"] = True
+
     width = 0.6
     font_size_out = 14
-    
-    fig, axes = plt.subplots(
-        figsize=(10, 7),
-        constrained_layout=True
-    )
-    
+
+    fig, axes = plt.subplots(figsize=(10, 7), constrained_layout=True)
+
     Colors_boxplots = {"Statistical_parity": "darkblue", "Equal_parity": "gold"}
-    
+
     PROPS = {
         "boxprops": {"facecolor": "none", "edgecolor": Colors_boxplots[Method]},
         "medianprops": {"color": Colors_boxplots[Method]},
         "whiskerprops": {"color": Colors_boxplots[Method]},
         "capprops": {"color": Colors_boxplots[Method]},
     }
-    
+
     if sampling_attribute == None:
         ER_Mitigation_DF = pd.DataFrame(ER_Mitigation.values(), columns=["ER_run"])
         sns.boxplot(
@@ -204,20 +164,26 @@ def boxplots_mitigation_strategies_pretty(
     if sampling_attribute == None:
         plt.scatter(0, ER_Old, color="purple", s=60, alpha=0.7)
     else:
-        plt.scatter(range(len(ER_Old)), list(ER_Old.values()), color="purple", s=60, alpha=0.7)
-    
+        plt.scatter(
+            range(len(ER_Old)), list(ER_Old.values()), color="purple", s=60, alpha=0.7
+        )
+
     # Style the axes
     for spine in ["right", "top"]:
         axes.spines[spine].set_visible(False)
-    
+
     # Adjust tick parameters
-    axes.tick_params("x", size=5, colors="black", labelsize=11, rotation=45)  # Reduced rotation
+    axes.tick_params(
+        "x", size=5, colors="black", labelsize=11, rotation=45
+    )  # Reduced rotation
     axes.tick_params("y", size=2, colors="black", labelsize=11)
-    
+
     # Label axes
-    axes.set_ylabel("Exposure distance women\nposition vs men position", size=12, labelpad=10)
+    axes.set_ylabel(
+        "Exposure distance women\nposition vs men position", size=12, labelpad=10
+    )
     axes.set_xlabel(" ", size=0)
-    
+
     # Add grid lines
     y_ticks = [float(str(i).split(", ")[1]) for i in axes.get_yticklabels()][2:-1]
     for l in y_ticks:
@@ -225,14 +191,15 @@ def boxplots_mitigation_strategies_pretty(
             axes.hlines(l, -0.5, 0.5, "darkgrey", lw=1, ls="--")
         else:
             axes.hlines(l, -0.5, len(ER_Old) - 0.5, "darkgrey", lw=1, ls="--")
-    
+
     # Adjust margins to prevent cutoff
     plt.margins(y=0.1)
-    
+
     # Save and encode
     plt.close(fig)
     enc_str = get_base64_encoded_image(fig)
     return enc_str
+
 
 # Function to generate a base64 string from a matplotlib plot
 def get_base64_encoded_image(fig):
@@ -244,18 +211,20 @@ def get_base64_encoded_image(fig):
     return img_str
 
 
-
 def image_to_base64(image_path):
-    with open(image_path, 'rb') as image_file:
+    with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode()
+
 
 def generate_group_metrics_rows(ER_Old, ER_Mitigation, n_runs):
     rows = []
     for group in ER_Old.keys():
         mitigation_values = [ER_Mitigation[group][r] for r in range(n_runs)]
         mean_fair = sum(mitigation_values) / len(mitigation_values)
-        std_fair = statistics.stdev(mitigation_values) if len(mitigation_values) > 1 else 0
-        
+        std_fair = (
+            statistics.stdev(mitigation_values) if len(mitigation_values) > 1 else 0
+        )
+
         row = f"""
         <tr>
             <td>{group}</td>
@@ -267,6 +236,7 @@ def generate_group_metrics_rows(ER_Old, ER_Mitigation, n_runs):
         rows.append(row)
     return "\n".join(rows)
 
+
 def generate_group_stats(dataset, sampling_attribute):
     stats = []
     unique_values = [x for x in dataset[sampling_attribute].unique() if pd.notna(x)]
@@ -274,6 +244,7 @@ def generate_group_stats(dataset, sampling_attribute):
         count = len(dataset[dataset[sampling_attribute] == group])
         stats.append(f"<p>{group}: {count} researchers</p>")
     return "\n".join(stats)
+
 
 # Heinous
 template = """
@@ -432,14 +403,14 @@ template = """
             </div>
             
             <div class="visualization-full">
-                <h3 class="section-title">2. Regional Distribution</h3>
-                <img src="data:image/png;base64,{normal_distribution_img_str}" alt="Regional Citation Distribution" style="width: 100%;"/>
+                <h3 class="section-title">2. Categorical Distribution</h3>
+                <img src="data:image/png;base64,{normal_distribution_img_str}" alt="Categorical Distribution" style="width: 100%;"/>
                 <div class="figure-caption">
-                    Distribution of {ranking_variable} across world regions, separated by gender.
+                    Distribution of {ranking_variable} across categories, separated by gender.
                 </div>
-                <img src="data:image/png;base64,{distribution_img_str}" alt="Regional Distribution" style="width: 100%;"/>
+                <img src="data:image/png;base64,{distribution_img_str}" alt="Categorical Distribution" style="width: 100%;"/>
                 <div class="figure-caption">
-                    Post-Mitigation Distribution of {ranking_variable} across world regions, separated by gender.
+                    Post-Mitigation Distribution of {ranking_variable} across categories, separated by gender.
                 </div>
             </div>
 
@@ -451,7 +422,7 @@ template = """
                         The Exposure Distance (ED) measures how fair is the visibility of researchers from different demographic groups in rankings. 
                         In this plot, we compare the position of each woman vs. each man inside the income group categories, and then we average those values. 
                         A value of ED closer to 0 means a fairer representation, and we show how using a mitigation strategy (statistical parity in this case) 
-                        improves the metric,, making it smaller.
+                        improves the metric, making it smaller.
                     </div>
                     <div class="caption-elements">
                         <div class="caption-element">
@@ -514,21 +485,34 @@ template = """
 </html>
 """
 
-def generate_html_report(dataset, ER_Old, ER_Mitigation, boxplot_img_str, 
-                        network_path, normal_distribution_img_str, distribution_img_str,
-                        sensitive_attribute, protected_attribute,
-                        sampling_attribute, ranking_variable, n_runs):
+
+def generate_html_report(
+    dataset,
+    ER_Old,
+    ER_Mitigation,
+    boxplot_img_str,
+    network_path,
+    normal_distribution_img_str,
+    distribution_img_str,
+    sensitive_attribute,
+    protected_attribute,
+    sampling_attribute,
+    ranking_variable,
+    n_runs,
+):
     # Calculate summary statistics
     max_disparity_old = max(ER_Old.values()) - min(ER_Old.values())
     mean_mitigation_by_group = {
         group: statistics.mean([ER_Mitigation[group][r] for r in range(n_runs)])
         for group in ER_Old.keys()
     }
-    max_disparity_new = max(mean_mitigation_by_group.values()) - min(mean_mitigation_by_group.values())
-    
+    max_disparity_new = max(mean_mitigation_by_group.values()) - min(
+        mean_mitigation_by_group.values()
+    )
+
     # Get base64 strings for the images
     network_img_str = image_to_base64(network_path)
-    
+
     # Generate HTML content
     html_content = template.format(
         sensitive_attribute=sensitive_attribute,
@@ -545,99 +529,180 @@ def generate_html_report(dataset, ER_Old, ER_Mitigation, boxplot_img_str,
         std_dev_old=statistics.stdev(list(ER_Old.values())),
         std_dev_new=statistics.stdev(list(mean_mitigation_by_group.values())),
         n_runs=n_runs,
-        group_stats=generate_group_stats(dataset, sampling_attribute)
+        group_stats=generate_group_stats(dataset, sampling_attribute),
     )
-    
+
     return HTML(html_content)
 
 
-
-
-def validate_input(dataset, model, n_runs, sensitive, protected, sampling_attribute, ranking_variable):
+def validate_input(
+    dataset, model, n_runs, sensitive, protected, sampling_attribute, ranking_variable
+):
     if not isinstance(n_runs, int) or not (1 <= n_runs <= 100):
         raise ValueError("n_runs must be an integer between 1 and 100")
 
-    required_columns = [sensitive, sampling_attribute, ranking_variable]
-    missing_columns = [col for col in required_columns if col not in dataset.data.columns]
-    
+    try:
+        sensitive_attr = sensitive[0]
+        assert sensitive_attr == "Gender"
+        assert protected == "female"
+    except:
+        raise ValueError("Currently, only `Gender` is a valid sensitive attribute, and the protected group is `female`")
+
+    required_columns = [sensitive_attr, sampling_attribute, ranking_variable]
+    missing_columns = [
+        col for col in required_columns if col not in dataset.data.columns
+    ]
+
     if missing_columns:
-        raise ValueError(f"The following columns are missing in the dataset: {', '.join(missing_columns)}")
-    
+        raise ValueError(
+            f"The following columns are missing in the dataset: {', '.join(missing_columns)}"
+        )
+
     if protected not in dataset.data[sensitive].values:
-        raise ValueError(f"The protected value '{protected}' is not present in the sensitive column '{sensitive}'")
+        raise ValueError(
+            f"The protected value '{protected}' is not present in the sensitive column '{sensitive}'"
+        )
+    
+    if ranking_variable not in ["Productivity", "Degree", "Citations"]:
+        raise ValueError(
+            f"The Ranking Variable can only be one of Productivity, Degree or Citations"
+        )
+    
+    if sampling_attribute not in ["Nationality_IncomeGroup", "Nationality_Region"]:
+        raise ValueError(
+            f"The Sampling Attribute may only be one of `Nationality_IncomeGroup` or `Nationality_Region`"
+        )
+
 
 @metric(namespace="csh", version="v002", python="3.11")
 def exposure_distance_comparison(
     dataset: CSV,
     model: ResearcherRanking,
-    model_baseline: ResearcherRanking = None,
+    sensitive: List[str] = ["Gender"],
     n_runs: int = 1,
-    sensitive: str = "Gender",
     protected: str = "female",
     sampling_attribute: str = "Nationality_IncomeGroup",
     ranking_variable: str = "Degree",
 ) -> HTML:
-    """Compute the exposure distance and return it without any markup"""
+    """
+    Compute the exposure distance between the protected and non-protected groups in the dataset and ranking.
+    Parameters:  \n
+        - `N runs`: Choose a natural number between 1 and 100 \n
+        - `Sensitive attributes`: Which attribute is relevant for fairness analysis.  To select this, click the blue '+' and then use the dropdown.  Currently, only *Gender* is supported \n
+        - `Protected`: The protected group for the fairness analysis. Currenly, only *female* is supported \n
+        - `Sampling Attribute`: The value by which we group the analysis for finer-grained results. One of *Nationality&#95;IncomeGroup* or *Nationality&#95;Region*. \n
+        - `Ranking Variable`: This refers to the main criteria by which ranking is done.  One of *Degree*, *Citations* or *Productivity*
+    """
 
-    validate_input(dataset, model, n_runs, sensitive, protected, sampling_attribute, ranking_variable)
+    validate_input(
+        dataset,
+        model,
+        n_runs,
+        sensitive,
+        protected,
+        sampling_attribute,
+        ranking_variable,
+    )
 
-    if not model_baseline:
-        # initialize our own baseline model
-        model_baseline = model.baseline_rank
-        print("Was not provided a baseline model.  Using default")
+    # initialize our own baseline model
+    model_baseline = model.baseline_rank
 
     # Only consider those rows where the sampling attribute is not missing
     data = dataset.data
     dataframe_sampling = data[~data[sampling_attribute].isnull()]
 
-    #sampling_attribute = "Nationality_IncomeGroup"
     Old_ranking_variable = ranking_variable
-    sensitive_attribute = sensitive
+    sensitive_attribute = sensitive[0]
     protected_attribute = protected
 
     ER_Old = {}
     ER_Mitigation = {}
-        
+
+    ranked_dataframe_normal = pd.DataFrame()
+    ranked_dataframe_mitigation = pd.DataFrame()
+
     for category in sorted(set(dataframe_sampling[sampling_attribute])):
-        dataframe_filtered = dataframe_sampling[dataframe_sampling[sampling_attribute]==category]
+
+        dataframe_filtered = dataframe_sampling[
+            dataframe_sampling[sampling_attribute] == category
+        ]
+
         print(f"{len(dataframe_filtered)} researchers in the category {category}")
+
+        # Rank the rows using the model
+        if callable(model_baseline):
+            ranked_dataframe_normal_category = model_baseline(
+                dataframe_filtered, ranking_variable
+            )
+        else:
+            ranked_dataframe_normal_category = model_baseline.rank(
+                dataframe_filtered, ranking_variable
+            )
 
         # Compute the exposure distance for the normal ranking
         ER_Old[category] = Exposure_distance(
-            dataframe_filtered,
-            model_baseline,
+            ranked_dataframe_normal_category,
             ranking_variable=Old_ranking_variable,
             sensitive_attribute=sensitive_attribute,
             protected_attirbute=protected_attribute,
         )
+        ranked_dataframe_normal = pd.concat(
+            [ranked_dataframe_normal, ranked_dataframe_normal_category]
+        )
 
+        # Compute the exposure distance for the normal ranking
         ER_Mitigation[category] = {}
+        ranked_dataframe_mitigation_category_runs = []
+
         for r in range(n_runs):
+            # Rank the rows using the model
+            if callable(model):
+                ranked_dataframe_mitigation_category = model(
+                    dataframe_filtered, ranking_variable
+                )
+            else:
+                ranked_dataframe_mitigation_category = model.rank(
+                    dataframe_filtered, ranking_variable
+                )
+
             ER_Mitigation[category][r] = Exposure_distance(
-                dataframe_filtered,
-                model,
+                ranked_dataframe_mitigation_category,
                 ranking_variable=Old_ranking_variable,
                 sensitive_attribute=sensitive_attribute,
                 protected_attirbute=protected_attribute,
             )
+            ranked_dataframe_mitigation_category_runs.append(ranked_dataframe_mitigation_category)
 
+        # Concatenate all runs
+        all_runs_df = pd.concat(ranked_dataframe_mitigation_category_runs)
 
-    # In order to show the boxplots with rankings for the full dataset
-    # i.e., not "per category"
-    if callable(model_baseline):         # HACK!
-        original_dataset_ranked = model_baseline(dataframe_sampling, ranking_variable)
-        mitigation_dataset_ranked = model_baseline(dataframe_filtered, ranking_variable)
-    else:
-        original_dataset_ranked = model_baseline.rank(dataframe_sampling, ranking_variable)
+        # Separate numeric columns for mean calculation
+        numeric_cols = all_runs_df.select_dtypes(include=[np.number]).columns
+        mean_ranking_df = all_runs_df[numeric_cols].groupby(level=0).mean()
 
-    # In order to show the boxplots with rankings for the full dataset
-    # i.e., not "per category"
-    if callable(model):         # HACK!
-        mitigation_dataset_ranked = model(dataframe_sampling, ranking_variable)
-    else:
-        mitigation_dataset_ranked = model.rank(dataframe_sampling, ranking_variable)
-    
-    # We now have three dictionaries: ER_Old, ER_Mitigation
+        # If you need non-numeric columns, take the first occurrence (e.g., string columns remain unchanged)
+        non_numeric_df = all_runs_df.select_dtypes(exclude=[np.number]).groupby(level=0).first()
+
+        # Merge numeric and non-numeric back together
+        mean_ranking_df = pd.concat([mean_ranking_df, non_numeric_df], axis=1)
+
+        # Append to the main mitigation DataFrame
+        ranked_dataframe_mitigation = pd.concat([ranked_dataframe_mitigation, mean_ranking_df])
+
+    normal_distribution_image = boxplots_rankings(
+        ranked_dataframe_normal,
+        hue_variable=sensitive_attribute,
+        y_variable=sampling_attribute,
+        ranking_variable="Ranking_" + Old_ranking_variable,
+    )
+
+    distribution_image = boxplots_rankings(
+        ranked_dataframe_mitigation,
+        hue_variable=sensitive_attribute,
+        y_variable=sampling_attribute,
+        ranking_variable="Ranking_" + Old_ranking_variable,
+    )
+
     mitigation_strategies_image = boxplots_mitigation_strategies_pretty(
         ER_Old,
         ER_Mitigation,
@@ -645,23 +710,6 @@ def exposure_distance_comparison(
         sampling_attribute=sampling_attribute,
         n_runs=n_runs,
     )
-
-    normal_distribution_image = boxplots_rankings(
-        original_dataset_ranked,
-        hue_variable=sensitive_attribute,
-        y_variable=sampling_attribute,
-        ranking_variable="Ranking_"+Old_ranking_variable
-    )
-
-    distribution_image = boxplots_rankings(
-        mitigation_dataset_ranked,
-        hue_variable=sensitive_attribute,
-        y_variable=sampling_attribute,
-        ranking_variable="Ranking_"+Old_ranking_variable
-    )
-
-
-    print("Mitigation experiments_done")
 
     # HACK
     network_path = "./data/researchers/network.png"
@@ -679,5 +727,5 @@ def exposure_distance_comparison(
         protected_attribute=protected,
         sampling_attribute=sampling_attribute,
         ranking_variable=ranking_variable,
-        n_runs=n_runs
+        n_runs=n_runs,
     )

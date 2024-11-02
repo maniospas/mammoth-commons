@@ -60,16 +60,15 @@ def test_researchers_ranking_comparison():
         dataset = env.data_csv_rankings(
             path="./data/researchers/Top_researchers.csv", delimiter="|"
         )
-        n_runs = 10
 
         model_mitigation = env.model_mitigation_ranking()
 
         analysis_outcome_mitigation = env.exposure_distance_comparison(
             dataset,
             model_mitigation,
-            #model_baseline=model_normal,   HACK: without passing in an explicit baseline, model_normal is chosen as default
             n_runs=10,
-            sampling_attribute="Nationality_Region"
+            sampling_attribute="Nationality_IncomeGroup",
+            ranking_variable="Degree"
         )
         analysis_outcome_mitigation.show()
 
