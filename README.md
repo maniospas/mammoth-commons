@@ -20,7 +20,7 @@ web application locally in your machine:
 1. Download this repository.
 2. Create a virtual environment. This is optional but recommended.
 3. Install dependencies with `pip install -r requirements[test].txt`. This can take a bit of time to download and install everything, but you will be able to run all modules and interface with most popular data types.
-4. Launch the local app server with `python demonstrator/app.py`. When everything is ready, this script will also open a browser window to the app's serving page at `http://localhost:5050`.
+4. Launch the local app server with `python demonstrator/app.py` or, if this fails on your platform, with `python -m demonstrator.app` (notice that slash is replaced by a dot and there is no file extension). When everything is ready, this script will also open a browser window to the app's serving page at `http://localhost:5050`.
 
 ## :clipboard: Catalogue
 

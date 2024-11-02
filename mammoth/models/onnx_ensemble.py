@@ -13,15 +13,12 @@ class ONNXEnsemble(Predictor):
         return int(match.group(1)) if match else float("inf")
 
     def predict(self, dataset, sensitive):
-        assert (
-            sensitive is None or len(sensitive) == 0
-        ), "ONNXEnsemble can only be called with no declared sensitive attributes"
-        X = dataset.to_features()
+        X = dataset if isinstance(dataset, np.ndarray) else dataset.to_features([])
         # n_classes = self.params['n_classes']
         classes = self.params["classes"][:, np.newaxis]
 
         pred = sum(
-            (estimator.predict(X) == classes).T * w
+            (estimator.predict(X, []) == classes).T * w
             for estimator, w in zip(
                 self.models[: self.params["theta"]],
                 self.params["alphas"][: self.params["theta"]],

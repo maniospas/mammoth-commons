@@ -4,6 +4,31 @@ from mammoth.exports import Markdown
 from typing import Dict, List
 from mammoth.integration import metric, Options
 import fairbench as fb
+import numpy as np
+
+
+@fb.core.Transform
+def categories(iterable):
+    # print(iterable)
+    is_numeric = True
+    values = list()
+    for value in iterable:
+        try:
+            values.append(float(value))
+        except Exception:
+            is_numeric = False
+            break
+    if is_numeric:
+        values = np.array(values)
+        mx = values.max()
+        mn = values.min()
+        if mx == mn:
+            raise Exception(
+                "Numerical sensitive attribute has the same value everywhere"
+            )
+        values = (values - mn) / (mx - mn)
+        return {f"fuzzy min ({mn:.3f})": 1 - values, f"fuzzy max ({mx:.3f})": values}
+    return fb.categories @ iterable
 
 
 @metric(namespace="maniospas", version="v008", python="3.11", packages=("fairbench",))
@@ -29,9 +54,7 @@ def model_card(
 
     # declare sensitive attributes
     labels = dataset.labels
-    sensitive = fb.Fork(
-        {attr: fb.categories @ dataset.data[attr] for attr in sensitive}
-    )
+    sensitive = fb.Fork({attr: categories @ dataset.data[attr] for attr in sensitive})
 
     # change behavior based on arguments
     if intersectional:

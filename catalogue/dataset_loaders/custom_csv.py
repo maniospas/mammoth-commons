@@ -32,14 +32,18 @@ def data_custom_csv(
 
     Args:
         path: The local file path or a web URL of the file.
-        numeric: A list of column names that hold numeric data.
-        categorical: A list of column names that hold categorical data.
+        numeric: A list of comma-separated column names that hold numeric data.
+        categorical: A list of comma-separated column names that hold categorical data.
         label: The name of the categorical column that holds predictive label for each data sample.
         delimiter: Which character to split loaded csv rows with.
         skip_invalid_lines: Whether to skip invalid lines being read instead of creating an error.
     """
     if not path.endswith(".csv"):
         raise Exception("A file or url with .csv extension is needed.")
+    if isinstance(categorical, str):
+        categorical = categorical.split(",")
+    if isinstance(numeric, str):
+        numeric = numeric.split(",")
     raw_data = fb.bench.loader.read_csv(
         path,
         on_bad_lines="skip" if skip_invalid_lines else "error",
