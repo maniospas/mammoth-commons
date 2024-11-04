@@ -98,7 +98,7 @@ def read_csv(url, **kwargs):
     python="3.11",
     packages=("pandas",),
 )
-def data_auto_csv(path: str = "", max_numeric_as_discrete: int = 10) -> CSV:
+def data_auto_csv(path: str = "", max_discrete: int = 10) -> CSV:
     """Loads a CSV file that contains numeric, categorical, and predictive data columns.
     Automatic detection methods for the delimiter and column types are applied.
     The last categorical column is considered the dataset label. To load the file using
@@ -111,8 +111,8 @@ def data_auto_csv(path: str = "", max_numeric_as_discrete: int = 10) -> CSV:
     """
     if not path.endswith(".csv"):
         raise Exception("A file or url with .csv extension is needed.")
-    max_numeric_as_discrete = int(max_numeric_as_discrete)
-    if max_numeric_as_discrete < 2:
+    max_discrete = int(max_discrete)
+    if max_discrete < 2:
         raise Exception(
             "The number of numeric levels (the value of max numeric as discrete) should be at least 2"
         )
@@ -126,7 +126,7 @@ def data_auto_csv(path: str = "", max_numeric_as_discrete: int = 10) -> CSV:
         col for col in raw_data if pd.api.types.is_any_real_numeric_dtype(raw_data[col])
     ]
     numeric = [
-        col for col in numeric if len(set(raw_data[col])) > max_numeric_as_discrete
+        col for col in numeric if len(set(raw_data[col])) > max_discrete
     ]
     numeric_set = set(numeric)
     categorical = [col for col in raw_data if col not in numeric_set]

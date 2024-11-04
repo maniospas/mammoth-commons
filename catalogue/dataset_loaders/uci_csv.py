@@ -1,27 +1,25 @@
 from mammoth.datasets import CSV
 from mammoth.integration import loader, Options
+from collections import OrderedDict
 import os
 
 
 @loader(
     namespace="arjunroy",
-    version="v002",
+    version="v003",
     python="3.11",
     packages=("pandas", "ucimlrepo"),
 )
-def data_uci_csv(
+def data_uci(
     dataset_name: Options("Credit", "Bank") = None,
     target=None,
 ) -> CSV:
-    """Loads a CSV file that contains numeric, categorical, and predictive data columns.
-    Automatic detection methods for the delimiter and column types are applied.
-    The last categorical column is considered the dataset label. To load the file using
-    different options (e.g., a subset of columns, different label column) use the
-    custom csv loader instead.
+    """Loads a UCI dataset that contains numeric, categorical, and predictive data columns.
+    The dataset is downloaded from www.uci.org .
 
     Args:
-        dataset_name: The local file path or a web URL of the file.
-        target: The name of the predictive column.
+        dataset_name: The name of the dataset.
+        target: The name of the predictive label.
     """
     name = dataset_name.lower()
     if name == "credit":
@@ -59,8 +57,9 @@ def data_uci_csv(
         categorical=categorical,
         labels=label,
     )
-    csv_dataset.description = {
-        "summary": all_raw_data.metadata.additional_info.summary,
-        "variable_info": all_raw_data.metadata.additional_info.variable_info,
-    }
+
+    csv_dataset.description = OrderedDict([
+        ("Summary", all_raw_data.metadata.additional_info.summary),
+        ("Variables", all_raw_data.metadata.additional_info.variable_info),
+    ])
     return csv_dataset

@@ -13,6 +13,6 @@ parameter_info: Some parameters are needed.
 component_type: LOADER_DATA
 parameter_default:
   path: ''
-  max_numeric_as_discrete: 10
+  max_discrete: 10
 output_types:
 - CSV

@@ -49,6 +49,8 @@ def model_card(
         compare_groups: Whether to compare groups pairwise, or each group to the whole population.
     """
 
+    text = ""
+
     # obtain predictions
     predictions = model.predict(dataset, sensitive)
 
@@ -68,9 +70,24 @@ def model_card(
             fb.stamps.prule(report),
             fb.stamps.four_fifths(report),
         )
-        text = fb.modelcards.tomarkdown(stamps)
+        text += fb.modelcards.tomarkdown(stamps)
+    elif isinstance(labels, np.ndarray) or hasattr(labels, "to_numpy"):
+        report = report_type(
+            predictions=predictions,
+            labels=labels.to_numpy() if hasattr(labels, "to_numpy") else labels,
+            sensitive=sensitive,
+        )
+        stamps = fb.combine(
+            fb.stamps.prule(report),
+            fb.stamps.accuracy(report),
+            fb.stamps.four_fifths(report),
+            fb.stamps.dfpr(report),
+            fb.stamps.dfnr(report),
+            # fb.stamps.auc(report),
+            # fb.stamps.abroca(report),
+        )
+        text += fb.modelcards.tomarkdown(stamps)
     else:
-        text = ""
         for label in labels:
             # TODO: the following analysis is only for one class label
             report = report_type(
@@ -94,14 +111,14 @@ def model_card(
         text += fb.modelcards.tomarkdown(stamps)
 
     if hasattr(dataset, "description"):
-        text = "# Dataset description"
+        text += "\n## Dataset\n"
         if isinstance(dataset.description, str):
-            text = dataset.description + "\n" + text
+            text += text+"\n"
         elif isinstance(dataset.description, dict):
             for key, value in dataset.description.items():
-                text = "## " + key + "\n" + value + "\n" + text
+                text += "#### " + key + "\n" + value.replace("\n", "\n\n") + "\n"
         else:
             raise Exception(
-                "The dataset's description field should be a string or dict from headers to descriptions"
+                "Since the dataset's description field exist, it should be either string or dict from headers to descriptions"
             )
     return Markdown(text)
