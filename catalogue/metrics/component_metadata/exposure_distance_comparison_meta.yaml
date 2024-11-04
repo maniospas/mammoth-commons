@@ -6,10 +6,11 @@ description: "\n    Compute the exposure distance between the protected and non-
   \ attribute is relevant for fairness analysis.  To select this, click the blue '+'\
   \ and then use the dropdown.  Currently, only *Gender* is supported \n\n       \
   \ - `Protected`: The protected group for the fairness analysis. Currenly, only *female*\
-  \ is supported \n\n        - `Sampling Attribute`: The value by which we group the\
-  \ analysis for finer-grained results. One of *Nationality&#95;IncomeGroup* or *Nationality&#95;Region*.\
-  \ \n\n        - `Ranking Variable`: This refers to the main criteria by which ranking\
-  \ is done.  One of *Degree*, *Citations* or *Productivity*\n    "
+  \ or *male* are supported \n\n        - `Sampling Attribute`: The value by which\
+  \ we group the analysis for finer-grained results. One of *Nationality&#95;IncomeGroup*\
+  \ or *Nationality&#95;Region*. \n\n        - `Ranking Variable`: This refers to\
+  \ the main criteria by which ranking is done.  One of *Degree*, *Citations* or *Productivity*\n\
+  \    "
 parameter_info: Some parameters are needed.
 component_type: METRIC
 input_types:

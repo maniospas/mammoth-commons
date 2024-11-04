@@ -58,9 +58,13 @@ def Compute_mitigation_strategy(
     elif mitigation_method == "Equal_parity":
         P_minority = 0.5
     elif mitigation_method == "Updated_statistical_parity":
-        raise NotImplementedError("Updated_statistical_parity method is not implemented yet.")
+        raise NotImplementedError(
+            "Updated_statistical_parity method is not implemented yet."
+        )
     elif mitigation_method == "Internal_group_fairness":
-        raise NotImplementedError("Internal_group_fairness method is not implemented yet.")
+        raise NotImplementedError(
+            "Internal_group_fairness method is not implemented yet."
+        )
 
     Positions = {
         non_protected_attribute: [

@@ -8,7 +8,11 @@ class ONNX(Predictor):
         self.np_type = np_type
 
     def predict(self, dataset, sensitive):
-        x = dataset if isinstance(dataset, np.ndarray) else dataset.to_features(sensitive)
+        x = (
+            dataset
+            if isinstance(dataset, np.ndarray)
+            else dataset.to_features(sensitive)
+        )
         import onnxruntime as rt
 
         sess = rt.InferenceSession(self.model_bytes, providers=["CPUExecutionProvider"])
