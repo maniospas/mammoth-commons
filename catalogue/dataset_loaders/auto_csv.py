@@ -100,6 +100,7 @@ def read_csv(url, **kwargs):
 )
 def data_auto_csv(
     path: str = "",
+    max_numeric_as_discrete: int=10
 ) -> CSV:
     """Loads a CSV file that contains numeric, categorical, and predictive data columns.
     Automatic detection methods for the delimiter and column types are applied.
@@ -109,9 +110,13 @@ def data_auto_csv(
 
     Args:
         path: The local file path or a web URL of the file.
+        max_discrete: If a numeric column has a number of discrete entries than is less than this number (e.g., if it has only values 1,2,3) then it is considered to hold categorical data. Minimum accepted value is 2.
     """
     if not path.endswith(".csv"):
         raise Exception("A file or url with .csv extension is needed.")
+    max_numeric_as_discrete = int(max_numeric_as_discrete)
+    if max_numeric_as_discrete < 2:
+        raise Exception("The number of numeric levels (the value of max numeric as discrete) should be at least 2")
     raw_data = read_csv(
         path,
         on_bad_lines="skip",
@@ -120,6 +125,9 @@ def data_auto_csv(
 
     numeric = [
         col for col in raw_data if pd.api.types.is_any_real_numeric_dtype(raw_data[col])
+    ]
+    numeric = [
+        col for col in numeric if len(set(raw_data[col])) > max_numeric_as_discrete
     ]
     numeric_set = set(numeric)
     categorical = [col for col in raw_data if col not in numeric_set]

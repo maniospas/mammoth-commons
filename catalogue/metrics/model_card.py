@@ -92,4 +92,14 @@ def model_card(
                 # fb.stamps.abroca(report),
             )
         text += fb.modelcards.tomarkdown(stamps)
+
+    if hasattr(dataset, "description"):
+        text = "# Dataset description"
+        if isinstance(dataset.description, str):
+            text = dataset.description+"\n"+text
+        elif isinstance(dataset.description, dict):
+            for key, value in dataset.description.items():
+                text = "## "+key+"\n"+value+"\n"+text
+        else:
+            raise Exception("The dataset's description field should be a string or dict from headers to descriptions")
     return Markdown(text)
