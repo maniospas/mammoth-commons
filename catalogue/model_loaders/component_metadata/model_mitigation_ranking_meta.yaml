@@ -6,6 +6,5 @@ description: This is a fair Ranking loader with Sampling. In this model, we will
 parameter_info: No parameters needed.
 component_type: LOADER_MODEL
 parameter_default: {}
-input_types: []
 output_types:
 - ResearcherRanking

@@ -28,6 +28,5 @@ parameter_default:
   data_transform_path: ''
   transform_variable: transform
   safe_libraries: torchvision
-input_types: []
 output_types:
 - ImagePairs

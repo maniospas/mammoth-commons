@@ -19,6 +19,5 @@ parameter_default:
   label: None
   delimiter: ','
   skip_invalid_lines: true
-input_types: []
 output_types:
 - CSV

@@ -9,6 +9,5 @@ component_type: LOADER_DATA
 parameter_default:
   path: ''
   delimiter: '|'
-input_types: []
 output_types:
 - CSV

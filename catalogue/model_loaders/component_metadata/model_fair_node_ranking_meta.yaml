@@ -12,6 +12,5 @@ component_type: LOADER_MODEL
 parameter_default:
   diffusion: 0.85
   redistribution: original
-input_types: []
 output_types:
 - NodeRanking

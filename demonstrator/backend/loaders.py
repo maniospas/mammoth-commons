@@ -10,6 +10,7 @@ from catalogue.dataset_loaders.graph import data_graph
 from catalogue.dataset_loaders.images import data_images
 from catalogue.dataset_loaders.image_pairs import data_image_pairs
 from catalogue.dataset_loaders.graph_from_csv import data_graph_csv
+from catalogue.dataset_loaders.uci_csv import data_uci_csv
 
 # model loaders
 from catalogue.model_loaders.no_model import no_model
@@ -138,9 +139,10 @@ dataset_loaders = dict()
 model_loaders = dict()
 analysis_methods = dict()
 
-register(dataset_loaders, data_csv_rankings)
 register(dataset_loaders, data_auto_csv)
+register(dataset_loaders, data_uci_csv)
 register(dataset_loaders, data_custom_csv)
+register(dataset_loaders, data_csv_rankings)
 register(dataset_loaders, data_graph)
 register(dataset_loaders, data_graph_csv)
 register(dataset_loaders, data_images)
@@ -149,11 +151,19 @@ register(dataset_loaders, data_image_pairs)
 register(
     model_loaders,
     no_model,
-    compatible=[data_auto_csv, data_custom_csv, data_images, data_graph_csv],
+    compatible=[
+        data_auto_csv,
+        data_custom_csv,
+        data_uci_csv,
+        data_images,
+        data_graph_csv,
+    ],
 )
-register(model_loaders, model_onnx, compatible=[data_auto_csv, data_custom_csv])
 register(
-    model_loaders, model_onnx_ensemble, compatible=[data_auto_csv, data_custom_csv]
+    model_loaders, model_onnx, compatible=[data_auto_csv, data_custom_csv, data_uci_csv]
+)
+register(
+    model_loaders, model_onnx_ensemble, compatible=[data_auto_csv, data_custom_csv, data_uci_csv]
 )
 register(model_loaders, model_torch, compatible=[data_images, data_image_pairs])
 register(model_loaders, model_fair_node_ranking, compatible=[data_graph])

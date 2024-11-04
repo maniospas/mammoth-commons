@@ -19,3 +19,4 @@ Flask-Session
 multisoc
 seaborn
 coverage
+ucimlrepo

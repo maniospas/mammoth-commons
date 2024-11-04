@@ -10,6 +10,7 @@ def _features(df, numeric, categorical):
     ]
     return pd.concat(dfs, axis=1).values
 
+
 def _pred_features(df, numeric, categorical, sensitives):
     import pandas as pd
 
@@ -26,12 +27,12 @@ class CSV(Dataset):
         self.data = data
         self.numeric = numeric
         self.categorical = categorical
-        self.labels = pd.get_dummies(data[labels])
+        self.labels = pd.get_dummies(data[labels]) if isinstance(labels, str) else labels
         self.cols = numeric + categorical
-        if sensitives!=None:
-            self.pred_cols=[col for col in self.cols if col not in sensitives]
-        else: 
-            self.pred_cols=[col for col in self.cols]
+        if sensitives != None:
+            self.pred_cols = [col for col in self.cols if col not in sensitives]
+        else:
+            self.pred_cols = [col for col in self.cols]
 
     def to_features(self, sensitive):
         """for attr in sensitive:
@@ -47,5 +48,6 @@ class CSV(Dataset):
             raise Exception(
                 "Fairness analysis on CSV datasets is not supported for non-categorical sensitive attributes."
             )"""
-        return _pred_features(self.data, self.numeric, self.categorical,sensitive).astype(np.float64)
-
+        return _pred_features(
+            self.data, self.numeric, self.categorical, sensitive
+        ).astype(np.float64)

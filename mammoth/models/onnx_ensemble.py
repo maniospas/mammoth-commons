@@ -13,9 +13,9 @@ class ONNXEnsemble(Predictor):
         return int(match.group(1)) if match else float("inf")
 
     def predict(self, dataset, sensitive):
-        '''assert (
+        """assert (
             sensitive is None or len(sensitive) == 0
-        ), "ONNXEnsemble can only be called with no declared sensitive attributes" '''
+        ), "ONNXEnsemble can only be called with no declared sensitive attributes" """
         X = dataset.to_pred(sensitive)
         # n_classes = self.params['n_classes']
         classes = self.params["classes"][:, np.newaxis]

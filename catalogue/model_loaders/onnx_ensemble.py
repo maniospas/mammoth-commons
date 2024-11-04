@@ -7,7 +7,13 @@ import zipfile
 
 @loader(namespace="arjunroy", version="v003", python="3.11", packages=("onnxruntime",))
 def model_onnx_ensemble(path: str = "") -> ONNXEnsemble:
-    """This is an ONNX_Ensemble loader."""
+    """This is an ONNX_Ensemble loader. It contains several weak learners and
+    combines them with a booster ensemble. For details of how to train your own model,
+    visit: github.com/mammoth-eu/mammoth-commons/blob/dev/tests/test_mfppb_onnx_ensemble.ipynb
+
+    Args:
+        path: A zip file containing the ensemble elements.
+    """
 
     models = []
     model_names = []

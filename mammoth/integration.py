@@ -174,17 +174,16 @@ def kfp_method(
 
     return wrapper
 
-
 def loader(
-    namespace, version, ltype=None, python=_default_packages, packages=_default_packages
+    namespace, version, ltype=None, python=_default_python, packages=_default_packages
 ):
     import kfp.dsl.executor
     from mammoth import custom_kfp
     import yaml
 
     def wrapper(method, ltype):
-        # prepare the kfp wrapper given decorator arguments
-        name = method.__name__  # will use this as the component id
+        # Prepare the KFP wrapper given decorator arguments
+        name = method.__name__  # Will use this as the component id
         if ltype is None:
             if "data" in name.lower():
                 ltype = "LOADER_DATA"
@@ -209,7 +208,7 @@ def loader(
             packages_to_install=["mammoth-commons[deployment]"] + list(packages),
         )
 
-        # find signature and check that we can obtain the integration type from the returned type
+        # Find signature and check that we can obtain the integration type from the returned type
         signature = inspect.signature(method)
         return_type = signature.return_annotation
         if return_type is inspect.Signature.empty:
@@ -223,25 +222,31 @@ def loader(
                 f"The loader {name} must declare a return type which is type-hinted"
             )
 
-        # keep type hint names, keeping default kwargs (these will be kwarg parameters)
+        # Keep type hint names, keeping default kwargs (these will be kwarg parameters)
         type_hints = get_type_hints(method)
         defaults = dict()
-        # input_types = list()
+        options = ""
         for pname, parameter in signature.parameters.items():
-            arg_type = type_hints.get(pname, parameter.annotation)
-            if parameter.default is not inspect.Parameter.empty:  # ignore kwargs
+            arg_type = unpack_optionals(type_hints.get(pname, parameter.annotation))
+            if isinstance(arg_type, Options):
+                arg_type.__name__ = pname
+                options += "\n        " + pname + ": "
+                options += ", ".join(arg_type.values)
+                arg_type = str  # Assuming options are string-based; adjust as needed
+            if parameter.default is not inspect.Parameter.empty:  # Ignore kwargs
                 defaults[pname] = (
                     "None" if parameter.default is None else parameter.default
                 )
                 continue
+            # Add handling for loader-specific parameters if necessary
             raise Exception(
                 f"Add both a type annotation and default value in method {name} for the argument: {pname}"
             )
-            # input_types.append(_class_to_name(arg_type))
-        # if len(input_types) != 1:
-        #    raise Exception("Your loader should have a 'path' argument")
 
-        # create component_metadata/{name}_meta.yaml
+        if options:
+            method.__doc__ += "\n    Options:" + options
+
+        # Create component_metadata/{name}_meta.yaml
         metadata = {
             "id": name,
             "name": " ".join(name.split("_")),
@@ -253,7 +258,6 @@ def loader(
             ),
             "component_type": ltype,
             "parameter_default": defaults,
-            "input_types": [],  # input_types would just be ["str"] instead
             "output_types": [_class_to_name(return_type)],
         }
         if not os.path.exists(_path(method) + "/component_metadata/"):
@@ -263,21 +267,21 @@ def loader(
         param_name = name + "__params"
         exec_context = globals().copy()
         exec_context.update(locals())
-        # create the kfp method to be wrapped
+        # Create the KFP method to be wrapped
         exec(
             f"""
 from kfp import dsl
 def kfp_method(
     output: dsl.Output[{return_type.integration}],
     {param_name}: Dict[str, any] = defaults,
-) -> str:
+):
     parameters = {param_name}
     """
             + """
     parameters = {
         **defaults,
         **parameters,
-    }  # insert missing defaults into parameters (TODO: maybe this is not needed)
+    }  # Insert missing defaults into parameters (TODO: maybe this is not needed)
     parameters = {
         k: None if isinstance(v, str) and v == "None" else v
         for k, v in parameters.items()
@@ -287,18 +291,16 @@ def kfp_method(
     with open(output.path, "wb") as file:
         pickle.dump(ret, file)
     return output.path
-        """,
+            """,
             exec_context,
         )
         kfp_method = exec_context["kfp_method"]
-        # rename the kfp_method so that kfp will create an appropriate name for it
+        # Rename the kfp_method so that KFP will create an appropriate name for it
         kfp_method.__name__ = name
         kfp_method.__module__ = method.__module__
         kfp_method.__mammoth_wrapped__ = method
 
-        # return the wrapped kfp method
+        # Return the wrapped KFP method
         return kfp_wrapper(kfp_method)
 
-    return lambda method: wrapper(
-        method, ltype
-    )  # this is the proper way to let wrapper know of ltype
+    return lambda method: wrapper(method, ltype)  # Properly pass ltype to the wrapper

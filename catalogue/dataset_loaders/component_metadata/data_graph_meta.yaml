@@ -7,6 +7,5 @@ parameter_info: Some parameters are needed.
 component_type: LOADER_DATA
 parameter_default:
   path: ''
-input_types: []
 output_types:
 - Graph

@@ -11,6 +11,5 @@ parameter_default:
   path_nodes: ''
   path_edges: ''
   attributes: ''
-input_types: []
 output_types:
 - Graph_CSH
