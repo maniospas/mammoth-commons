@@ -96,10 +96,12 @@ def model_card(
     if hasattr(dataset, "description"):
         text = "# Dataset description"
         if isinstance(dataset.description, str):
-            text = dataset.description+"\n"+text
+            text = dataset.description + "\n" + text
         elif isinstance(dataset.description, dict):
             for key, value in dataset.description.items():
-                text = "## "+key+"\n"+value+"\n"+text
+                text = "## " + key + "\n" + value + "\n" + text
         else:
-            raise Exception("The dataset's description field should be a string or dict from headers to descriptions")
+            raise Exception(
+                "The dataset's description field should be a string or dict from headers to descriptions"
+            )
     return Markdown(text)

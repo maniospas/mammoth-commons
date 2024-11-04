@@ -98,10 +98,7 @@ def read_csv(url, **kwargs):
     python="3.11",
     packages=("pandas",),
 )
-def data_auto_csv(
-    path: str = "",
-    max_numeric_as_discrete: int=10
-) -> CSV:
+def data_auto_csv(path: str = "", max_numeric_as_discrete: int = 10) -> CSV:
     """Loads a CSV file that contains numeric, categorical, and predictive data columns.
     Automatic detection methods for the delimiter and column types are applied.
     The last categorical column is considered the dataset label. To load the file using
@@ -116,7 +113,9 @@ def data_auto_csv(
         raise Exception("A file or url with .csv extension is needed.")
     max_numeric_as_discrete = int(max_numeric_as_discrete)
     if max_numeric_as_discrete < 2:
-        raise Exception("The number of numeric levels (the value of max numeric as discrete) should be at least 2")
+        raise Exception(
+            "The number of numeric levels (the value of max numeric as discrete) should be at least 2"
+        )
     raw_data = read_csv(
         path,
         on_bad_lines="skip",
