@@ -544,9 +544,11 @@ def validate_input(
     try:
         sensitive_attr = sensitive[0]
         assert sensitive_attr == "Gender"
-        assert protected in ["female","male"]
+        assert protected in ["female", "male"]
     except:
-        raise ValueError("Currently, only `Gender` is a valid sensitive attribute, and the protected group is `female` or `male`")
+        raise ValueError(
+            "Currently, only `Gender` is a valid sensitive attribute, and the protected group is `female` or `male`"
+        )
 
     required_columns = [sensitive_attr, sampling_attribute, ranking_variable]
     missing_columns = [
@@ -562,12 +564,12 @@ def validate_input(
         raise ValueError(
             f"The protected value '{protected}' is not present in the sensitive column '{sensitive}'"
         )
-    
+
     if ranking_variable not in ["Productivity", "Degree", "Citations"]:
         raise ValueError(
             f"The Ranking Variable can only be one of Productivity, Degree or Citations"
         )
-    
+
     if sampling_attribute not in ["Nationality_IncomeGroup", "Nationality_Region"]:
         raise ValueError(
             f"The Sampling Attribute may only be one of `Nationality_IncomeGroup` or `Nationality_Region`"
@@ -671,7 +673,9 @@ def exposure_distance_comparison(
                 sensitive_attribute=sensitive_attribute,
                 protected_attirbute=protected_attribute,
             )
-            ranked_dataframe_mitigation_category_runs.append(ranked_dataframe_mitigation_category)
+            ranked_dataframe_mitigation_category_runs.append(
+                ranked_dataframe_mitigation_category
+            )
 
         # Concatenate all runs
         all_runs_df = pd.concat(ranked_dataframe_mitigation_category_runs)
@@ -681,13 +685,17 @@ def exposure_distance_comparison(
         mean_ranking_df = all_runs_df[numeric_cols].groupby(level=0).mean()
 
         # If you need non-numeric columns, take the first occurrence (e.g., string columns remain unchanged)
-        non_numeric_df = all_runs_df.select_dtypes(exclude=[np.number]).groupby(level=0).first()
+        non_numeric_df = (
+            all_runs_df.select_dtypes(exclude=[np.number]).groupby(level=0).first()
+        )
 
         # Merge numeric and non-numeric back together
         mean_ranking_df = pd.concat([mean_ranking_df, non_numeric_df], axis=1)
 
         # Append to the main mitigation DataFrame
-        ranked_dataframe_mitigation = pd.concat([ranked_dataframe_mitigation, mean_ranking_df])
+        ranked_dataframe_mitigation = pd.concat(
+            [ranked_dataframe_mitigation, mean_ranking_df]
+        )
 
     normal_distribution_image = boxplots_rankings(
         ranked_dataframe_normal,

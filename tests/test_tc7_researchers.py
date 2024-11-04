@@ -68,10 +68,9 @@ def test_researchers_ranking_comparison():
             model_mitigation,
             n_runs=10,
             sampling_attribute="Nationality_IncomeGroup",
-            ranking_variable="Degree"
+            ranking_variable="Degree",
         )
         analysis_outcome_mitigation.show()
-
 
 
 if __name__ == "__main__":
