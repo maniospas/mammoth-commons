@@ -62,10 +62,14 @@ def interactive_sklearn_report(
     """
     X = dataset.to_features(sensitive)
     y = dataset.labels
-    assert (
-        y.shape[1] <= 2
-    ), "Cannot create a logistic regression interactive report for non-binary predictions"
-    y = y[y.columns[-1]]
+    if isinstance(y, dict):
+        y = y[list(y.keys())[0]]
+    else:
+        assert (
+            y.shape[1] <= 2
+        ), "Cannot create a logistic regression interactive report for non-binary predictions"
+        y = y[y.columns[-1]]
+
 
     (
         X_train,
