@@ -163,7 +163,9 @@ register(
     model_loaders, model_onnx, compatible=[data_auto_csv, data_custom_csv, data_uci]
 )
 register(
-    model_loaders, model_onnx_ensemble, compatible=[data_auto_csv, data_custom_csv, data_uci]
+    model_loaders,
+    model_onnx_ensemble,
+    compatible=[data_auto_csv, data_custom_csv, data_uci],
 )
 register(model_loaders, model_torch, compatible=[data_images, data_image_pairs])
 register(model_loaders, model_fair_node_ranking, compatible=[data_graph])

@@ -96,7 +96,7 @@ def model_card(
     if hasattr(dataset, "description"):
         text += "\n## Dataset\n"
         if isinstance(dataset.description, str):
-            text += text+"\n"
+            text += text + "\n"
         elif isinstance(dataset.description, dict):
             for key, value in dataset.description.items():
                 text += "#### " + key + "\n" + value.replace("\n", "\n\n") + "\n"

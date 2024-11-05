@@ -174,6 +174,7 @@ def kfp_method(
 
     return wrapper
 
+
 def loader(
     namespace, version, ltype=None, python=_default_python, packages=_default_packages
 ):

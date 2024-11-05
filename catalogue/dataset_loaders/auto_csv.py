@@ -125,9 +125,7 @@ def data_auto_csv(path: str = "", max_discrete: int = 10) -> CSV:
     numeric = [
         col for col in raw_data if pd.api.types.is_any_real_numeric_dtype(raw_data[col])
     ]
-    numeric = [
-        col for col in numeric if len(set(raw_data[col])) > max_discrete
-    ]
+    numeric = [col for col in numeric if len(set(raw_data[col])) > max_discrete]
     numeric_set = set(numeric)
     categorical = [col for col in raw_data if col not in numeric_set]
     if len(categorical) < 1:

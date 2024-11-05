@@ -58,8 +58,10 @@ def data_uci(
         labels=label,
     )
 
-    csv_dataset.description = OrderedDict([
-        ("Summary", all_raw_data.metadata.additional_info.summary),
-        ("Variables", all_raw_data.metadata.additional_info.variable_info),
-    ])
+    csv_dataset.description = OrderedDict(
+        [
+            ("Summary", all_raw_data.metadata.additional_info.summary),
+            ("Variables", all_raw_data.metadata.additional_info.variable_info),
+        ]
+    )
     return csv_dataset

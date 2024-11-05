@@ -30,7 +30,11 @@ class CSV(Dataset):
         self.data = data
         self.numeric = numeric
         self.categorical = categorical
-        self.labels = pd.get_dummies(data[labels]) if isinstance(labels, str) else (labels if isinstance(labels, dict) else {"label": labels})
+        self.labels = (
+            pd.get_dummies(data[labels])
+            if isinstance(labels, str)
+            else (labels if isinstance(labels, dict) else {"label": labels})
+        )
         self.cols = numeric + categorical
         if sensitives != None:
             self.pred_cols = [col for col in self.cols if col not in sensitives]
