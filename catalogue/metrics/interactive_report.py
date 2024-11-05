@@ -62,12 +62,6 @@ def interactive_report(
     print(labels)
     if labels is None:
         report = report_type(predictions=predictions, sensitive=sensitive)
-    elif isinstance(labels, np.ndarray) or hasattr(labels, "to_numpy"):
-        report = report_type(
-            predictions=predictions,
-            labels=labels.to_numpy() if hasattr(labels, "to_numpy") else labels,
-            sensitive=sensitive,
-        )
     else:
         report = fb.Fork(
             {

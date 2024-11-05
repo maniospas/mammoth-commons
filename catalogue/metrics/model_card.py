@@ -62,29 +62,12 @@ def model_card(
     if intersectional:
         sensitive = sensitive.intersectional()
     report_type = fb.multireport if compare_groups == "Pairwise" else fb.unireport
-
     # perform different analysis, depending on whether labels are provided
     if labels is None:
         report = report_type(predictions=predictions, sensitive=sensitive)
         stamps = fb.combine(
             fb.stamps.prule(report),
             fb.stamps.four_fifths(report),
-        )
-        text += fb.modelcards.tomarkdown(stamps)
-    elif isinstance(labels, np.ndarray) or hasattr(labels, "to_numpy"):
-        report = report_type(
-            predictions=predictions,
-            labels=labels.to_numpy() if hasattr(labels, "to_numpy") else labels,
-            sensitive=sensitive,
-        )
-        stamps = fb.combine(
-            fb.stamps.prule(report),
-            fb.stamps.accuracy(report),
-            fb.stamps.four_fifths(report),
-            fb.stamps.dfpr(report),
-            fb.stamps.dfnr(report),
-            # fb.stamps.auc(report),
-            # fb.stamps.abroca(report),
         )
         text += fb.modelcards.tomarkdown(stamps)
     else:
