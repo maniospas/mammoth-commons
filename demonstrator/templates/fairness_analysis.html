@@ -3,7 +3,7 @@
 {% block content %}
 
 
-<form method="post" id="analysis-form">
+<form method="post" id="analysis-form" onsubmit="showLoadingModal()">
     <div class="form-group">
         <select class="form-control form-dropdown" name="analysis_method" id="analysis_method" onchange="updateAnalysisParameters()">
             <option value="" disabled>Choose an analysis method</option>
@@ -35,13 +35,6 @@
         <input type="text" class="form-control" id="task_name" name="task_name" value="{{ default_task_name }}" required>
     </div>
 
-    {% if error_title %}
-    <div class="alert alert-danger" role="alert">
-        <h3>{{ error_title }}</h3>
-        {{ error_message }}
-    </div>
-    {% endif %}
-
     <button type="submit" class="btn btn-success btn-lg btn-block mt-5">Start</button>
 </form>
 
@@ -68,9 +61,25 @@
 </div>
 
 
+<!-- Waiting -->
+<div class="modal fade" id="loadingModal" tabindex="-1" aria-labelledby="loadingModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="loadingModalLabel">Running fairness analysis</h5>
+      </div>
+      <div class="modal-body">
+        Please wait while the fairness is analysis is running. This might take a while. Afterwards, the MAMMOth demonstrator will proceed to the results.<br><b>Do not close this tab or your browser.</b>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 <script>
-    const analysisMethods = JSON.parse('{{ analysis_methods|tojson|safe }}');
-    const sensitiveAttributes = JSON.parse('{{ sensitive_attributes|tojson|safe }}');  // Load sensitive attributes from the backend
+    const analysisMethods = {{ analysis_methods|tojson|safe }};
+    const sensitiveAttributes = {{ sensitive_attributes|tojson|safe }};  // Load sensitive attributes from the backend
 
     function updateAnalysisParameters() {
         const methodName = document.getElementById('analysis_method').value;
@@ -265,8 +274,29 @@
         container.appendChild(selectGroup);
     }
 
+    function showDescriptionModal(button) {
+        // Get the description and name from the button's data attributes
+        const description = button.getAttribute("data-description");
+        const name = button.getAttribute("data-name");
+
+        // Set the modal title and body content
+        document.getElementById("descriptionModalLabel").innerText = name;
+        document.getElementById("descriptionModalBody").innerText = description;
+
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById("descriptionModal"));
+        modal.show();
+    }
+
+    function showLoadingModal() {
+        const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+        setTimeout(() => {
+            loadingModal.show();
+        }, 200);
+    }
+
     // Pre-fill existing sensitive attributes
-    const prefilledSensitiveAttributes = JSON.parse('{{ prefilled_sensitive_attributes | tojson | safe }}');
+    const prefilledSensitiveAttributes = {{ prefilled_sensitive_attributes | tojson | safe }};
     prefilledSensitiveAttributes.forEach(attr => addSensitiveAttribute(attr));
     updateAnalysisParameters();
 </script>

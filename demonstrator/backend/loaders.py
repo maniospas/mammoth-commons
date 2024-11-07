@@ -78,7 +78,17 @@ def register(catalogue: dict, component, compatible=None):
             # args_desc[splt[0]] = f"{separator_title}<i>{name} - </i> {splt[1]}"
 
             args_desc[splt[0]] = (
-                f"{separator_title}<button type='button' class='btn btn-light' data-bs-toggle='tooltip' data-placement='top' title='{splt[1]}'><i class='bi bi-info-circle'></i> {name}</button>"
+                f"""{separator_title}<button
+                      type="button"
+                      class="btn btn-light"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title="{ splt[1] }"
+                      data-description="{ splt[1] }"
+                      data-name="{ name }"
+                      onclick="showDescriptionModal(this)">
+                      <i class="bi bi-info-circle"></i> { name }
+                    </button>"""
             )
 
             separator_title = ""

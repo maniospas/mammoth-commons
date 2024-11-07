@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<form method="post" id="task-form-data" enctype="multipart/form-data">
+<form method="post" id="task-form-data" enctype="multipart/form-data" onsubmit="showLoadingModal()">
     <div class="row mt-3">
         <!-- Dataset Loader Column -->
         <div class="col-md-12">
@@ -15,7 +15,7 @@
                 </select>
             </div>
             <div class="card card-body">
-                <p id="dataset-description">The loader's parameters will appear here.</p>
+                <p id="dataset-description">Select a dataset loader from the dropdown list above. Its description and parameters will appear here.</p>
                 <div id="dataset-parameters"></div>
             </div>
         </div>
@@ -27,15 +27,9 @@
         <input type="text" class="form-control" id="task_name" name="task_name" value="{{ default_task_name }}" required>
     </div>
 
-    {% if error_title %}
-    <div class="alert alert-danger" role="alert">
-        <h3>{{ error_title }}</h3>
-        {{ error_message }}
-    </div>
-    {% endif %}
-
     <button type="submit" class="btn btn-primary btn-lg btn-block mt-5" id="next-button-data" disabled>Next</button>
 </form>
+
 
 <div class="steps d-flex flex-wrap flex-sm-nowrap justify-content-between padding-top-2x padding-bottom-1x mt-3">
   <div class="step completed">
@@ -58,9 +52,23 @@
   </div>
 </div>
 
+<!-- Waiting -->
+<div class="modal fade" id="loadingModal" tabindex="-1" aria-labelledby="loadingModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="loadingModalLabel">Loading data</h5>
+      </div>
+      <div class="modal-body">
+        Please wait while your data are being loaded. Afterwards, the MAMMOth demonstrator will proceed to the next step. <br><b>Do not close this tab or your browser.</b>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <script>
-    const datasetLoaders = JSON.parse('{{ dataset_loaders|tojson|safe }}');
+    const datasetLoaders = {{ dataset_loaders|tojson|safe }};
     const baseTask = {{ base_task|tojson|safe }}; // Contains the base task for pre-filling parameters
 
     function updateDatasetParameters() {
@@ -235,6 +243,27 @@
     // Preload dataset parameters if baseTask exists
     if (baseTask) {
         updateDatasetParameters();
+    }
+
+    function showDescriptionModal(button) {
+        // Get the description and name from the button's data attributes
+        const description = button.getAttribute("data-description");
+        const name = button.getAttribute("data-name");
+
+        // Set the modal title and body content
+        document.getElementById("descriptionModalLabel").innerText = name;
+        document.getElementById("descriptionModalBody").innerText = description;
+
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById("descriptionModal"));
+        modal.show();
+    }
+
+    function showLoadingModal() {
+        const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+        setTimeout(() => {
+            loadingModal.show();
+        }, 200);
     }
 
 </script>
