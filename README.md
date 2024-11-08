@@ -66,9 +66,10 @@ web application locally in your machine:
 ## :clipboard: Catalogue
 
 Find a catalogue of modules implemented by the MAMMOth consortium
-[here](catalogue/README.md). These modules are developed by and
-depend on datatypes found in the main commons library that resides 
-under this repo's `mammoth/` directory.
+[here](https://mammoth-eu.github.io/mammoth-commons/). 
+These modules are implemented in the `catalogue/` directory.
+They depend on datatypes found in the main commons library, which
+resides under the `mammoth/` directory.
 
 ## :thumbsup: Contributing
 

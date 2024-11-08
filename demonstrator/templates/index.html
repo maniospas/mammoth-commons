@@ -1,12 +1,61 @@
 {% extends "base.html" %}
 
 {% block content %}
+
+<style>
+    #openModalButton {
+        background-color: transparent;
+        border: 1px solid #ccc;
+        transition: background-color 0.3s ease;
+    }
+
+    #openModalButton:hover {
+        background-color: #f8f9fa; /* Light background on hover */
+    }
+</style>
+
 <div class="jumbotron text-center">
-    <h1>MAMMOth-commons</h1>
-    <p>Fairness analysis of models and datasets.
-        This application demonstrates base functionality offered by the modules of the
-        MAMMOth bias <a href="https://github.com/mammoth-eu/mammoth-toolkit-releases">toolkit</a>.</p>
+    <h1>MAMMOth demonstrator</h1>
+    <button type="button" class="btn btn-light" id="openModalButton">
+        <i class="bi bi-info-circle"></i> Fairness analysis of models and datasets.
+    </button>
+
 </div>
+<div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="infoModalLabel">About</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>
+                    This application contains the base functionality offered by the modules of the
+                    MAMMOth bias toolkit linked below.
+                </p>
+                <p>
+                    Start a fairness analysis by clicking on the <i>new</i> button. You will be asked to select
+                    loaders for the type of data and models you have available, as well as fill in details. We
+                    also offer modules that run out-of-the-box. In the last step,
+                    select a sensitive attributes and a fairness assessment metric.</p>
+                <p>
+                    If you return to the home screen,
+                    progress will be saved up to last point at which you clicked <i>next</i>.
+                    You may also rerun or create variations of analysis.
+                </p>
+                <p>
+                    Not all modules are compatible with each other. For example, vision models run on image data.
+                    Find them all in the catalogue linked below.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <a href="https://mammoth-eu.github.io/mammoth-commons/" class="btn btn-secondary" target="_blank">Catalogue</a>
+                <a href="https://github.com/mammoth-eu/mammoth-toolkit-releases" class="btn btn-secondary" target="_blank">Toolkit</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <p>
     <a href="{{ url_for('new_task') }}" class="btn btn-primary bi bi-file-plus"> New</a>
@@ -69,4 +118,18 @@
         {% endfor %}
     </tbody>
 </table>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const openModalButton = document.getElementById("openModalButton");
+        const infoModal = new bootstrap.Modal(document.getElementById("infoModal"), {
+            keyboard: true
+        });
+
+        openModalButton.addEventListener("click", function () {
+            infoModal.show();
+        });
+    });
+</script>
 {% endblock %}
