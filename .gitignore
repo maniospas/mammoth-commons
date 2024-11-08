@@ -20,3 +20,5 @@ coverage.html
 htmlcov/
 __pycache__/**
 .vscode/launch.json
+component_metadata
+**/component_metadata
