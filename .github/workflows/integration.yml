@@ -51,7 +51,7 @@ jobs:
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git add coverage-badge.svg README.md
-        git add docs/*
+        git add docs/*.html
         if git diff --cached --exit-code; then
           echo "No changes to commit."
         else
