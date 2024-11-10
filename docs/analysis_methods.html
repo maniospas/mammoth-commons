@@ -102,14 +102,14 @@
             <div class="container">
 <h1 class='display-4 text-center my-4'>Analysis metrics</h1>
 <h2 id='card'>Card</h2>
-<p><p>Creates a model card using FairBench. The card includes as many fairness stamps as applicable, and includes caveats and recommendations from a socio-technical database. All stamps summarize the behavior across population groups or subgraphs, where intersectional subgroups may be created for analysis of edge cases.</p> </p>
+<p><p>Creates a model card using the <a href="https://github.com/mever-team/FairBench">FairBench</a> library. The card includes several fairness stamps; these are specific measures of bias or fairness that are commonly used in the algorithmic fairness literature. Only the most prominent of those measures are used as stamps, and they correspond to a perfunctory fairness analysis would reveal.</p>  <p>This module computes all applicable FairBench stamps. Furthermore, multidimensional sensitive attributes are allowed. This means that both multiple sensitive attributes may be present, such as gender, age, and race, and each of those attributes may obtain multiple values, as happens when multiple genders or races are considered. Numeric sensitive attributes like age are parsed by normalizing them to the range [0,1] and considering this value as the truth value of membership to the group of the maximum vs the group of the minimum value. Stamps summarize behavior across all population groups or intersectional subgroups. A different stamp is computed for each predicted label.</p>  <p>The provided model card contains exact descriptions of methods used to compute fairness under the selected stamps. These come alongside an extensive list of caveats and recommendations that are retrieved from FairBench's online socio-technical database generated through MAMMOth's multidisciplinary activities. You may also create intersectional subgroups, that is, create a separate subgroup for each combination of sensitive attribute values. Many of those groups will have few members if there are too many attributes, and empty groups are ignored during the analysis.</p>  <p>The generated model card may also contain details about out-of-the-box datasets. To get the full picture, a detailed fairness report that also allows you to backtrack computations is available in the <code>interactive report</code> module.</p> </p>
 <b>Parameters</b><br> <button
                       type="button"
                       class="btn btn-light"
                       data-bs-toggle="tooltip"
                       data-bs-placement="top"
-                      title=" Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute."
-                      data-description=" Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute."
+                      title=" Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute, but may also be computationally intensive if too many group intersections are selected."
+                      data-description=" Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute, but may also be computationally intensive if too many group intersections are selected."
                       data-name="Intersectional"
                       onclick="showDescriptionModal(this)">
                       <i class="bi bi-info-circle"></i> Intersectional
@@ -119,8 +119,8 @@
                       class="btn btn-light"
                       data-bs-toggle="tooltip"
                       data-bs-placement="top"
-                      title=" Whether to compare groups pairwise, or each group to the whole population."
-                      data-description=" Whether to compare groups pairwise, or each group to the whole population."
+                      title=" Whether to compare groups pairwise, or each group to the whole population. For example, if the 4/5ths rule stamp is applicable, it computes positive rates and obtains the minimum ratio, either across all pairs of groups (for pairwise comparison) or otherwise between each group and the total population."
+                      data-description=" Whether to compare groups pairwise, or each group to the whole population. For example, if the 4/5ths rule stamp is applicable, it computes positive rates and obtains the minimum ratio, either across all pairs of groups (for pairwise comparison) or otherwise between each group and the total population."
                       data-name="Compare groups"
                       onclick="showDescriptionModal(this)">
                       <i class="bi bi-info-circle"></i> Compare groups
@@ -202,7 +202,7 @@
                     </button>
 <br>
 <h2 id='facex-regions'>Facex regions</h2>
-<p><p>Analyses 19 facial regions and accessories to provide explanations.</p> </p>
+<p><p>Analyses 19 facial regions and accessories to provide explanations.</p>  <span class="alert alert-warning alert-dismissible fade show" role="alert" style="display: inline-block; padding: 10px;"> <i class="bi bi-exclamation-triangle-fill"></i> XAI analysis may be computationally intensive. </span> </p>
 <b>Parameters</b><br> <button
                       type="button"
                       class="btn btn-light"

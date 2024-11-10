@@ -102,14 +102,14 @@
 <h2 id='no-model'>No model</h2>
 <p><p>Signifies that the analysis should focus solely on the fairness of the dataset.</p> </p>
 <h2 id='onnx'>Onnx</h2>
-<p><p>Loads an inference model stored in ONNx format.</p> </p>
+<p><p>Loads an inference model stored in <a href="https://onnx.ai/">ONNx</a> format. This is a generic cross-platform format for representing machine learning models with a common set of operations. Several machine learning frameworks can export to this format. The loaded model should be compatible with the dataset being analysed. For example, the same data columns as in the dataset should be used for training on tabular data.</p>  <p>ONNx supports several different runtimes, but this loader's implementation selects the <code>CPUExecutionProvider</code> runtime to run on, therefore maintaining compatibility with most machines. For inference in GPUs, prefer storing and loading models in formats that are guaranteed to maintain all features that could be included in the architectures of respective frameworks; this can be achieved with different model loaders.</p>  <p>Here are some quick links on how to export ONNx models from popular frameworks:</p>  <ul> <li><a href="https://onnx.ai/sklearn-onnx">scikit-learn</a></li> <li><a href="https://pytorch.org/tutorials/beginner/onnx/export simple model to onnx tutorial.html">PyTorch</a></li> <li><a href="https://onnxruntime.ai/docs/tutorials/tf-get-started.html">TensorFlow</a></li> </ul> </p>
 <b>Parameters</b><br> <button
                       type="button"
                       class="btn btn-light"
                       data-bs-toggle="tooltip"
                       data-bs-placement="top"
-                      title=" A local path or url pointing to the loaded file."
-                      data-description=" A local path or url pointing to the loaded file."
+                      title=" A local path or url pointing to the loaded file. The loader checks for the existence of the local path, and if it does not exist the `urllib.request` module is obtained to read the model's bytes."
+                      data-description=" A local path or url pointing to the loaded file. The loader checks for the existence of the local path, and if it does not exist the `urllib.request` module is obtained to read the model's bytes."
                       data-name="Path"
                       onclick="showDescriptionModal(this)">
                       <i class="bi bi-info-circle"></i> Path
@@ -177,7 +177,7 @@
                     </button>
 <br>
 <h2 id='fair-node-ranking'>Fair node ranking</h2>
-<p><p>Constructs a node ranking algorithm based on PageRank. The algorithm employs a diffusion parameter in the range [0, 1), and can either have a none, uniform or original rank redistribution strategy to achieve fairness. This strategy transfers node score mass from over-represented groups of nodes to those with lesser average mass.</p> </p>
+<p><p>Constructs a node ranking algorithm that is a variation non-personalized PageRank. The base algorithm is often computes a notion of centrality/structural importance for each node in the graph, and employs a diffusion parameter in the range [0, 1). Find more details on how the algorithm works based on the following seminal paper:</p>  <p><i>Page, L. (1999). The PageRank citation ranking: Bringing order to the web. Technical Report.</i></p>  <p>The base node ranking algorithm is enriched by fairness-aware interventions implemented by the <a href="https://pygrank.readthedocs.io/en/latest/">pygrank</a> library. The latter may run on various computational backends, but <code>numpy</code> is selected due to its compatibility with a broad range of software and hardware. All implemented algorithms transfer node score mass from over-represented groups of nodes to those with lesser average mass using different strategies that determine the redistribution details. Fairness is imposed in terms of centrality scores achieving similar score mass between groups. The three available strategies are described here:</p>  <ul> <li>`none` does not employ any fairness intervention and runs the base algorithm.</li> <li>`uniform` applies a uniform rank redistribution strategy.</li> <li>`original` tries to preserve the order of original node ranks by distributing more score mass to those.</li> </ul> </p>
 <b>Parameters</b><br> <button
                       type="button"
                       class="btn btn-light"

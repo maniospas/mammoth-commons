@@ -1,4 +1,6 @@
 import numpy as np
+from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
+
 from mammoth.models.predictor import Predictor
 
 
@@ -18,5 +20,13 @@ class ONNX(Predictor):
         sess = rt.InferenceSession(self.model_bytes, providers=["CPUExecutionProvider"])
         input_name = sess.get_inputs()[0].name
         label_name = sess.get_outputs()[0].name
-
-        return sess.run([label_name], {input_name: x.astype(self.np_type)})[0]
+        try:
+            return sess.run([label_name], {input_name: x.astype(self.np_type)})[0]
+        except InvalidArgument as e:
+            raise Exception("The ONNx loader's runtime encountered an error that typically occurs "
+                            "when the selected dataset is incompatible to the loaded model. "
+                            "Consult with the model provider whether your are loading the "
+                            "model properly. If you are investigating a dataset, "
+                            "consider switching to trained-on-the-fly model loaders.<br><br>"
+                            "<details><summary class=\"btn btn-secondary\">Details</summary><br><br>"
+                            "<pre>"+str(e)+"</pre></details>")

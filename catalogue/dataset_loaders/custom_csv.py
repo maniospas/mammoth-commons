@@ -27,8 +27,9 @@ def data_custom_csv(
 ) -> CSV:
     """Loads a CSV file that contains numeric, categorical, and predictive data columns.
     To use all data in the file and automate discovery of numerical and categorical columns,
-    as well as of delimiters, use the auto csv loader instead. Otherwise, set here all loading
+    as well as of delimiters, use the `auto csv` loader instead. Otherwise, set here all loading
     parameters.
+    A <a href="https://pandas.pydata.org/">pandas</a> CSV reader is employed internally.
 
     Args:
         path: The local file path or a web URL of the file.

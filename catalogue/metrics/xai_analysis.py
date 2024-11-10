@@ -23,6 +23,10 @@ def facex_regions(
 ) -> HTML:
     """Analyses 19 facial regions and accessories to provide explanations.
 
+    <span class="alert alert-warning alert-dismissible fade show" role="alert" style="display: inline-block; padding: 10px;">
+      <i class="bi bi-exclamation-triangle-fill"></i> XAI analysis may be computationally intensive.
+    </span>
+
     Args:
         target_class: The integer identifier of the target class.
         target_layer: The layer to be explained.

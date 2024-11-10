@@ -102,7 +102,7 @@
             <div class="container">
 <h1 class='display-4 text-center my-4'>Dataset loaders</h1>
 <h2 id='auto-csv'>Auto csv</h2>
-<p><p>Loads a CSV file that contains numeric, categorical, and predictive data columns. Automatic detection methods for the delimiter and column types are applied. The last categorical column is considered the dataset label. To load the file using different options (e.g., a subset of columns, different label column) use the custom csv loader instead.</p> </p>
+<p><p>Loads a CSV file that contains numeric, categorical, and predictive data columns. This automatically detects the characteristics of the dataset being loaded, namely the delimiter that separates the columns, and whether each column contains numeric or categorical data. A <a href="https://pandas.pydata.org/">pandas</a> CSV reader is employed internally. The last categorical column is used as the dataset label. To load the file using different options (e.g., a subset of columns, a different label column) use the custom csv loader instead.</p> </p>
 <b>Parameters</b><br> <button
                       type="button"
                       class="btn btn-light"
@@ -119,8 +119,8 @@
                       class="btn btn-light"
                       data-bs-toggle="tooltip"
                       data-bs-placement="top"
-                      title=" If a numeric column has a number of discrete entries than is less than this number (e.g., if it has only values 1,2,3) then it is considered to hold categorical data. Minimum accepted value is 2."
-                      data-description=" If a numeric column has a number of discrete entries than is less than this number (e.g., if it has only values 1,2,3) then it is considered to hold categorical data. Minimum accepted value is 2."
+                      title=" If a numeric column has a number of discrete entries than is less than this number (e.g., if it contains binary numeric values) then it is considered to hold categorical instead of numeric data. Minimum accepted value is 2."
+                      data-description=" If a numeric column has a number of discrete entries than is less than this number (e.g., if it contains binary numeric values) then it is considered to hold categorical instead of numeric data. Minimum accepted value is 2."
                       data-name="Max discrete"
                       onclick="showDescriptionModal(this)">
                       <i class="bi bi-info-circle"></i> Max discrete
@@ -152,7 +152,7 @@
                     </button>
 <br>
 <h2 id='custom-csv'>Custom csv</h2>
-<p><p>Loads a CSV file that contains numeric, categorical, and predictive data columns. To use all data in the file and automate discovery of numerical and categorical columns, as well as of delimiters, use the auto csv loader instead. Otherwise, set here all loading parameters.</p> </p>
+<p><p>Loads a CSV file that contains numeric, categorical, and predictive data columns. To use all data in the file and automate discovery of numerical and categorical columns, as well as of delimiters, use the <code>auto csv</code> loader instead. Otherwise, set here all loading parameters. A <a href="https://pandas.pydata.org/">pandas</a> CSV reader is employed internally.</p> </p>
 <b>Parameters</b><br> <button
                       type="button"
                       class="btn btn-light"

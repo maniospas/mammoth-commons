@@ -98,23 +98,27 @@ def read_csv(url, **kwargs):
     python="3.11",
     packages=("pandas",),
 )
-def data_auto_csv(path: str = "", max_discrete: int = 10) -> CSV:
+def data_auto_csv(path: str = "",
+                  max_discrete: int = 10) -> CSV:
     """Loads a CSV file that contains numeric, categorical, and predictive data columns.
-    Automatic detection methods for the delimiter and column types are applied.
-    The last categorical column is considered the dataset label. To load the file using
-    different options (e.g., a subset of columns, different label column) use the
+    This automatically detects the characteristics of the dataset being loaded,
+    namely the delimiter that separates the columns, and whether each column contains
+    numeric or categorical data. A <a href="https://pandas.pydata.org/">pandas</a>
+    CSV reader is employed internally.
+    The last categorical column is used as the dataset label. To load the file using
+    different options (e.g., a subset of columns, a different label column) use the
     custom csv loader instead.
 
     Args:
         path: The local file path or a web URL of the file.
-        max_discrete: If a numeric column has a number of discrete entries than is less than this number (e.g., if it has only values 1,2,3) then it is considered to hold categorical data. Minimum accepted value is 2.
+        max_discrete: If a numeric column has a number of discrete entries than is less than this number (e.g., if it contains binary numeric values) then it is considered to hold categorical instead of numeric data. Minimum accepted value is 2.
     """
     if not path.endswith(".csv"):
         raise Exception("A file or url with .csv extension is needed.")
     max_discrete = int(max_discrete)
     if max_discrete < 2:
         raise Exception(
-            "The number of numeric levels (the value of max numeric as discrete) should be at least 2"
+            "The number of numeric levels (the value of max discrete) should be at least 2"
         )
     raw_data = read_csv(
         path,
