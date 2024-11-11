@@ -1,4 +1,8 @@
-from demonstrator.backend.loaders import dataset_loaders, model_loaders, analysis_methods
+from demonstrator.backend.loaders import (
+    dataset_loaders,
+    model_loaders,
+    analysis_methods,
+)
 
 # Template prefix with updated styling and centered navbar
 template_prefix = """
@@ -139,14 +143,16 @@ template_postfix = """
 def prepare(catalogue, page_title):
     # Sidebar content with links to each h2 section
     sidebar_content = ""
-    #sidebar_content = f"<h4 class='text-center'><a href='index.html'>Catalogue</a></h4>\n"
+    # sidebar_content = f"<h4 class='text-center'><a href='index.html'>Catalogue</a></h4>\n"
 
     # Main content with a page title
     main_content = f"<h1 class='display-4 text-center my-4'>{page_title}</h1>\n"
 
     # Loop through each loader and create a sidebar link and main section
     for loader in catalogue:
-        loader_id = loader.replace(" ", "-").lower()  # create a URL-friendly id for each section
+        loader_id = loader.replace(
+            " ", "-"
+        ).lower()  # create a URL-friendly id for each section
         sidebar_content += f"<a href='#{loader_id}'>{loader}</a>\n"
         main_content += f"<h2 id='{loader_id}'>{loader}</h2>\n"
         main_content += f"<p>{catalogue[loader]['description']}</p>\n"
@@ -157,7 +163,7 @@ def prepare(catalogue, page_title):
                 continue
             param_content += f"{desc}\n"
         if param_content:
-            main_content += "<b>Parameters</b><br>" + param_content+"<br>\n"
+            main_content += "<b>Parameters</b><br>" + param_content + "<br>\n"
     return sidebar_content, main_content
 
 
@@ -169,10 +175,11 @@ for page, (catalogue, page_title) in {
 }.items():
     sidebar_content, main_content = prepare(catalogue, page_title)
     full_content = (
-            template_prefix.replace("{{ title }}", page_title)
-            .replace("{{ sidebar_content }}", sidebar_content)
-            + main_content
-            + template_postfix
+        template_prefix.replace("{{ title }}", page_title).replace(
+            "{{ sidebar_content }}", sidebar_content
+        )
+        + main_content
+        + template_postfix
     )
     with open(f"docs/{page}", "w") as file:
         file.write(full_content)
@@ -229,9 +236,9 @@ to quickly set up a demonstrator that lets you run all these modules.<p>
 
 with open("docs/index.html", "w") as file:
     file.write(
-        template_prefix.replace("{{ title }}", "MAMMOth Catalogue")
-        .replace("{{ sidebar_content }}",
-                 "")
+        template_prefix.replace("{{ title }}", "MAMMOth Catalogue").replace(
+            "{{ sidebar_content }}", ""
+        )
         + index_content
         + template_postfix
     )

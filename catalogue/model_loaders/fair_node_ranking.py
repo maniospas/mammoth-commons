@@ -4,7 +4,8 @@ from mammoth.integration import loader, Options
 
 @loader(namespace="maniospas", version="v003", python="3.11", packages=("pygrank",))
 def model_fair_node_ranking(
-    diffusion: float = 0.85, redistribution: Options("none", "uniform", "original") = "original"
+    diffusion: float = 0.85,
+    redistribution: Options("none", "uniform", "original") = "original",
 ) -> NodeRanking:
     """
     Constructs a node ranking algorithm that is a variation non-personalized PageRank.

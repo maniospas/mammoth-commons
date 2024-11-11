@@ -10,7 +10,8 @@ library (for example, to add data types) see [here](../mammoth-commons/README.md
 1. [Set things up](#set-things-up)
 2. [Write a new module](#write-a-new-module)
 3. [Locally test a module](#locally-test-a-module)
-4. [Build and upload a module](#build-and-upload-a-module)
+4. [Write documentation](#write-documentation)
+5. [Build and upload a module](#build-and-upload-a-module)
 
 ## Set things up
 
@@ -186,8 +187,10 @@ with mammoth.testing.Env(dataloader, modelloader, metric) as env:
 
 If you are planning to create a pull request to mammoth-commons, also
 create a file `tests/test_...` containing the above code. This will be run
-by the `integration_tests.py` script. Everything new is expected to have high 
-code coverage (more than 80% right now).
+by the `integration_tests.py` script, which is part of the project's
+GitHub actions. Everything new is expected to have high 
+code coverage (more than 80% right now). Please run the script locally
+to ensure that you did not break anything else.
 
 Do not forget to add all requirements to the `requirements[test].txt` file.
 Pull requests will be reviewed manually, so if you plan to create a complex one
@@ -197,6 +200,53 @@ to appear in the main toolkit
 (instructions on launching the demonstrator [here](../mammoth-commons/README.md)).
 The demonstrator does not require the steps covered below and you can run it
 during development.
+
+## Write documentation
+
+You need to populate your module's docstring with adequate information.
+This information will automatically appear in the demonstrator, 
+in the toolkit, and in the MAMMOth catalogue webpage 
+[here](https://mammoth-eu.github.io/mammoth-commons/).
+Adhere to the following checkpoints:
+
+- Describe the modules to people that may be inexperience about your 
+modality or fairness. The domain and data organization should be clearly explained, as well as
+what the fairness analysis consists of.
+Add links to examples webpages, libraries, or
+notebooks (e.g., to instructions on how to create models that can be
+loaded by respective loaders). 
+- Aim for 250 words for metric modules, and at least 150 words for the rest.
+If you plan to use more words, consider hiding parts of the description
+with a `summary` tag.
+- Use HTML tags in the description and bootstrap classes for styling (no custom CSS).
+- Add warning for modules that are unstable or require performant hardware.
+In this case, embed something like the following in your docstring (taken from
+the XAI module):
+
+```html
+<span class="alert alert-warning alert-dismissible fade show" role="alert" style="display: inline-block; padding: 10px;">
+  <i class="bi bi-exclamation-triangle-fill"></i> XAI analysis may be computationally intensive.
+</span>
+```
+
+- Properly add arguments without annotating their types in the docstring. Each
+argument's description can only span one line for now, but do make sure that
+you describe all inputs other than `dataset,model,sensitive` which are common
+across all metrics. Use underscores to separate multiple words
+in argument and module names, as they can be converted to spaces
+when shown to users.
+Here is an example docstring with args:
+
+```python
+"""
+This is my extensive module description.
+
+Args:
+    arg0: Detailed description for arg0.
+    arg1: Detailed description for arg1.
+"""
+```
+
 
 ## Build and upload a module
 

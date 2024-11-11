@@ -70,7 +70,6 @@ def interactive_sklearn_report(
         ), "Cannot create a logistic regression interactive report for non-binary predictions"
         y = y[y.columns[-1]]
 
-
     (
         X_train,
         X_test,

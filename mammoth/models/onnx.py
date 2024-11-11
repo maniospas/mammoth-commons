@@ -23,10 +23,12 @@ class ONNX(Predictor):
         try:
             return sess.run([label_name], {input_name: x.astype(self.np_type)})[0]
         except InvalidArgument as e:
-            raise Exception("The ONNx loader's runtime encountered an error that typically occurs "
-                            "when the selected dataset is incompatible to the loaded model. "
-                            "Consult with the model provider whether your are loading the "
-                            "model properly. If you are investigating a dataset, "
-                            "consider switching to trained-on-the-fly model loaders.<br><br>"
-                            "<details><summary class=\"btn btn-secondary\">Details</summary><br><br>"
-                            "<pre>"+str(e)+"</pre></details>")
+            raise Exception(
+                "The ONNx loader's runtime encountered an error that typically occurs "
+                "when the selected dataset is incompatible to the loaded model. "
+                "Consult with the model provider whether your are loading the "
+                "model properly. If you are investigating a dataset, "
+                "consider switching to trained-on-the-fly model loaders.<br><br>"
+                '<details><summary class="btn btn-secondary">Details</summary><br><br>'
+                "<pre>" + str(e) + "</pre></details>"
+            )

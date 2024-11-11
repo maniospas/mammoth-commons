@@ -98,8 +98,7 @@ def read_csv(url, **kwargs):
     python="3.11",
     packages=("pandas",),
 )
-def data_auto_csv(path: str = "",
-                  max_discrete: int = 10) -> CSV:
+def data_auto_csv(path: str = "", max_discrete: int = 10) -> CSV:
     """Loads a CSV file that contains numeric, categorical, and predictive data columns.
     This automatically detects the characteristics of the dataset being loaded,
     namely the delimiter that separates the columns, and whether each column contains
