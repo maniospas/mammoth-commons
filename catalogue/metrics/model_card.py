@@ -42,27 +42,30 @@ def model_card(
     """Creates a model card using the <a href="https://github.com/mever-team/FairBench">FairBench</a>
     library. The card includes several fairness stamps; these are specific measures of bias
     or fairness that are commonly used in the algorithmic fairness literature. Only the most prominent
-    of those measures are used as stamps, and they correspond to a perfunctory fairness
-    analysis would reveal.
+    of those measures are used as stamps, and they correspond to a perfunctory fairness analysis.
 
-    This module computes all applicable FairBench stamps.
-    Furthermore, multidimensional sensitive attributes are allowed.
-    This means that both multiple sensitive attributes may be present, such as gender, age, and race,
-    and each of those attributes may obtain multiple values, as happens when multiple genders or
-    races are considered. Numeric sensitive attributes like age are parsed by normalizing them to
-    the range [0,1] and considering this value as the truth value of membership to the group of the maximum
-    vs the group of the minimum value. Stamps summarize behavior across all population groups or intersectional
-    subgroups. A different stamp is computed for each predicted label.
+    This module computes all applicable FairBench stamps, which
+    summarize behavior across all population groups or intersectional
+    subgroups.
+    Multiple sensitive attributes may be present, such as gender, age, and race.
+    Furthermore, each of those attributes may obtain multiple values, as happens when multiple genders or
+    races are considered. Numeric attributes, like age, are normalized to
+    the range [0,1] and we consider the result as truth values of membership to the group of the maximum
+    value - as opposed to membership to the group with minimum value.
+    A different stamp is computed for each prediction label.
 
-    The provided model card contains exact descriptions of methods used to compute fairness under
-    the selected stamps. These come alongside an extensive list of
-    caveats and recommendations that are retrieved from FairBench's
-    online socio-technical database generated through MAMMOth's multidisciplinary activities.
-    You may also create intersectional subgroups, that is, create
+    You may optionally create intersectional subgroups, that is, create
     a separate subgroup for each combination of sensitive attribute values. Many of those groups will have few
     members if there are too many attributes, and empty groups are ignored during the analysis.
 
-    The generated model card may also contain details about out-of-the-box datasets.
+    The created model card contains exact descriptions of methods used to compute fairness under
+    the selected stamps, and it lists population groups that were taken into account
+    These come alongside an extensive list of
+    caveats and recommendations that help the reader get a grasp on how they should
+    account for the social context. This material is retrieved from FairBench's
+    online socio-technical database generated through MAMMOth's multidisciplinary activities.
+
+    Finally, the generated model card may contain details about out-of-the-box datasets.
     To get the full picture, a detailed fairness report that also allows you to backtrack computations
     is available in the `interactive report` module.
 
