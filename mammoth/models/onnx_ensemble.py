@@ -7,27 +7,31 @@ class ONNXEnsemble(Predictor):
     def __init__(self, models, params):
         self.models = models
         self.params = params
+        if 'pareto' in params:
+            self.pareto=params['pareto']
 
     def _extract_number(self, filename):
         match = re.search(r"_(\d+)\.onnx$", filename)
         return int(match.group(1)) if match else float("inf")
 
-    def predict(self, dataset, sensitive):
+    def predict(self, dataset, sensitive, theta=None):
         """assert (
             sensitive is None or len(sensitive) == 0
         ), "ONNXEnsemble can only be called with no declared sensitive attributes" """
-        X = dataset.to_pred(sensitive)
+        X = dataset.to_pred(self.params['sensitives'])
         # n_classes = self.params['n_classes']
         classes = self.params["classes"][:, np.newaxis]
+        if theta==None:
+            theta=self.params["theta"]
 
         pred = sum(
             (estimator.predict(X, []) == classes).T * w
             for estimator, w in zip(
-                self.models[: self.params["theta"]],
-                self.params["alphas"][: self.params["theta"]],
+                self.models[: theta],
+                self.params["alphas"][: theta],
             )
         )
-        pred /= self.params["alphas"][: self.params["theta"]].sum()
+        pred /= self.params["alphas"][: theta].sum()
         pred[:, 0] *= -1
         preds = classes.take(pred.sum(axis=1) > 0, axis=0)
         return np.squeeze(preds, axis=1)
