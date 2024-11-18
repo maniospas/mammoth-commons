@@ -4,8 +4,20 @@ import re
 
 
 class ONNXEnsemble(Predictor):
-    def __init__(self, models, _=None, alphas=None, classes=None, n_classes=None, theta=None, pareto=None, sensitive=None):
-        assert _ is None, "Internal error: ONNXEnsemble was accidentally constructed with more positional arguments than acceptable"
+    def __init__(
+        self,
+        models,
+        _=None,
+        alphas=None,
+        classes=None,
+        n_classes=None,
+        theta=None,
+        pareto=None,
+        sensitive=None,
+    ):
+        assert (
+            _ is None
+        ), "Internal error: ONNXEnsemble was accidentally constructed with more positional arguments than acceptable"
         self.models = models
         self.pareto = pareto
         self.alphas = alphas
@@ -32,11 +44,11 @@ class ONNXEnsemble(Predictor):
         pred = sum(
             (estimator.predict(X, []) == classes).T * alpha
             for estimator, alpha in zip(
-                self.models[: theta],
-                self.alphas[: theta],
+                self.models[:theta],
+                self.alphas[:theta],
             )
         )
-        pred /= self.alphas[: theta].sum()
+        pred /= self.alphas[:theta].sum()
         pred[:, 0] *= -1
         preds = classes.take(pred.sum(axis=1) > 0, axis=0)
         return np.squeeze(preds, axis=1)
