@@ -1,6 +1,13 @@
-
-
+from mammoth.datasets import CSV
+from mammoth.models.onnx_ensemble import ONNXEnsemble
+from mammoth.exports import HTML
+from typing import Dict, List
+from mammoth.integration import metric, Options
+import fairbench as fb
+import numpy as np
 import plotly
+
+
 def create_3d_plot(x=None,y=None,z=None):
     # Generate sample 3D plot
     go=plotly.graph_objects
@@ -20,14 +27,6 @@ def create_3d_plot(x=None,y=None,z=None):
                                 width=1000,  # Set the width of the plot
                                 height=700 )
     return fig.to_html(full_html=False)  # Returns HTML as a string
-
-from mammoth.datasets import Dataset
-from mammoth.models.onnx_ensemble import ONNXEnsemble
-from mammoth.exports import HTML
-from typing import Dict, List
-from mammoth.integration import metric, Options
-import fairbench as fb
-import numpy as np
 
 
 @fb.core.Transform
@@ -56,7 +55,7 @@ def categories(iterable):
 
 @metric(namespace="arjunroyihrpa", version="v005", python="3.11", packages=("fairbench","plotly"))
 def Multi_objective_report(
-    dataset: Dataset,
+    dataset: CSV,
     model: ONNXEnsemble,
     sensitive: List[str],
     intersectional: bool = False,
@@ -69,64 +68,31 @@ def Multi_objective_report(
         intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute.
         compare_groups: Whether to compare groups pairwise, or each group to the whole population.
     """
-    # obtain predictions
 
-    if hasattr(model,'pareto'):
-        thetas=model.pareto
+    # obtain predictions
+    if hasattr(model,'pareto') and model.pareto is not None:
+        thetas = model.pareto
     else:
-        thetas=np.arange(2,len(model.models))
-    O_1,O_2,O_3=[],[],[]
-    labels = dataset.labels
-    for label in labels:
-        if hasattr(labels[label], "to_numpy"):
-            labs=labels[label].to_numpy()
-        else: labs=labels[label] 
+        thetas = np.arange(2,len(model.models))
+    O_1,O_2,O_3 = [],[],[]
+    labs = list(dataset.labels.values())[-1]
+    labs = labs.to_numpy() if hasattr(labs, "to_numpy") else np.array(labs)
     for i in thetas:
         predictions = model.predict(dataset, sensitive,theta=i)
         O_1.append(1-float(fb.accuracy(predictions=predictions, labels=labs)))
         O_2.append(1-(float(fb.tpr(predictions=predictions, labels=labs))+ float(fb.tnr(predictions=predictions, labels=labs)))/2)
-        mm_fair=[]
+        mm_fair = []
         for attr in sensitive:
-            prots=fb.Fork(fb.categories @ dataset.data[attr]) 
-            groups=list(prots.branches().keys())#[g for g in prots]#
-            dfnr=fb.dfnr(predictions=predictions, labels=labs,sensitive=prots)
-            dfpr=fb.dfpr(predictions=predictions, labels=labs,sensitive=prots)
+            prots = fb.Fork(fb.categories @ dataset.data[attr])
+            groups = list(prots.branches().keys())#[g for g in prots]#
+            dfnr = fb.dfnr(predictions=predictions, labels=labs, sensitive=prots)
+            dfpr = fb.dfpr(predictions=predictions, labels=labs, sensitive=prots)
             mm_fair.append(max([max([float(dfnr[g]) for g in groups]), max([float(dfpr[g]) for g in groups])]))
+            #mm_fair.append(max([fb.areduce(dfpr, fb.max), fb.areduce(dfnr, fb.max)]))
         O_3.append(max(mm_fair))
-        #obs.append([O_1,O_2,O_3])
+        #print(O_1[-1], O_2[-1], O_3[-1])
+        #obs.append([O_1,O_2,O_3
 
-    # declare sensitive attributes
-    labels = dataset.labels
-    sensitive = fb.Fork(
-        {attr + " ": categories @ dataset.data[attr] for attr in sensitive}
-    )
-
-    # change behavior based on arguments
-    '''
-    if intersectional:
-        sensitive = sensitive.intersectional()
-    report_type = fb.multireport if compare_groups == "Pairwise" else fb.unireport
-    print(labels)
-    if labels is None:
-        report = report_type(predictions=predictions, sensitive=sensitive)
-    else:
-        report = fb.Fork(
-            {
-                label
-                + " ": report_type(
-                    predictions=predictions,
-                    labels=(
-                        labels[label].to_numpy()
-                        if hasattr(labels[label], "to_numpy")
-                        else labels[label]
-                    ),
-                    sensitive=sensitive,
-                )
-                for label in labels
-            }
-        )
-    #plot_html = create_3d_plot()
-    '''
     plot_html = create_3d_plot(x=O_1,y=O_2,z=O_3)
 
     # Create an instance of your existing HTML class with the plot content

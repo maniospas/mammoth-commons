@@ -38,5 +38,4 @@ def model_onnx_ensemble(path: str = "") -> ONNXEnsemble:
             with myzip.open(file_name) as model_file:
                 model_bytes = model_file.read()
                 models.append(ONNX(model_bytes, np.float32))
-
-    return ONNXEnsemble(models, params.item())
+    return ONNXEnsemble(models, **dict(params.item()))
