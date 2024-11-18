@@ -69,7 +69,7 @@ def interactive_sklearn_report(
             y.shape[1] <= 2
         ), "Cannot create a logistic regression interactive report for non-binary predictions"
         y = y[y.columns[-1]]
-
+    from sklearn import model_selection
     (
         X_train,
         X_test,
@@ -77,7 +77,7 @@ def interactive_sklearn_report(
         y_test,
         _,
         idx_test,
-    ) = sklearn.model_selection.train_test_split(
+    ) = model_selection.train_test_split(
         X, y, np.arange(0, y.shape[0], dtype=np.int64), test_size=0.2
     )
     if predictor == "Logistic regression":
