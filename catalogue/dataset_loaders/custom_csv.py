@@ -113,7 +113,9 @@ def data_custom_csv(
     delimiter: str = ",",
     skip_invalid_lines: bool = True,
 ) -> CSV:
-    """Loads a CSV file that contains numeric, categorical, and predictive data columns.
+    """Loads a CSV file that contains numeric, categorical, and predictive data columns
+    separated by a user-defined delimiter. Each row corresponds to a different data sample,
+    with the first one sometimes holding column names (this is automatically detected).
     To use all data in the file and automate discovery of numerical and categorical columns,
     as well as of delimiters, use the `auto csv` loader instead. Otherwise, set here all loading
     parameters.
