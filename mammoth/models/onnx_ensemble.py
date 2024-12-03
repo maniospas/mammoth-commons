@@ -13,7 +13,7 @@ class ONNXEnsemble(Predictor):
         n_classes=None,
         theta=None,
         pareto=None,
-        sensitive=None,
+        sensitives=None,
     ):
         assert (
             _ is None
@@ -21,7 +21,7 @@ class ONNXEnsemble(Predictor):
         self.models = models
         self.pareto = pareto
         self.alphas = alphas
-        self.sensitive = sensitive
+        self.sensitive = sensitives
         self.classes = classes
         self.theta = theta
         self.n_classes = n_classes

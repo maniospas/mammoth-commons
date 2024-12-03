@@ -12,7 +12,6 @@ needing to add a decorator. It also provides integration
 tests, as well as a lightweight demonstrator that is a thinned
 down version of the toolkit.
 
-
 ## :microscope: Investigate fairness
 
 Instructions to quickly launch and install the demonstrator 
