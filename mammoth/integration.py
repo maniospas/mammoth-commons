@@ -1,7 +1,6 @@
 import inspect
 from typing import get_type_hints, Dict, List, get_origin, get_args, Union
 import os
-import pickle
 
 _default_python = "3.11"
 _default_packages = ()  # appended to ["mammoth-commons[deployment]"]
@@ -29,6 +28,8 @@ def _path(method):
 def _class_to_name(arg_type):
     return arg_type.__name__
 
+def _class_to_outputs(arg_type):
+    return list(set([_class_to_name(arg_type)]+[_class_to_name(base) for base in arg_type.__bases__]))
 
 class Options:
     def __init__(self, *args):
@@ -259,7 +260,7 @@ def loader(
             ),
             "component_type": ltype,
             "parameter_default": defaults,
-            "output_types": [_class_to_name(return_type)],
+            "output_types": _class_to_outputs(return_type),
         }
         if not os.path.exists(_path(method) + "/component_metadata/"):
             os.makedirs(_path(method) + "/component_metadata/")

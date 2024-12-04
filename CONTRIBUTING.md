@@ -279,7 +279,7 @@ Finally, create and upload a module by running the following
 command (kfp is installed alongside MAMMOth-commons):
 
 ```bash
-kfp component build . --component-filepattern catalogue/fairbench/modelcard.py 
+kfp component build . --component-filepattern catalogue/metrics/model_card.py 
 ```
 
 In this, replace the `test_modules/metric.py` with any other path
