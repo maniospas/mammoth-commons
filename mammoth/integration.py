@@ -1,3 +1,4 @@
+# autoflake: skip_file
 import inspect
 from typing import get_type_hints, Dict, List, get_origin, get_args, Union
 import os
@@ -41,8 +42,6 @@ class Options:
 
 
 def metric(namespace, version, python=_default_python, packages=_default_packages):
-    import kfp.dsl.executor
-    from kfp import dsl
     from mammoth import custom_kfp
     import yaml
 
@@ -179,7 +178,6 @@ def kfp_method(
 def loader(
     namespace, version, ltype=None, python=_default_python, packages=_default_packages
 ):
-    import kfp.dsl.executor
     from mammoth import custom_kfp
     import yaml
 

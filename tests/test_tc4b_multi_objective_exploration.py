@@ -2,7 +2,6 @@ from mammoth import testing
 from catalogue.model_loaders.onnx_ensemble import model_onnx_ensemble
 from catalogue.dataset_loaders.uci_csv import data_uci
 from catalogue.metrics.Multi_objective_report import Multi_objective_report
-import os
 
 
 def test_multiobjective_report():

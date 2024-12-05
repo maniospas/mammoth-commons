@@ -1,5 +1,4 @@
 from mammoth import testing
-from mammoth.models.empty import EmptyModel
 from catalogue.dataset_loaders.data_csv_rankings import data_csv_rankings
 
 from catalogue.model_loaders.compute_researcher_ranking import model_normal_ranking

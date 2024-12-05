@@ -19,9 +19,7 @@ from sklearn.utils.validation import (
     check_X_y,
     check_random_state,
 )
-import statistics as st
 from pymoo.mcdm.pseudo_weights import PseudoWeights
-from pymoo.util.ref_dirs import get_reference_directions
 
 __all__ = ["Multi_Fair"]
 
@@ -322,7 +320,6 @@ class BaseWeightBoosting(six.with_metaclass(ABCMeta, BaseEnsemble)):
             The classification error for the current boost.
             If None then boosting has terminated early.
         """
-        pass
 
     def staged_score(self, X, y, sample_weight=None):
         """Return staged scores for X, y.

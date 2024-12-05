@@ -1,6 +1,5 @@
 from flask import render_template, redirect, url_for
 from demonstrator.backend.loaders import (
-    name_to_runnable,
     analysis_methods,
     parameters_to_class,
 )

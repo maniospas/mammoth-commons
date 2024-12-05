@@ -1,7 +1,4 @@
 import numpy as np
-from networkx.algorithms.isolate import is_isolate
-from onnxruntime.transformers.import_utils import is_installed
-
 from mammoth.datasets.dataset import Dataset
 
 

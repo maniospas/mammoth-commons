@@ -9,7 +9,6 @@ from torch.nn import BatchNorm1d, BatchNorm2d
 from torch.nn import ReLU, Sigmoid
 from torch.nn import Module
 from torch.nn import PReLU
-import torch.nn.functional as F
 
 
 def initialize_weights(modules):

@@ -20,7 +20,6 @@ from catalogue.model_loaders.pytorch import model_torch
 from catalogue.model_loaders.fair_node_ranking import model_fair_node_ranking
 from catalogue.model_loaders.compute_researcher_ranking import (
     model_mitigation_ranking,
-    model_normal_ranking,
 )
 
 # metrics
