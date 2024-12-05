@@ -1,6 +1,4 @@
 import numpy as np
-from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
-
 from mammoth.models.predictor import Predictor
 
 
@@ -16,6 +14,7 @@ class ONNX(Predictor):
             else dataset.to_features(sensitive)
         )
         import onnxruntime as rt
+        from onnxruntime.capi.onnxruntime_pybind11_state import InvalidArgument
 
         sess = rt.InferenceSession(self.model_bytes, providers=["CPUExecutionProvider"])
         input_name = sess.get_inputs()[0].name
