@@ -1,9 +1,10 @@
 from mammoth.models.predictor import Predictor
 from mammoth.datasets.image_pairs import ImagePairs
-import torch
 
 
 def get_predictions(threshold, embed1, embed2):
+    import torch
+
     embed1 = torch.nn.functional.normalize(embed1, p=2, dim=1)
     embed2 = torch.nn.functional.normalize(embed2, p=2, dim=1)
     diff = embed1 - embed2
