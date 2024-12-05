@@ -30,4 +30,3 @@ def safeexec(code: str, out: str = "commons", whitelist: list[str] = None):
     exec_context = locals().copy()
     exec(code, exec_context)
     return exec_context[out]
-

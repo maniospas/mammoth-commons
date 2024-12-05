@@ -75,10 +75,10 @@ def Multi_objective_report(
     compare_groups: Options("Pairwise", "To the total population") = None,
 ) -> HTML:
     """<p>This module presents an interactive <a href="https://plotly.com/python/3d-charts/" target="_blank">Plotly 3D plot</a> visualizing multiple objectives to evaluate model fairness and performance trade-offs. The report highlights three primary objectives: <b>accuracy loss</b>, <b>balanced accuracy loss</b>, and <b>discrimination (MMM-fairness) loss</b>. Each point plotted within the 3D space represents a <i>Pareto-optimal</i> solution, which achieves an optimal balance between these objectives where no single objective can improve without worsening another.</p>
-    
+
     <p>Users can hover over any solution point to display the corresponding loss values for each objective. Additionally, each point includes a <b>theta</b> value, indicating up to which sequence in the ONNX ensemble the particular solution is achieved. This allows users to observe performance changes throughout different stages of the ensemble, helping them better understand the trade-offs involved in each model configuration.</p>
-    
-    <p><b>Disclaimer</b><br> 
+
+    <p><b>Disclaimer</b><br>
     <button type="button" class="btn btn-light" data-bs-toggle="tooltip" data-bs-placement="top" title="The multi-objective report requires generating predictions at each step of the partial ensemble. This may result in slower processing times when the number of Pareto solutions is high." onclick="showDescriptionModal(this)">
       <i class="bi bi-info-circle"></i> Note on Processing Time
     </button>

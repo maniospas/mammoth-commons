@@ -29,8 +29,15 @@ def _path(method):
 def _class_to_name(arg_type):
     return arg_type.__name__
 
+
 def _class_to_outputs(arg_type):
-    return list(set([_class_to_name(arg_type)]+[_class_to_name(base) for base in arg_type.__bases__]))
+    return list(
+        set(
+            [_class_to_name(arg_type)]
+            + [_class_to_name(base) for base in arg_type.__bases__]
+        )
+    )
+
 
 class Options:
     def __init__(self, *args):

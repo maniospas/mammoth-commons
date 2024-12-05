@@ -493,7 +493,7 @@ class Multi_Fair(BaseWeightBoosting, ClassifierMixin):
         preference=None,
         pareto=False,
         pos_class=None,
-        #sensitives=None
+        # sensitives=None
     ):  # ,protected_attr=['Race','Sex']):
         super(Multi_Fair, self).__init__(
             estimator=estimator,
@@ -501,8 +501,7 @@ class Multi_Fair(BaseWeightBoosting, ClassifierMixin):
             learning_rate=learning_rate,
             random_state=random_state,
         )
-        
-        
+
         self.preference = preference  ########Initialization of Preference Weight vector
         self.pareto = pareto
         self.saIndex = saIndex
@@ -519,8 +518,8 @@ class Multi_Fair(BaseWeightBoosting, ClassifierMixin):
         self.n_classes_ = None
         self.costs = []
         self.PF = {}
-        self.sensitives=list(self.saValue.keys())
-        '''
+        self.sensitives = list(self.saValue.keys())
+        """
         if sensitives!=None:
             self.prot_attr=sensitives
             if len(self.saValue)!=len(self.prot_attr):
@@ -528,17 +527,17 @@ class Multi_Fair(BaseWeightBoosting, ClassifierMixin):
                     "Number of protected attributes do not match with the number of protected values"
                 )
         # self.PF_f={}
-        '''
+        """
         self.debug = debug
 
         self.X_test = X_test
         self.y_test = y_test
         self.pseudo = None
-        
-        if pos_class!=None:
-            self.pos_class=pos_class
+
+        if pos_class != None:
+            self.pos_class = pos_class
         else:
-            self.pos_class=1
+            self.pos_class = 1
 
     def fit(self, X, y, sample_weight=None):
         """Build a boosted classifier from the training set (X, y).
@@ -603,7 +602,6 @@ class Multi_Fair(BaseWeightBoosting, ClassifierMixin):
         tn_non_protected = [0 for i in self.saValue]
         fp_non_protected = [0 for i in self.saValue]
         fn_non_protected = [0 for i in self.saValue]
-        
 
         for idx, val in enumerate(data):
             for i in range(len(self.saValue)):
@@ -723,7 +721,7 @@ class Multi_Fair(BaseWeightBoosting, ClassifierMixin):
             :maximise: boolean. True for maximising, False for minimising
             :return: A (n_points, ) boolean array, indicating whether each point is Pareto efficient
             """
-            eps=0.001
+            eps = 0.001
             is_efficient = np.ones(costs.shape[0], dtype=bool)
             for i, c in enumerate(costs):
                 if is_efficient[i]:
@@ -743,7 +741,7 @@ class Multi_Fair(BaseWeightBoosting, ClassifierMixin):
             objective = deepcopy(self.fairobs)
         else:
             objective = deepcopy(self.ob)
-        #objective=np.round(objective,2)
+        # objective=np.round(objective,2)
         if self.pareto == False:
             PF = {i: objective[i] for i in range(len(objective))}
             F = np.array([objective[o] for o in range(len(objective))])
@@ -895,7 +893,6 @@ class Multi_Fair(BaseWeightBoosting, ClassifierMixin):
         estimator.fit(X, y, sample_weight=sample_weight)
         y_predict = estimator.predict(X)
         proba = estimator.predict_proba(X)
-        
 
         if iboost == 0:
             self.classes_ = getattr(estimator, "classes_", None)
@@ -955,7 +952,7 @@ class Multi_Fair(BaseWeightBoosting, ClassifierMixin):
         tn, fp, fn, tp = confusion_matrix(
             y,
             self.classes_.take(np.argmax(self.predictions_array, axis=1), axis=0),
-            #labels=[0, 1],
+            # labels=[0, 1],
         ).ravel()
         TPR = (float(tp)) / (tp + fn)
         TNR = (float(tn)) / (tn + fp)
@@ -971,8 +968,10 @@ class Multi_Fair(BaseWeightBoosting, ClassifierMixin):
                         con = True
                         if isinstance(self.saValue[self.sensitives[i]], list):
                             if (
-                                self.saIndex[idx][i] <= self.saValue[self.sensitives[i]][0]
-                                or self.saIndex[idx][i] >= self.saValue[self.sensitives[i]][1]
+                                self.saIndex[idx][i]
+                                <= self.saValue[self.sensitives[i]][0]
+                                or self.saIndex[idx][i]
+                                >= self.saValue[self.sensitives[i]][1]
                             ):
                                 con = True
                             else:
@@ -980,12 +979,16 @@ class Multi_Fair(BaseWeightBoosting, ClassifierMixin):
                         elif isinstance(self.saValue[self.sensitives[i]], float):
                             if self.saIndex[idx][i] <= self.saValue[self.sensitives[i]]:
                                 con = True
-                            elif self.saIndex[idx][i] > self.saValue[self.sensitives[i]]:
+                            elif (
+                                self.saIndex[idx][i] > self.saValue[self.sensitives[i]]
+                            ):
                                 con = False
                         elif isinstance(self.saValue[self.sensitives[i]], int):
                             if self.saIndex[idx][i] == self.saValue[self.sensitives[i]]:
                                 con = True
-                            elif self.saIndex[idx][i] != self.saValue[self.sensitives[i]]:
+                            elif (
+                                self.saIndex[idx][i] != self.saValue[self.sensitives[i]]
+                            ):
                                 con = False
                         if con == True:
                             cost_p[i] = self.cost_protected_positive[i]
@@ -1002,8 +1005,10 @@ class Multi_Fair(BaseWeightBoosting, ClassifierMixin):
                         con = True
                         if isinstance(self.saValue[self.sensitives[i]], list):
                             if (
-                                self.saIndex[idx][i] <= self.saValue[self.sensitives[i]][0]
-                                or self.saIndex[idx][i] >= self.saValue[self.sensitives[i]][1]
+                                self.saIndex[idx][i]
+                                <= self.saValue[self.sensitives[i]][0]
+                                or self.saIndex[idx][i]
+                                >= self.saValue[self.sensitives[i]][1]
                             ):
                                 con = True
                             else:
@@ -1011,12 +1016,16 @@ class Multi_Fair(BaseWeightBoosting, ClassifierMixin):
                         elif isinstance(self.saValue[self.sensitives[i]], float):
                             if self.saIndex[idx][i] <= self.saValue[self.sensitives[i]]:
                                 con = True
-                            elif self.saIndex[idx][i] > self.saValue[self.sensitives[i]]:
+                            elif (
+                                self.saIndex[idx][i] > self.saValue[self.sensitives[i]]
+                            ):
                                 con = False
                         elif isinstance(self.saValue[self.sensitives[i]], int):
                             if self.saIndex[idx][i] == self.saValue[self.sensitives[i]]:
                                 con = True
-                            elif self.saIndex[idx][i] != self.saValue[self.sensitives[i]]:
+                            elif (
+                                self.saIndex[idx][i] != self.saValue[self.sensitives[i]]
+                            ):
                                 con = False
                         if con == True:
                             cost_n[i] = self.cost_protected_negative[i]
