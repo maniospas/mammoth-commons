@@ -2,6 +2,8 @@
 import inspect
 from typing import get_type_hints, Dict, List, get_origin, get_args, Union
 import os
+import pickle
+
 
 _default_python = "3.11"
 _default_packages = ()  # appended to ["mammoth-commons[deployment]"]
