@@ -143,6 +143,8 @@ def metric(namespace, version, python=_default_python, packages=_default_package
         exec(
             f"""
 from kfp import dsl
+import pickle
+
 def kfp_method(
     model: dsl.Input[dsl.Model],
     dataset: dsl.Input[dsl.Dataset],
@@ -280,6 +282,8 @@ def loader(
         exec(
             f"""
 from kfp import dsl
+import pickle
+
 def kfp_method(
     output: dsl.Output[{return_type.integration}],
     {param_name}: Dict[str, any] = defaults,

@@ -93,8 +93,8 @@ def read_csv(url, **kwargs):
 
 
 @loader(
-    namespace="maniospas",
-    version="v001",
+    namespace="maniopas",
+    version="v002",
     python="3.11",
     packages=("pandas",),
 )

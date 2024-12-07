@@ -18,7 +18,7 @@ with open("requirements[test].txt", "r") as file:
 
 setuptools.setup(
     name="MAMMOth-commons",
-    version="0.0.33",
+    version="0.0.36",
     author="Emmanouil (Manios) Krasanakis",
     author_email="maniospas@hotmail.com",
     description="Component interfaces of the MAMMOth fairness toolkit.",

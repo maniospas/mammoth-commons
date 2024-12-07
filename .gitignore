@@ -22,3 +22,4 @@ __pycache__/**
 .vscode/launch.json
 component_metadata
 **/component_metadata
+local_outputs
