@@ -5,7 +5,7 @@ from mammoth.models import EmptyModel
 from mammoth.exports import HTML
 from typing import Dict, List
 from mammoth.integration import metric, Options
-import fairbench as fb
+from fairbench import v1 as fb
 import sklearn
 import numpy as np
 

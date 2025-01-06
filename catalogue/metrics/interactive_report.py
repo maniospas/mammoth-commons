@@ -3,7 +3,7 @@ from mammoth.models import Predictor
 from mammoth.exports import HTML
 from typing import Dict, List
 from mammoth.integration import metric, Options
-import fairbench as fb
+from fairbench import v1 as fb
 import numpy as np
 
 

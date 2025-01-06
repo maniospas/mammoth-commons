@@ -2,7 +2,7 @@ import os.path
 
 from mammoth.datasets import CSV
 from mammoth.integration import loader
-import fairbench as fb
+from fairbench import v1 as fb
 import pandas as pd
 from typing import List, Optional
 

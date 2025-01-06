@@ -117,7 +117,7 @@ def new_metric(
 ```python
 from mammoth.datasets import CSV
 from mammoth.integration import loader
-import fairbench as fb
+from fairbench import v1 as fb
 from typing import List, Optional
 
 
