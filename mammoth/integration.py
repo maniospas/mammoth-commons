@@ -64,7 +64,7 @@ def metric(namespace, version, python=_default_python, packages=_default_package
             true_func=method,
             base_image=base_image,
             target_image=target_image,
-            packages_to_install=["mammoth-commons[deployment]"] + list(packages),
+            packages_to_install=["mammoth-commons[deployment]==0.0.38"] + list(packages),
         )
 
         # find signature and check that we can obtain the integration type from the returned type
@@ -151,7 +151,7 @@ def kfp_method(
     output: dsl.Output[{return_type.integration}],
     sensitive: List[str],
     {param_name}: Dict[str, any] = defaults
-) -> str:
+):
     parameters = {param_name}
     """
             + """
@@ -216,7 +216,7 @@ def loader(
             true_func=method,
             base_image=base_image,
             target_image=target_image,
-            packages_to_install=["mammoth-commons[deployment]"] + list(packages),
+            packages_to_install=["mammoth-commons[deployment]==0.0.38"] + list(packages),
         )
 
         # Find signature and check that we can obtain the integration type from the returned type
@@ -278,6 +278,8 @@ def loader(
         param_name = name + "__params"
         exec_context = globals().copy()
         exec_context.update(locals())
+
+
         # Create the KFP method to be wrapped
         exec(
             f"""
@@ -287,7 +289,7 @@ import pickle
 def kfp_method(
     output: dsl.Output[{return_type.integration}],
     {param_name}: Dict[str, any] = defaults,
-) -> str:
+):
     parameters = {param_name}
     """
             + """
@@ -304,7 +306,6 @@ def kfp_method(
     assert isinstance(ret, return_type)
     with open(output.path, "wb") as file:
         pickle.dump(ret, file)
-    return output.path
             """,
             exec_context,
         )

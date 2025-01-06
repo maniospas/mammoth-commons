@@ -1,11 +1,11 @@
 from catalogue.model_loaders.onnx import model_onnx
 from catalogue.dataset_loaders.auto_csv import data_auto_csv
 from catalogue.metrics.model_card import model_card
+from typing import Dict, List
+from kfp import dsl, local
 
 
 def test_kfp_pipeline():
-    from typing import Dict, List
-    from kfp import dsl, local
 
     @dsl.pipeline(name="pipeline_test")
     def pipeline(
