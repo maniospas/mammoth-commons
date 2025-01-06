@@ -64,7 +64,8 @@ def metric(namespace, version, python=_default_python, packages=_default_package
             true_func=method,
             base_image=base_image,
             target_image=target_image,
-            packages_to_install=["mammoth-commons[deployment]==0.0.38"] + list(packages),
+            packages_to_install=["mammoth-commons[deployment]==0.0.38"]
+            + list(packages),
         )
 
         # find signature and check that we can obtain the integration type from the returned type
@@ -216,7 +217,8 @@ def loader(
             true_func=method,
             base_image=base_image,
             target_image=target_image,
-            packages_to_install=["mammoth-commons[deployment]==0.0.38"] + list(packages),
+            packages_to_install=["mammoth-commons[deployment]==0.0.38"]
+            + list(packages),
         )
 
         # Find signature and check that we can obtain the integration type from the returned type
@@ -278,7 +280,6 @@ def loader(
         param_name = name + "__params"
         exec_context = globals().copy()
         exec_context.update(locals())
-
 
         # Create the KFP method to be wrapped
         exec(
