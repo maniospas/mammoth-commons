@@ -151,7 +151,7 @@ def kfp_method(
     output: dsl.Output[{return_type.integration}],
     sensitive: List[str],
     {param_name}: Dict[str, any] = defaults
-):
+) -> str:
     parameters = {param_name}
     """
             + """
@@ -287,7 +287,7 @@ import pickle
 def kfp_method(
     output: dsl.Output[{return_type.integration}],
     {param_name}: Dict[str, any] = defaults,
-):
+) -> str:
     parameters = {param_name}
     """
             + """
@@ -299,6 +299,7 @@ def kfp_method(
         k: None if isinstance(v, str) and v == "None" else v
         for k, v in parameters.items()
     }
+    
     ret = method(**parameters)
     assert isinstance(ret, return_type)
     with open(output.path, "wb") as file:

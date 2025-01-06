@@ -4,7 +4,7 @@ import urllib
 import os
 
 
-@loader(namespace="maniopas", version="v008", python="3.11", packages=("onnxruntime",))
+@loader(namespace="maniopas", version="v013", python="3.12", packages=("onnxruntime",))
 def model_onnx(path: str = "") -> ONNX:
     """Loads an inference model stored in <a href="https://onnx.ai/">ONNx</a> format.
     This is a generic cross-platform format for representing machine learning models with a common set of operations.
