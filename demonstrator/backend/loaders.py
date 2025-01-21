@@ -31,6 +31,7 @@ from catalogue.metrics.xai_analysis import facex_regions
 from catalogue.metrics.xai_analysis_embeddings import facex_embeddings
 from catalogue.metrics.ma_graph_connection import connection_properties
 from catalogue.metrics.ranking_fairness import exposure_distance_comparison
+from catalogue.metrics.Multi_objective_report import Multi_objective_report
 
 
 def format_name(name):
@@ -187,6 +188,7 @@ register(analysis_methods, image_bias_analysis)
 register(analysis_methods, facex_regions)
 register(analysis_methods, facex_embeddings)
 register(analysis_methods, connection_properties)
+register(analysis_methods, Multi_objective_report)
 register(
     analysis_methods,
     exposure_distance_comparison,

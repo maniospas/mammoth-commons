@@ -591,7 +591,7 @@ def exposure_distance_comparison(
     Parameters:  \n
         - `N runs`: Choose a natural number between 1 and 100 \n
         - `Sensitive attributes`: Which attribute is relevant for fairness analysis.  To select this, click the blue '+' and then use the dropdown.  Currently, only *Gender* is supported \n
-        - `Protected`: The protected group for the fairness analysis. Currenly, only *female* or *male* are supported \n
+        - `Protected`: The protected group for the fairness analysis. Currently, only *female* or *male* are supported \n
         - `Sampling Attribute`: The value by which we group the analysis for finer-grained results. One of *Nationality&#95;IncomeGroup* or *Nationality&#95;Region*. \n
         - `Ranking Variable`: This refers to the main criteria by which ranking is done.  One of *Degree*, *Citations* or *Productivity*
     """
