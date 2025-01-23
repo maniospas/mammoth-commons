@@ -35,8 +35,8 @@ def categories(iterable):
 
 
 @metric(
-    namespace="maniospas",
-    version="v002",
+    namespace="mammotheu",
+    version="v0035",
     python="3.11",
     packages=(
         "fairbench",

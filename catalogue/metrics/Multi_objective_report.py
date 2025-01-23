@@ -62,8 +62,8 @@ def categories(iterable):
 
 
 @metric(
-    namespace="arjunroyihrpa",
-    version="v005",
+    namespace="mammotheu",
+    version="v0035",
     python="3.11",
     packages=("fairbench", "plotly"),
 )
