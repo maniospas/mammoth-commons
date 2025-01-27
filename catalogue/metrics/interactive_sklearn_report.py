@@ -41,6 +41,10 @@ def categories(iterable):
     packages=(
         "fairbench",
         "scikit-learn",
+        "pandas",
+        "onnxruntime",
+        "ucimlrepo",
+        "pygrank",
     ),
 )
 def interactive_sklearn_report(
