@@ -7,7 +7,7 @@ import pandas as pd
 from typing import List, Optional
 
 
-@loader(namespace="csh", version="002", python="3.11")
+@loader(namespace="mammotheu", version="v0035", python="3.11")
 def data_csv_rankings(path: str = "", delimiter: str = "|") -> CSV:
     """
     This is a Loader to load .csv files with information about researchers

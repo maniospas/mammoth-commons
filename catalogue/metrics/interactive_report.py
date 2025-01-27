@@ -31,7 +31,7 @@ def categories(iterable):
     return fb.categories @ iterable
 
 
-@metric(namespace="maniospas", version="v005", python="3.11", packages=("fairbench",))
+@metric(namespace="mammotheu", version="v0035", python="3.11", packages=("fairbench",))
 def interactive_report(
     dataset: Dataset,
     model: Predictor,

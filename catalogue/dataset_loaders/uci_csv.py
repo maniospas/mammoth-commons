@@ -5,8 +5,8 @@ import os
 
 
 @loader(
-    namespace="arjunroy",
-    version="v003",
+    namespace="mammotheu",
+    version="v0035",
     python="3.11",
     packages=("pandas", "ucimlrepo"),
 )

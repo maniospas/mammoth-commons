@@ -4,8 +4,8 @@ from mammoth.externals import safeexec
 
 
 @loader(
-    namespace="gsarridis",
-    version="v003",
+    namespace="mammotheu",
+    version="v0035",
     python="3.11",
     packages=("torch", "torchvision", "pandas"),
 )

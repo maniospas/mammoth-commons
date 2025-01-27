@@ -576,7 +576,7 @@ def validate_input(
         )
 
 
-@metric(namespace="csh", version="v002", python="3.11")
+@metric(namespace="mammotheu", version="v0035", python="3.11")
 def exposure_distance_comparison(
     dataset: CSV,
     model: ResearcherRanking,
