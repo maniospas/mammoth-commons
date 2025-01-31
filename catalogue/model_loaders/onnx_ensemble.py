@@ -5,7 +5,10 @@ import numpy as np
 import zipfile
 
 
-@loader(namespace="mammotheu", version="v0036", python="3.11", packages=("onnxruntime",))
+@loader(
+    namespace="mammotheu", version="v0036", python="3.11", packages=("onnxruntime",)
+)
+
 def model_onnx_ensemble(path: str = "") -> ONNXEnsemble:
     """<p>This ONNX Ensemble Module enables predictions using a <a href="https://scikit-learn.org/stable/modules/ensemble.html" target="_blank">boosting ensemble</a> mechanism, ideal for combining multiple weak learners to improve prediction accuracy. Boosting, a powerful technique in machine learning, focuses on training a series of simple models (weak learners) – often single-depth <a href="https://scikit-learn.org/stable/modules/tree.html#classification" target="_blank">decision trees</a> – and combining them into a strong ensemble model.</p>
     <p><b>Usage Instructions:</b> To load a model, users need to supply a zip file path. This zip file should include multiple weak learners, each saved in the ONNX format, as well as parameters, such as weights (often denoted as ‘alphas’), that define each learner’s contribution to the final model. For an example of preparing this file, please see <a href="https://github.com/mammoth-eu/mammoth-commons/blob/dev/tests/test-mfppb-onnx-ensemble.ipynb" target="_blank">our notebook</a>.</p>

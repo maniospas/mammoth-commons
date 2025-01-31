@@ -65,7 +65,7 @@ def categories(iterable):
     namespace="mammotheu",
     version="v0036",
     python="3.11",
-    packages=("fairbench", "plotly"),
+    packages=("fairbench", "plotly",  "pandas", "onnxruntime", "ucimlrepo", "pygrank"),
 )
 def Multi_objective_report(
     dataset: CSV,

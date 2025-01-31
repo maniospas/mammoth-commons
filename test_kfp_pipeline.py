@@ -16,9 +16,12 @@ def test_kfp_pipeline():
     ):
         model_onnx_task = model_onnx(model_onnx__params=model_onnx__params)
         data_auto_csv_task = data_auto_csv(data_auto_csv__params=data_auto_csv__params)
-        model_card_task = model_card(model_card__params=model_card__params, sensitive=sensitive,
-                                    dataset=data_auto_csv_task.outputs['output'],
-                                    model=model_onnx_task.outputs['output'])
+        model_card_task = model_card(
+            model_card__params=model_card__params,
+            sensitive=sensitive,
+            dataset=data_auto_csv_task.outputs["output"],
+            model=model_onnx_task.outputs["output"],
+        )
 
     # IMPORTANT: Components need to be build to have the docker image before testing with this file
     # Build components commands

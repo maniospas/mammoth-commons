@@ -31,7 +31,12 @@ def categories(iterable):
     return fb.categories @ iterable
 
 
-@metric(namespace="mammotheu", version="v0036", python="3.11", packages=("fairbench",))
+@metric(
+    namespace="mammotheu",
+    version="v0036",
+    python="3.11",
+    packages=("fairbench", "pandas", "onnxruntime", "ucimlrepo", "pygrank"),
+)
 def model_card(
     dataset: Dataset,
     model: Predictor,
