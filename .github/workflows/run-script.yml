@@ -40,3 +40,10 @@ jobs:
 
       - name: Build Modules
         run: ./components_script.sh
+
+      - name: Store module yaml artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: module_yamls
+          path: yamls/
+          compression-level: 9
