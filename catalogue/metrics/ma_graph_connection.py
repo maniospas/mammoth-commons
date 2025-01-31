@@ -8,7 +8,7 @@ from mammoth.integration import metric
 
 
 @metric(
-    namespace="mammotheu", version="v0035", python="3.11", packages=("multisoc",)
+    namespace="mammotheu", version="v0036", python="3.11", packages=("multisoc",)
 )
 def connection_properties(
     dataset: Graph_CSH,
