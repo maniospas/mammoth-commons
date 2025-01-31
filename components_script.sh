@@ -1,9 +1,5 @@
 echo "Building components"
 
-# Change version and docker repository name
-
-#find . -type f -name "*.py" -exec sed -i 's/version="v0035"/version="v0036"/g' {} +
-
 pip install --upgrade -r requirements\[test\].txt
 pip install -e .
 
