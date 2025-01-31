@@ -1,11 +1,6 @@
 echo "Building components"
 
-# Change version and docker repository name
-
-#find . -type f -name "*.py" -exec sed -i 's/version="v0034"/version="v0035"/g' {} +
-#find . -type f -name "*.py" -exec sed -i 's/version="v0035"/version="v0036"/g' {} +
-
-pip install --upgrade -r action_build_requirements.txt
+pip install --upgrade -r requirements\[test\].txt
 pip install -e .
 
 kfp component build . --component-filepattern catalogue/dataset_loaders/auto_csv.py
@@ -35,4 +30,15 @@ kfp component build . --component-filepattern catalogue/metrics/ranking_fairness
 kfp component build . --component-filepattern catalogue/metrics/xai_analysis_embeddings.py
 kfp component build . --component-filepattern catalogue/metrics/xai_analysis.py
 
+mkdir yamls
+mkdir yamls/data
+mkdir yamls/meta
+
+cp catalogue/dataset_loaders/component_metadata/* yamls/meta/
+cp catalogue/model_loaders/component_metadata/* yamls/meta/
+cp catalogue/metrics/component_metadata/* yamls/meta/
+cp component_metadata/* yamls/data/
+
+
 echo "Completed building components"
+
