@@ -95,7 +95,7 @@ def read_csv(url, **kwargs):
 
 @loader(
     namespace="mammotheu",
-    version="v0035",
+    version="v0036",
     python="3.11",
     packages=("pandas",),
 )
