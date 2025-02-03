@@ -296,3 +296,19 @@ kfp component build . --component-filepattern catalogue/fairbench/modelcard.py -
 
 :warning: The build should be called from a directory where both your
 module and virtual environment are subdirectories.
+
+
+## Automatic build toolkit modules
+
+You can use the **Toolkit Modules Build** action from the Actions section in github.
+
+:warning: As this procedure is very heavy on build resources please use it only when it is really needed.
+
+Before running the procedure, update the docker image version of all modules to the new one.
+
+After the procedure is completed the module_yamls file is available that can be downloaded and use the yamls in it to update your local toolkit installation.
+
+Folder named data yamls should be put in components_yaml folder of toolkit.
+
+Folder named meta yamls should be put in components_metadata folder of toolkit.
+
