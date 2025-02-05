@@ -47,8 +47,7 @@ class Pytorch(Predictor):
                 all_predictions.append(predictions.cpu())
                 all_labels.append(targets.cpu())
                 for i in range(len(sensitive)):
-                    all_sensitive[i].append(sens[i].cpu())
-
+                    all_sensitive[i] += [sens[i].cpu() for i in range(len(sens))]
         all_predictions = torch.cat(all_predictions)
         all_labels = torch.cat(all_labels)
         dataset.labels = {"0": 1 - all_labels, "1": all_labels}
