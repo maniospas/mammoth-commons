@@ -1,5 +1,10 @@
 from typing import List
 from mammoth.datasets import Dataset
+from mammoth.datasets.backend.onnx_transforms import torch2onnx
+from mammoth.datasets.backend.onnx_implementations import (
+    ONNXImageDataset,
+    numpy_dataloader_image,
+)
 
 
 class Image(Dataset):
@@ -23,6 +28,7 @@ class Image(Dataset):
         self.batch_size = batch_size
         self.shuffle = shuffle
         self.cols = cols
+        self.input_size = self._get_input_size(self.data_transform)
 
     def to_torch(self, sensitive: List[str]):
         # dynamic dependencies here to not force a torch dependency on commons from components that don't need it
@@ -41,5 +47,29 @@ class Image(Dataset):
             dataset=torch_dataset, batch_size=self.batch_size, shuffle=self.shuffle
         )
 
+    def to_numpy(self, sensitive: List[str]):
+        onnx_transforms = torch2onnx(self.data_transform)
+        dataset = ONNXImageDataset(
+            csv_path=self.path,
+            root_dir=self.root_dir,
+            target=self.target,
+            sensitive=sensitive,
+            data_transform=onnx_transforms,
+        )
+
+        return numpy_dataloader_image(
+            dataset=dataset, batch_size=self.batch_size, shuffle=self.shuffle
+        )
+
     def to_features(self):
         return
+
+    def _get_input_size(self, transform):
+        from torchvision import transforms
+
+        # Check for Resize transform in the composition
+        for t in transform.transforms:
+            if isinstance(t, transforms.Resize):
+                return t.size  # Return the size of the Resize transform
+        # Default to a common size if Resize is not found
+        return (224, 224)  # Default size

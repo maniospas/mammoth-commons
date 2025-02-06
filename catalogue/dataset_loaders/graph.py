@@ -4,7 +4,7 @@ from mammoth.datasets import Graph
 from mammoth.integration import loader
 
 
-@loader(namespace="mammotheu", version="v0035", python="3.11", packages=("pygrank",))
+@loader(namespace="mammotheu", version="v0036", python="3.11", packages=("pygrank",))
 def data_graph(
     path: str = "",
 ) -> Graph:
