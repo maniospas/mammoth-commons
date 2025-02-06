@@ -1,11 +1,9 @@
 import io
 from PIL import Image as PILImage
 import numpy as np
-from torch.utils.data import Dataset
 import pandas as pd
 from typing import List
 import os
-import onnxruntime as ort
 
 
 class ONNXImageDataset:

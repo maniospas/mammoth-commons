@@ -1,13 +1,9 @@
-import io
 import os
 import torch.nn as nn
 import torch
 import torchvision.transforms as transforms
-from PIL import Image as PILImage
 import onnxruntime as ort
 import tempfile
-from PIL import Image
-import numpy as np
 
 
 class TransformWrapper(nn.Module):

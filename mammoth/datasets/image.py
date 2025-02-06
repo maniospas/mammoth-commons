@@ -1,11 +1,5 @@
 from typing import List
 from mammoth.datasets import Dataset
-from mammoth.datasets.backend.onnx_transforms import torch2onnx
-from mammoth.datasets.backend.onnx_implementations import (
-    ONNXImageDataset,
-    numpy_dataloader_image,
-)
-
 
 class Image(Dataset):
     def __init__(
@@ -48,6 +42,12 @@ class Image(Dataset):
         )
 
     def to_numpy(self, sensitive: List[str]):
+        from mammoth.datasets.backend.onnx_transforms import torch2onnx
+        from mammoth.datasets.backend.onnx_implementations import (
+            ONNXImageDataset,
+            numpy_dataloader_image,
+        )
+
         onnx_transforms = torch2onnx(self.data_transform)
         dataset = ONNXImageDataset(
             csv_path=self.path,
