@@ -17,6 +17,7 @@ from catalogue.model_loaders.no_model import no_model
 from catalogue.model_loaders.onnx import model_onnx
 from catalogue.model_loaders.onnx_ensemble import model_onnx_ensemble
 from catalogue.model_loaders.pytorch import model_torch
+from catalogue.model_loaders.pytorch2onnx import model_torch2onnx
 from catalogue.model_loaders.fair_node_ranking import model_fair_node_ranking
 from catalogue.model_loaders.compute_researcher_ranking import (
     model_mitigation_ranking,
@@ -178,6 +179,7 @@ register(
     compatible=[data_auto_csv, data_custom_csv, data_uci],
 )
 register(model_loaders, model_torch, compatible=[data_images, data_image_pairs])
+register(model_loaders, model_torch2onnx, compatible=[data_images, data_image_pairs])
 register(model_loaders, model_fair_node_ranking, compatible=[data_graph])
 register(model_loaders, model_mitigation_ranking, compatible=[data_csv_rankings])
 

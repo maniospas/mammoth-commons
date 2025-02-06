@@ -4,6 +4,7 @@ fairbench
 PyYAML
 kfp
 onnxruntime
+onnx
 markdown2
 dill
 timm
