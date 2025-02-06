@@ -34,8 +34,8 @@ def test_bias_exploration():
             input_size=dataset.input_size,
         )
 
-        html_result = env.model_card(dataset, model, [protected])
-        print(html_result.text())
+        result = env.model_card(dataset, model, [protected])
+        print(result.text())
         # html_result.show()
 
 

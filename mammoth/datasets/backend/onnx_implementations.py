@@ -190,7 +190,7 @@ def numpy_dataloader_imagepairs(
     for start_idx in range(0, len(dataset), batch_size):
         end_idx = min(start_idx + batch_size, len(dataset))
         batch_indices = indices[start_idx:end_idx]
-        images, images2, targets, protected = [], [], []
+        images, images2, targets, protected = [], [], [], []
 
         for idx in batch_indices:
             image, image2, target, protected_attr = dataset[idx]
