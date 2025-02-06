@@ -89,6 +89,7 @@
 <a href='#onnx'>Onnx</a>
 <a href='#onnx-ensemble'>Onnx ensemble</a>
 <a href='#torch'>Torch</a>
+<a href='#torch2onnx'>Torch2onnx</a>
 <a href='#fair-node-ranking'>Fair node ranking</a>
 <a href='#mitigation-ranking'>Mitigation ranking</a>
 
@@ -164,6 +165,54 @@
                       onclick="showDescriptionModal(this)">
                       <i class="bi bi-info-circle"></i> Name
                     </button>
+<button
+                      type="button"
+                      class="btn btn-light"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title=" A comma-separated list of libraries that can be imported."
+                      data-description=" A comma-separated list of libraries that can be imported."
+                      data-name="Safe libraries"
+                      onclick="showDescriptionModal(this)">
+                      <i class="bi bi-info-circle"></i> Safe libraries
+                    </button>
+<br>
+<h2 id='torch2onnx'>Torch2onnx</h2>
+<p><p>Loads a ONNX model that comprises a Python code initializing the architecture and a file of trained parameters. For safety, the architecture's definition is allowed to directly import only specified libraries.</p> </p>
+<b>Parameters</b><br> <button
+                      type="button"
+                      class="btn btn-light"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title=" The path in which the architecture's state is stored."
+                      data-description=" The path in which the architecture's state is stored."
+                      data-name="State path"
+                      onclick="showDescriptionModal(this)">
+                      <i class="bi bi-info-circle"></i> State path
+                    </button>
+<button
+                      type="button"
+                      class="btn btn-light"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title=" The path in which the architecture's initialization script resides. Alternatively, you may also just paste the initialization code in this field."
+                      data-description=" The path in which the architecture's initialization script resides. Alternatively, you may also just paste the initialization code in this field."
+                      data-name="Path"
+                      onclick="showDescriptionModal(this)">
+                      <i class="bi bi-info-circle"></i> Path
+                    </button>
+<button
+                      type="button"
+                      class="btn btn-light"
+                      data-bs-toggle="tooltip"
+                      data-bs-placement="top"
+                      title=" The variable in the model path's script to which the architecture is assigned."
+                      data-description=" The variable in the model path's script to which the architecture is assigned."
+                      data-name="Name"
+                      onclick="showDescriptionModal(this)">
+                      <i class="bi bi-info-circle"></i> Name
+                    </button>
+Input size
 <button
                       type="button"
                       class="btn btn-light"
