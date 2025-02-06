@@ -7,10 +7,7 @@ from typing import List
 from mammoth.integration import metric
 
 
-
-@metric(
-    namespace="mammotheu", version="v0036", python="3.11", packages=("multisoc",)
-)
+@metric(namespace="mammotheu", version="v0036", python="3.11", packages=("multisoc",))
 def connection_properties(
     dataset: Graph_CSH,
     model: EmptyModel,  # TODO: seems we cannot give a default model!

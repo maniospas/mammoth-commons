@@ -1,6 +1,7 @@
 from typing import List
 from mammoth.datasets import Dataset
 
+
 class Image(Dataset):
     def __init__(
         self, path, root_dir, target, data_transform, batch_size, shuffle, cols

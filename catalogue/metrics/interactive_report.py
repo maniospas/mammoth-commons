@@ -31,7 +31,6 @@ def categories(iterable):
     return fb.categories @ iterable
 
 
-
 @metric(
     namespace="mammotheu",
     version="v0036",
