@@ -11,7 +11,7 @@ def handle_select_model_get(database, task_id, error_title=None, error_message=N
 
     loaders = {
         loader: loader_data
-        for loader, loader_data in model_loaders.items()
+        for loader, loader_data in model_loaders.runs()
         if task["dataset_loader"] in loader_data["compatible"]
     }
 

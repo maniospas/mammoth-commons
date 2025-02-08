@@ -20,7 +20,7 @@ def handle_fairness_analysis_get(
             "description": entries["description"],
             "parameter_options": entries["parameter_options"],
         }
-        for method, entries in analysis_methods.items()
+        for method, entries in analysis_methods.runs()
         if issubclass(
             parameters_to_class[task["dataset_loader"]]["return"],
             parameters_to_class[method][entries["parameters"][0][0]],

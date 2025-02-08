@@ -29,7 +29,7 @@ def model_onnx(path: str = "") -> ONNX:
     </ul>
 
     Args:
-        path: A local path or url pointing to the loaded file. The loader checks for the existence of the local path, and if it does not exist the `urllib.request` module is obtained to read the model's bytes.
+        path: A local path or url pointing to the loaded file. The loader checks for the existence of the local path, and if it does not exist the `urllib.request` module reads the model's bytes from a URL.
     """
     if os.path.exists(path):
         with open(path, "rb") as f:

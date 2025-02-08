@@ -2,6 +2,8 @@ import inspect
 from typing import get_type_hints
 import markdown2
 
+desktopmode = True
+
 # data loaders
 from catalogue.dataset_loaders.data_csv_rankings import data_csv_rankings
 from catalogue.dataset_loaders.custom_csv import data_custom_csv
@@ -79,7 +81,9 @@ def register(catalogue: dict, component, compatible=None):
             # args_desc[splt[0]] = f"{separator_title}<i>{name} - </i> {splt[1]}"
 
             args_desc[splt[0]] = (
-                f"""{separator_title}<button
+                f"""<h1>{separator_title} {name}</h1> {splt[1]}""" if desktopmode
+                else
+                f"""<h1>{separator_title} {name}</h1> {splt[1]}<button
                       type="button"
                       class="btn btn-light"
                       data-bs-toggle="tooltip"
@@ -103,8 +107,8 @@ def register(catalogue: dict, component, compatible=None):
         assert pname != "return"
         args_to_classes[pname] = arg_type
         arg_type = arg_type.__name__
-        # if arg_type == "str" and ("path" in pname.lower() or "url" in pname.lower()):
-        #    arg_type = "url"
+        if arg_type == "str" and ("path" in pname.lower() or "url" in pname.lower()):
+            arg_type = "url"
         if parameter.default is not inspect.Parameter.empty:  # ignore kwargs
             args.append(
                 [

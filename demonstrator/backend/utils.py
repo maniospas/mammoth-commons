@@ -13,16 +13,12 @@ def handle_error(error):
         500,
     )
 
-
 def handle_task_results(database, task_id):
     task = database.get(task_id)
-    if not task:
-        return redirect(url_for("index"))
+    if not task: return redirect(url_for("index"))
     return render_template("task_results.html", task=task)
-
 
 def handle_deletion(database, task_id):
     task = database.get(task_id)
-    if task:
-        database.remove(task)
+    if task: database.remove(task)
     return redirect(url_for("index"))
