@@ -46,10 +46,8 @@ class Dashboard(QWidget):
         if layout is not None:
             while layout.count():
                 child = layout.takeAt(0)
-                # If the item is a widget, delete it.
                 if child.widget():
                     child.widget().deleteLater()
-                # If the item is a layout, recursively clear it.
                 elif child.layout():
                     self.clear_layout(child.layout())
 
@@ -80,14 +78,14 @@ class Dashboard(QWidget):
                 tag_label.clicked.connect(lambda checked, t=tag: self.show_tag_description(t))
                 tag_container.addWidget(tag_label)
 
-            if "result" in run:
+            if run.get("status") == "complete":
                 action_button = QPushButton("👁", self)
                 action_button.setStyleSheet("background-color: #17a2b8; border-radius: 5px; color: white;")
-                action_button.clicked.connect(lambda checked, res=run["result"]: self.view_result(res))
+                action_button.clicked.connect(lambda checked, i=index: self.view_result(i))
             else:
                 action_button = QPushButton("✎", self)
                 action_button.setStyleSheet("background-color: #ffc107; border-radius: 5px; color: white;")
-                action_button.clicked.connect(lambda checked: self.edit_item(run["description"]))
+                action_button.clicked.connect(lambda checked, i=index: self.edit_item(i))
 
             action_button.setFixedSize(30, 30)
 
@@ -104,43 +102,47 @@ class Dashboard(QWidget):
 
             self.layout.addLayout(item_layout)
 
-        # Ensure scrolling works by letting the content widget grow
         self.content_widget.adjustSize()
 
     def showEvent(self, event):
         self.refresh_dashboard()
         super().showEvent(event)
 
-    def edit_item(self, description):
-        print(f"Editing item: {description}")
+    def edit_item(self, index):
+        # Move the run to the end before editing
+        run = self.runs.pop(index)
+        self.runs.append(run)
+        self.refresh_dashboard()
+        self.stacked_widget.setCurrentIndex(1)  # Navigate to editing page
 
-    def view_result(self, result):
-        msg = QMessageBox()
-        msg.setWindowTitle("View Result")
-        msg.setText(str(result))
-        msg.exec()
+    def view_result(self, index):
+        # Move the completed run to the end before viewing results
+        run = self.runs.pop(index)
+        self.runs.append(run)
+        self.refresh_dashboard()
+        self.stacked_widget.setCurrentIndex(4)  # Navigate to results page
 
     def show_tag_description(self, tag):
         msg = QMessageBox()
-        msg.setWindowTitle("Tag Description")
+        msg.setWindowTitle("Help")
         msg.setText(self.tag_descriptions.get(tag, "No description available."))
         msg.exec()
 
     def create_new_item(self):
         self.runs.append({
             "description": "Fairness analysis",
-            "timestamp": datetime.now().strftime("%d-%m-%Y %H:%M")
+            "timestamp": datetime.now().strftime("%d-%m-%Y %H:%M"),
+            "status": "in_progress"
         })
         self.stacked_widget.setCurrentIndex(1)
 
     def delete_item(self, index):
         reply = QMessageBox.question(self, "Delete?",
-                                     f"Are you sure you want to delete {format_run(self.runs[index])}?",
+                                     f"Confirm the deletion of {format_run(self.runs[index])}.",
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             self.runs.pop(index)
             self.refresh_dashboard()
-            self.update()
 
 def format_run(run):
     return "[" + run["timestamp"] + "] " + run["description"]

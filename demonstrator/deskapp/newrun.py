@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (
     QPushButton, QLabel, QVBoxLayout, QWidget, QHBoxLayout, QComboBox,
-    QFormLayout, QLineEdit, QMessageBox, QFrame, QCheckBox, QFileDialog
+    QFormLayout, QLineEdit, QMessageBox, QFrame, QCheckBox, QFileDialog, QDialog, QListWidget
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIntValidator, QDoubleValidator, QIcon
@@ -25,12 +25,12 @@ class NewRun(QWidget):
         layout.addWidget(self.label)
 
         self.dataset_selector = QComboBox(self)
-        self.dataset_selector.addItems(["Please select a module"] + list(dataset_loaders.keys()))
+        self.dataset_selector.addItems(["Select a module"] + list(dataset_loaders.keys()))
         self.dataset_selector.currentTextChanged.connect(self.update_param_form)
         layout.addWidget(self.dataset_selector)
 
         # Dataset description section
-        self.description_label = QLabel("Select a module to see its description and parameters to fill in.", self)
+        self.description_label = QLabel("Select a module to see its description and parameters to fill in.", self, openExternalLinks=True)
         self.description_label.setWordWrap(True)
         self.description_label.setStyleSheet("font-size: 14px; color: #555; margin-top: 5px;")
         layout.addWidget(self.description_label)
@@ -67,12 +67,12 @@ class NewRun(QWidget):
     def showEvent(self, event):
         super().showEvent(event)
         self.dataset_selector.clear()
-        self.dataset_selector.addItems(["Please select a dataset loader"] + list(self.dataset_loaders.keys()))
-        self.update_param_form("Please select a dataset loader")
+        self.dataset_selector.addItems(["Select a dataset loader"] + list(self.dataset_loaders.keys()))
+        self.update_param_form("Select a dataset loader")
 
     def update_param_form(self, dataset_name):
         """Update the form based on the selected dataset loader."""
-        if self.first_selection and dataset_name != "Please select a dataset loader":
+        if self.first_selection and dataset_name != "Select a dataset loader":
             self.dataset_selector.removeItem(0)
             self.first_selection = False
 
@@ -89,9 +89,36 @@ class NewRun(QWidget):
 
         # Populate parameters
         for name, param_type, default, description in loader["parameters"]:
+            if name == "dataset" or name == "model": continue
             param_options = loader.get("parameter_options", {}).get(name, [])  # Get options if available
             param_widget = self.create_input_widget(name, param_type, default, description, param_options)
             self.param_form.addRow(param_widget)
+
+    def open_sensitive_modal(self, input_field, columns):
+        """Open a modal dialog to select sensitive columns."""
+        dialog = QDialog(self)
+        dialog.setWindowTitle("Select Sensitive Columns")
+        dialog.setModal(True)
+
+        layout = QVBoxLayout()
+
+        list_widget = QListWidget(dialog)
+        list_widget.addItems(columns)
+        list_widget.setSelectionMode(QListWidget.SelectionMode.MultiSelection)
+        layout.addWidget(list_widget)
+
+        confirm_button = QPushButton("Confirm", dialog)
+        confirm_button.clicked.connect(lambda: self.set_sensitive_values(dialog, list_widget, input_field))
+        layout.addWidget(confirm_button)
+
+        dialog.setLayout(layout)
+        dialog.exec()
+
+    def set_sensitive_values(self, dialog, list_widget, input_field):
+        """Set selected columns into the input field."""
+        selected_items = [item.text() for item in list_widget.selectedItems()]
+        input_field.setText(", ".join(selected_items))
+        dialog.accept()
 
     def create_input_widget(self, name, param_type, default, description, param_options):
         """Create an appropriate input widget based on the parameter type."""
@@ -106,7 +133,20 @@ class NewRun(QWidget):
             input_widget.addItems(col_options)
             input_widget.setCurrentText(default if default in param_options else param_options[0])
         el"""
-        if param_options:  # If parameter options are provided, use a dropdown
+        if name == "sensitive":
+            if not self.runs: return QWidget()
+            columns = self.runs[-1]["dataset"]["return"].cols
+
+            input_widget = QLineEdit(self)
+            input_widget.setText(str(default) if default != "None" else "")
+
+            select_button = QPushButton("...")
+            select_button.setFixedSize(30, 20)
+            select_button.setStyleSheet("background-color: #ddd; border-radius: 5px;")
+            select_button.clicked.connect(lambda: self.open_sensitive_modal(input_widget, columns))
+
+            helper = select_button
+        elif param_options:  # If parameter options are provided, use a dropdown
             input_widget = QComboBox(self)
             input_widget.addItems(param_options)
             input_widget.setCurrentText(default if default in param_options else param_options[0])
@@ -155,7 +195,7 @@ class NewRun(QWidget):
 
     def select_path(self, input_field):
         """Open a file dialog to select a path."""
-        path = QFileDialog.getOpenFileName(self, "Select Directory")
+        path = QFileDialog.getOpenFileName(self, "Select file")
         if path: input_field.setText(path[0])
 
     def show_help_popup(self, param_name, description):
@@ -165,6 +205,7 @@ class NewRun(QWidget):
         msg.setText(description)
         msg.setIcon(QMessageBox.Icon.NoIcon)
         msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+        msg.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
         msg.exec()
 
     def save(self, step):
@@ -180,10 +221,10 @@ class NewRun(QWidget):
                 params[param] = field.text()
         pipeline[step] = {"module": dataset_name, "params": params}
 
-    def next(self):
-        self.save("dataset")
-        self.stacked_widget.setCurrentIndex(2)
-
-    def switch_to_dashboard(self):
-        self.save("dataset")
-        self.stacked_widget.setCurrentIndex(0)
+    def show_error_message(self, message):
+        error_msg = QMessageBox(self)
+        error_msg.setWindowTitle("Error")
+        error_msg.setText(message)
+        error_msg.setIcon(QMessageBox.Critical)
+        error_msg.setModal(True)
+        error_msg.exec()
