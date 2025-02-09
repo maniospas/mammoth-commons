@@ -41,6 +41,7 @@ class DatasetLoaderThread(QThread):
 
             self.finished_success.emit(self.pipeline)
         except Exception as e:
+            traceback.print_exception(e)
             if not self._is_canceled:
                 self.pipeline["status"] = "failed"
                 traceback.print_exception(e)
@@ -237,6 +238,7 @@ class AnalysisThread(QThread):
 
             self.finished_success.emit(self.pipeline)
         except Exception as e:
+            traceback.print_exception(e)
             if not self._is_canceled:
                 self.pipeline["status"] = "failed"
                 self.finished_failure.emit(str(e))

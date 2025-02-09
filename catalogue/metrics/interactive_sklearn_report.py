@@ -5,12 +5,12 @@ from mammoth.models import EmptyModel
 from mammoth.exports import HTML
 from typing import Dict, List
 from mammoth.integration import metric, Options
-from fairbench import v1 as fb
+import fairbench as fb
 import sklearn
 import numpy as np
 
 
-@fb.core.Transform
+@fb.v1.core.Transform
 def categories(iterable):
     # print(iterable)
     is_numeric = True
@@ -22,7 +22,7 @@ def categories(iterable):
             is_numeric = False
             break
     if is_numeric:
-        values = np.array(values)
+        values = fb.v1.tobackend(values)
         mx = values.max()
         mn = values.min()
         if mx == mn:
@@ -88,7 +88,7 @@ def interactive_sklearn_report(
     if predictor == "Logistic regression":
         from sklearn.linear_model import LogisticRegression
 
-        model = LogisticRegression(max_iter=1000)
+        model = LogisticRegression(max_iter=10000)
     elif predictor == "Gaussian naive Bayes":
         from sklearn.naive_bayes import GaussianNB
 
@@ -102,14 +102,14 @@ def interactive_sklearn_report(
     scores = model.predict_proba(X_test)[:, 1]
 
     # declare sensitive attributes
-    sensitive = fb.Fork(
+    sensitive = fb.Dimensions(
         {attr + " ": (categories @ dataset.data[attr][idx_test]) for attr in sensitive}
     )
 
     # change behavior based on arguments
     if intersectional:
         sensitive = sensitive.intersectional()
-    report_type = fb.multireport if compare_groups == "Pairwise" else fb.unireport
+    report_type = fb.reports.pairwise if compare_groups == "Pairwise" else fb.reports.vsall
 
     report = report_type(
         predictions=predictions,
@@ -117,4 +117,5 @@ def interactive_sklearn_report(
         scores=scores,
         sensitive=sensitive,
     )
-    return HTML(fb.interactive_html(report, show=False, name=predictor))
+    ret = report.show(env=fb.export.Html(view=False, filename=None))
+    return HTML(ret)

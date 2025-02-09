@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout
-from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QSizePolicy
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWebEngineWidgets import QWebEngineView
 
 def format_run(run):
@@ -14,13 +14,7 @@ class Results(QWidget):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        self.title_label = QLabel("Analysis outcome", self)
-        self.title_label.setStyleSheet("font-size: 20px; font-weight: bold;")
-        layout.addWidget(self.title_label)
-
-        self.results_viewer = QWebEngineView(self)
-        layout.addWidget(self.results_viewer)
-
+        # Create button layout first (buttons at the top)
         button_layout = QHBoxLayout()
 
         self.edit_button = QPushButton("Edit", self)
@@ -44,33 +38,50 @@ class Results(QWidget):
         self.close_button.clicked.connect(self.switch_to_dashboard)
         button_layout.addWidget(self.close_button)
 
-        layout.addLayout(button_layout)
-        layout.addStretch()
+        layout.addLayout(button_layout)  # Add buttons first
+
+        # Title label
+        self.title_label = QLabel("Analysis outcome", self)
+        self.title_label.setStyleSheet("font-size: 20px; font-weight: bold;")
+        layout.addWidget(self.title_label)
+
+        # Results Viewer (Stretches to fill available space)
+        self.results_viewer = QWebEngineView(self)
+        size_policy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.results_viewer.setSizePolicy(size_policy)
+        layout.addWidget(self.results_viewer, 1)  # "1" ensures it stretches in available space
+
         self.setLayout(layout)
 
     def switch_to_dashboard(self):
         self.stacked_widget.setCurrentIndex(0)
 
     def showEvent(self, event):
-        self.title_label.setText(format_run(self.runs[-1]))
         super().showEvent(event)
         if self.runs:
+            self.title_label.setText(format_run(self.runs[-1]))
             html_content = self.runs[-1]["analysis"].get("return", "<p>No results available.</p>")
-            print(html_content)
-            self.results_viewer.setHtml(html_content)
-        else: self.results_viewer.setHtml("<p>No results available.</p>")
+        else:
+            html_content = "<p>No results available.</p>"
+
+        # Use QTimer to ensure the WebEngineView renders properly
+        QTimer.singleShot(100, lambda: self.results_viewer.setHtml(html_content))
+        self.results_viewer.show()
 
     def edit_run(self):
-        if self.runs: self.stacked_widget.setCurrentIndex(1)
+        if self.runs:
+            self.stacked_widget.setCurrentIndex(1)
 
     def create_variation(self):
-        if not self.runs: return
+        if not self.runs:
+            return
         new_run = self.runs[-1].copy()
         new_run["status"] = "new"
         self.runs.append(new_run)
         self.stacked_widget.setCurrentIndex(1)
 
     def delete_run(self):
-        if not self.runs: return
+        if not self.runs:
+            return
         self.runs.pop()
         self.stacked_widget.setCurrentIndex(0)  # Go back to the dashboard
