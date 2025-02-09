@@ -1,9 +1,30 @@
+import copy
+
 from PySide6.QtWidgets import (
     QPushButton, QLabel, QVBoxLayout, QWidget, QHBoxLayout, QComboBox,
     QFormLayout, QLineEdit, QMessageBox, QFrame, QCheckBox, QFileDialog, QDialog, QListWidget
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIntValidator, QDoubleValidator, QIcon
+import json
+import os
+
+def save_all_runs(path, runs):
+    copy_runs = list()
+    for run in runs:
+        copy_run = dict()
+        copy_run["timestamp"] = run["timestamp"]
+        copy_run["description"] = run["description"]
+        if "dataset" in run: copy_run["dataset"] = {"module": run["dataset"]["module"], "params": run["dataset"]["params"]}
+        if "model" in run: copy_run["model"] = {"module": run["model"]["module"], "params": run["model"]["params"]}
+        if "analysis" in run: copy_run["analysis"] = {"module": run["analysis"]["module"], "params": run["analysis"]["params"], "return": run["analysis"].get("return", None)}
+        copy_runs.append(copy_run)
+    with open(path, 'w', encoding='utf-8') as file: file.write(json.dumps(copy_runs))
+
+def load_all_runs(path):
+    if not os.path.exists(path): return list()
+    with open(path, 'r', encoding='utf-8') as file: return json.load(file)
+
 
 def format_name(name):
     """Format parameter names for better display."""
@@ -62,17 +83,12 @@ class NewRun(QWidget):
         layout.addLayout(button_layout)
         layout.addStretch()
         self.setLayout(layout)
+        self.defaults = dict()
         self.update_param_form(self.dataset_selector.currentText())
-
-    def showEvent(self, event):
-        super().showEvent(event)
-        self.dataset_selector.clear()
-        self.dataset_selector.addItems(["Select a dataset loader"] + list(self.dataset_loaders.keys()))
-        self.update_param_form("Select a dataset loader")
 
     def update_param_form(self, dataset_name):
         """Update the form based on the selected dataset loader."""
-        if self.first_selection and dataset_name != "Select a dataset loader":
+        if self.first_selection and dataset_name!=self.dataset_selector.itemText(0):
             self.dataset_selector.removeItem(0)
             self.first_selection = False
 
@@ -87,8 +103,8 @@ class NewRun(QWidget):
         loader = self.dataset_loaders[dataset_name]
         self.description_label.setText(loader.get("description", "No description available."))
 
-        # Populate parameters
         for name, param_type, default, description in loader["parameters"]:
+            default = self.defaults.get(name, default)
             if name == "dataset" or name == "model": continue
             param_options = loader.get("parameter_options", {}).get(name, [])  # Get options if available
             param_widget = self.create_input_widget(name, param_type, default, description, param_options)
@@ -213,12 +229,9 @@ class NewRun(QWidget):
         dataset_name = self.dataset_selector.currentText()
         params = {}
         for param, field in self.param_inputs.items():
-            if isinstance(field, QCheckBox):
-                params[param] = field.isChecked()
-            elif isinstance(field, QComboBox):
-                params[param] = field.currentText()
-            else:
-                params[param] = field.text()
+            if isinstance(field, QCheckBox): params[param] = field.isChecked()
+            elif isinstance(field, QComboBox): params[param] = field.currentText()
+            else: params[param] = field.text()
         pipeline[step] = {"module": dataset_name, "params": params}
 
     def show_error_message(self, message):

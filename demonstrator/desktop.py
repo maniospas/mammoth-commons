@@ -2,12 +2,12 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget, QMessag
 from PySide6.QtCore import QThread, Signal, QMutex
 import sys
 from deskapp.dashboard import Dashboard
-from deskapp.newrun import NewRun
+from deskapp.newrun import NewRun, load_all_runs, save_all_runs
 from deskapp.results import Results
 from demonstrator.backend.loaders import name_to_runnable, dataset_loaders, model_loaders, parameters_to_class, analysis_methods
 import traceback
 
-items = list()
+items = load_all_runs("history.json")
 
 
 class DatasetLoaderThread(QThread):
@@ -56,6 +56,7 @@ class DatasetLoaderThread(QThread):
 class SelectDataset(NewRun):
     def next(self):
         self.save("dataset")
+        save_all_runs("history.json", self.runs)
 
         self.loading_message = QMessageBox(self)
         self.loading_message.setWindowTitle("Loading Dataset")
@@ -89,10 +90,19 @@ class SelectDataset(NewRun):
             self.thread.wait()  # Wait until the thread finishes
             self.loading_message.done(0)
 
+    def showEvent(self, event):
+        self.dataset_selector.clear()
+        self.dataset_selector.addItems(["Select a dataset loader"] + list(self.dataset_loaders.keys()))
+        self.defaults = self.runs[-1].get("dataset", dict()).get("params", dict())
+        #self.update_param_form(self.runs[-1].get("dataset", dict()).get("module", "Select a dataset loader"))
+        self.dataset_selector.setCurrentIndex(self.dataset_selector.findText(self.runs[-1].get("dataset", dict()).get("module", "Select a dataset loader")))
+        super().showEvent(event)
+
     def switch_to_dashboard(self):
         self.save("dataset")
         self.runs[-1]["status"] = "saved"
         self.stacked_widget.setCurrentIndex(0)
+        save_all_runs("history.json", self.runs)
 
     def closeEvent(self, event):
         if hasattr(self, 'thread') and self.thread.isRunning():
@@ -144,13 +154,16 @@ class SelectModel(NewRun):
         pipeline = self.runs[-1]
         module = pipeline["dataset"]["module"]
         loaders = [loader for loader, values in model_loaders.items() if module in values["compatible"]]
-        super().showEvent(event)
         self.dataset_selector.clear()
         self.dataset_selector.addItems(["Select a model loader"] + loaders)
-        self.update_param_form("Select a model loader")
+        self.defaults = self.runs[-1].get("model", dict()).get("params", dict())
+        #self.update_param_form(self.runs[-1].get("model", dict()).get("module", "Select a model loader"))
+        self.dataset_selector.setCurrentIndex(self.dataset_selector.findText(self.runs[-1].get("model", dict()).get("module", "Select a model loader")))
+        super().showEvent(event)
 
     def next(self):
         self.save("model")
+        save_all_runs("history.json", self.runs)
         pipeline = self.runs[-1]
 
         self.loading_message = QMessageBox(self)
@@ -190,6 +203,7 @@ class SelectModel(NewRun):
         self.save("model")
         self.runs[-1]["status"] = "saved"
         self.stacked_widget.setCurrentIndex(0)
+        save_all_runs("history.json", self.runs)
 
     def closeEvent(self, event):
         if hasattr(self, 'thread') and self.thread.isRunning():
@@ -264,10 +278,12 @@ class SelectAnalysis(NewRun):
                 parameters_to_class[method][entries["parameters"][1][0]],
             )
         ]
-        super().showEvent(event)
         self.dataset_selector.clear()
         self.dataset_selector.addItems(["Select a fairness analysis method"] + compatible_methods)
-        self.update_param_form("Select a fairness analysis method")
+        self.defaults = self.runs[-1].get("analysis", dict()).get("params", dict())
+        #self.update_param_form(self.runs[-1].get("analysis", dict()).get("module", "Select a fairness analysis method"))
+        self.dataset_selector.setCurrentIndex(self.dataset_selector.findText(self.runs[-1].get("analysis", dict()).get("module", "Select a fairness analysis method")))
+        super().showEvent(event)
 
     def next(self):
         self.save("analysis")
@@ -292,10 +308,12 @@ class SelectAnalysis(NewRun):
     def on_success(self, pipeline):
         self.loading_message.done(0)
         self.stacked_widget.setCurrentIndex(4)
+        save_all_runs("history.json", self.runs)
 
     def on_failure(self, error_message):
         self.loading_message.done(0)
         self.show_error_message(error_message)
+        save_all_runs("history.json", self.runs)
 
     def on_cancel(self):
         self.loading_message.done(0)
@@ -310,6 +328,7 @@ class SelectAnalysis(NewRun):
         self.save("analysis")
         self.runs[-1]["status"] = "saved"
         self.stacked_widget.setCurrentIndex(0)
+        save_all_runs("history.json", self.runs)
 
     def closeEvent(self, event):
         if hasattr(self, 'thread') and self.thread.isRunning():
@@ -321,16 +340,15 @@ class SelectAnalysis(NewRun):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-
+        tags = {key: "<h1>"+key+"</h1>"+module["description"] for key, module in (dataset_loaders | model_loaders | analysis_methods).items()}
         self.setWindowTitle("MAMMOth Direct")
         self.setGeometry(100, 100, 1200, 800)
         self.stacked_widget = QStackedWidget()
-        self.stacked_widget.addWidget(Dashboard(self.stacked_widget, items,
-            {key: "<h1>"+key+"</h1>"+module["description"] for key, module in (dataset_loaders | model_loaders | analysis_methods).items()}))
+        self.stacked_widget.addWidget(Dashboard(self.stacked_widget, items, tags))
         self.stacked_widget.addWidget(SelectDataset(self.stacked_widget,  dataset_loaders, items))
         self.stacked_widget.addWidget(SelectModel(self.stacked_widget, model_loaders, items))
         self.stacked_widget.addWidget(SelectAnalysis(self.stacked_widget, analysis_methods, items))
-        self.stacked_widget.addWidget(Results(self.stacked_widget, items))
+        self.stacked_widget.addWidget(Results(self.stacked_widget, items, tags))
         self.setCentralWidget(self.stacked_widget)
 
 

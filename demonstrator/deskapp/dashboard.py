@@ -78,7 +78,7 @@ class Dashboard(QWidget):
                 tag_label.clicked.connect(lambda checked, t=tag: self.show_tag_description(t))
                 tag_container.addWidget(tag_label)
 
-            if run.get("status") == "complete":
+            if run.get("status") == "completed":
                 action_button = QPushButton("👁", self)
                 action_button.setStyleSheet("background-color: #17a2b8; border-radius: 5px; color: white;")
                 action_button.clicked.connect(lambda checked, i=index: self.view_result(i))
