@@ -4,6 +4,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWebEngineWidgets import QWebEngineView
+from .newrun import save_all_runs
 
 
 def format_run(run):
@@ -20,52 +21,60 @@ class Results(QWidget):
         self.layout = QVBoxLayout()
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        # Title label
-        self.title_label = QLabel("Analysis Outcome", self)
-        self.title_label.setStyleSheet("font-size: 20px; font-weight: bold;")
-        self.layout.addWidget(self.title_label)
-
-        # Container for buttons and tags
+        # Top Row (Title & Buttons)
         self.top_container = QHBoxLayout()
         self.top_container.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.top_container.setSpacing(4)  # Reduced spacing between buttons
 
-        # Buttons (Square Icons with Tooltips)
-        self.edit_button = self.create_icon_button("✎", "#17a2b8", "Edit this analysis", self.edit_run)
-        self.variation_button = self.create_icon_button("➕", "#ffc107", "Create a variation", self.create_variation)
-        self.delete_button = self.create_icon_button("🗑", "#dc3545", "Delete this result", self.delete_run)
-        self.close_button = self.create_icon_button("❌", "#6c757d", "Close and return to dashboard", self.switch_to_dashboard)
+        # Title label (Now aligned with buttons)
+        self.title_label = QLabel("Analysis Outcome", self)
+        self.title_label.setStyleSheet("font-size: 20px; font-weight: bold;")
+
+        self.top_container.addWidget(self.title_label)
+
+        # Spacer between title and buttons
+        self.top_container.addItem(QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum))
+
+        # Buttons (Square Icons with Short Hints & Mouse Hover Effect)
+        self.edit_button = self.create_icon_button("✎", "#d39e00", "Edit", self.edit_run)
+        self.variation_button = self.create_icon_button("➕", "#d39e00", "New variation", self.create_variation)
+        self.delete_button = self.create_icon_button("🗑", "#dc3545", "Delete", self.delete_run)
+        self.close_button = self.create_icon_button("❌", "#6c757d", "Close", self.switch_to_dashboard)
 
         self.top_container.addWidget(self.edit_button)
         self.top_container.addWidget(self.variation_button)
         self.top_container.addWidget(self.delete_button)
         self.top_container.addWidget(self.close_button)
 
-        # Spacer to separate buttons and tags
-        self.top_container.addItem(QSpacerItem(10, 10, QSizePolicy.Fixed, QSizePolicy.Minimum))
+        self.layout.addLayout(self.top_container)
 
-        # Tags container (Now aligned to the left)
+        # Tags container (Left-aligned)
         self.tags_container = QHBoxLayout()
-        self.tags_container.setAlignment(Qt.AlignmentFlag.AlignLeft)  # Left-aligned
-
-        self.top_container.addLayout(self.tags_container)
-
-        self.layout.addLayout(self.top_container)  # Add buttons and tags container
+        self.tags_container.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.layout.addLayout(self.tags_container)
 
         # Results Viewer
         self.results_viewer = QWebEngineView(self)
         size_policy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         self.results_viewer.setSizePolicy(size_policy)
-        self.layout.addWidget(self.results_viewer, 1)  # "1" ensures it stretches to available space
+        self.layout.addWidget(self.results_viewer, 1)
 
         self.setLayout(self.layout)
 
     def create_icon_button(self, text, color, tooltip, callback):
-        """Helper function to create square buttons with icons and tooltips."""
+        """Create square buttons with icons, short hints, and mouse hover effect."""
         button = QPushButton(text, self)
-        button.setStyleSheet(f"background-color: {color}; color: white; border-radius: 5px;")
+        button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {color}; 
+                color: white; 
+                border-radius: 5px;
+            }}
+            QPushButton:hover {{
+                background-color: {self.darken_color(color)};
+            }}
+        """)
         button.setFixedSize(30, 30)
-        button.setToolTip(tooltip)  # Set tooltip (hint)
+        button.setToolTip(tooltip)
         button.clicked.connect(callback)
         return button
 
@@ -89,7 +98,7 @@ class Results(QWidget):
         self.results_viewer.show()
 
     def update_tags(self, run):
-        """Refresh the tags displayed below the title."""
+        """Refresh tags displayed below the title."""
         # Clear existing tags
         while self.tags_container.count():
             item = self.tags_container.takeAt(0)
@@ -104,16 +113,26 @@ class Results(QWidget):
 
         for tag in tags:
             tag_button = QPushButton(f" {tag} ", self)
-            tag_button.setStyleSheet("background-color: gray; color: white; padding: 2px 6px; border-radius: 10px;")
+            tag_button.setStyleSheet(f"""
+                QPushButton {{
+                    background-color: gray; 
+                    color: white; 
+                    padding: 2px 6px; 
+                    border-radius: 10px;
+                }}
+                QPushButton:hover {{
+                    background-color: darkgray;
+                }}
+            """)
             tag_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            tag_button.setToolTip("Click to view tag description")  # Tooltip hint
+            tag_button.setToolTip("Module info")  # Short hint
             tag_button.clicked.connect(lambda checked, t=tag: self.show_tag_description(t))
             self.tags_container.addWidget(tag_button)
 
     def show_tag_description(self, tag):
         """Show description of a tag."""
         msg = QMessageBox()
-        msg.setWindowTitle("Help")
+        msg.setWindowTitle("Module info")
         msg.setText(self.tag_descriptions.get(tag, "No description available."))
         msg.exec()
 
@@ -122,15 +141,28 @@ class Results(QWidget):
             self.stacked_widget.setCurrentIndex(1)
 
     def create_variation(self):
-        if not self.runs:
-            return
+        if not self.runs: return
         new_run = self.runs[-1].copy()
         new_run["status"] = "new"
         self.runs.append(new_run)
         self.stacked_widget.setCurrentIndex(1)
 
     def delete_run(self):
-        if not self.runs:
-            return
-        self.runs.pop()
-        self.stacked_widget.setCurrentIndex(0)  # Go back to the dashboard
+        if not self.runs: return
+        reply = QMessageBox.question(self, "Delete?",
+                                     f"Confirm the deletion of {format_run(self.runs[-1])}.",
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.runs.pop()
+            self.stacked_widget.setCurrentIndex(0)
+            save_all_runs("history.json", self.runs)
+
+    def darken_color(self, color):
+        """Helper function to darken a given hex color for hover effects."""
+        if color.startswith("#"):
+            color = color[1:]
+        r, g, b = int(color[:2], 16), int(color[2:4], 16), int(color[4:6], 16)
+        r = max(r - 30, 0)
+        g = max(g - 30, 0)
+        b = max(b - 30, 0)
+        return f"#{r:02x}{g:02x}{b:02x}"

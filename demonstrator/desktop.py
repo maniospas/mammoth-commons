@@ -167,7 +167,7 @@ class SelectModel(NewRun):
         pipeline = self.runs[-1]
 
         self.loading_message = QMessageBox(self)
-        self.loading_message.setWindowTitle("Loading Model")
+        self.loading_message.setWindowTitle("Loading model")
         self.loading_message.setText("Please wait while the model is loading...")
         self.loading_message.setStandardButtons(QMessageBox.Cancel)
         self.loading_message.setModal(True)
@@ -235,6 +235,7 @@ class AnalysisThread(QThread):
             model = self.pipeline["model"]["return"]
             sensitive = args["sensitive"]
             if "," in sensitive: sensitive = sensitive.split(",")
+            elif sensitive=="": sensitive = []
             else: sensitive = [sensitive]
             sensitive = [s.strip() for s in sensitive]
             args = {k:v for k,v in args.items() if k not in ["dataset", "model", "sensitive"]}
@@ -290,7 +291,7 @@ class SelectAnalysis(NewRun):
         pipeline = self.runs[-1]
 
         self.loading_message = QMessageBox(self)
-        self.loading_message.setWindowTitle("Running Fairness Analysis")
+        self.loading_message.setWindowTitle("Running fairness analysis")
         self.loading_message.setText("Please wait while the fairness analysis is running...")
         self.loading_message.setStandardButtons(QMessageBox.Cancel)
         self.loading_message.setModal(True)
@@ -345,9 +346,9 @@ class MainWindow(QMainWindow):
         self.setGeometry(100, 100, 1200, 800)
         self.stacked_widget = QStackedWidget()
         self.stacked_widget.addWidget(Dashboard(self.stacked_widget, items, tags))
-        self.stacked_widget.addWidget(SelectDataset(self.stacked_widget,  dataset_loaders, items))
-        self.stacked_widget.addWidget(SelectModel(self.stacked_widget, model_loaders, items))
-        self.stacked_widget.addWidget(SelectAnalysis(self.stacked_widget, analysis_methods, items))
+        self.stacked_widget.addWidget(SelectDataset("Data", self.stacked_widget,  dataset_loaders, items))
+        self.stacked_widget.addWidget(SelectModel("Model", self.stacked_widget, model_loaders, items))
+        self.stacked_widget.addWidget(SelectAnalysis("Analysis method", self.stacked_widget, analysis_methods, items))
         self.stacked_widget.addWidget(Results(self.stacked_widget, items, tags))
         self.setCentralWidget(self.stacked_widget)
 

@@ -64,6 +64,7 @@ def interactive_sklearn_report(
         intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute.
         compare_groups: Whether to compare groups pairwise, or each group to the whole population.
     """
+    assert len(sensitive)!=0, "Set at least one sensitive attribute"
     X = dataset.to_features(sensitive)
     y = dataset.labels
     if isinstance(y, dict):
@@ -71,7 +72,7 @@ def interactive_sklearn_report(
     else:
         assert (
             y.shape[1] <= 2
-        ), "Cannot create a logistic regression interactive report for non-binary predictions"
+        ), "Cannot create an interactive report for non-binary predictions"
         y = y[y.columns[-1]]
     from sklearn import model_selection
 

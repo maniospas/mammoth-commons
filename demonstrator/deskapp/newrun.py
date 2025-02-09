@@ -15,6 +15,7 @@ def save_all_runs(path, runs):
         copy_run = dict()
         copy_run["timestamp"] = run["timestamp"]
         copy_run["description"] = run["description"]
+        copy_run["status"] = run.get("status", None)
         if "dataset" in run: copy_run["dataset"] = {"module": run["dataset"]["module"], "params": run["dataset"]["params"]}
         if "model" in run: copy_run["model"] = {"module": run["model"]["module"], "params": run["model"]["params"]}
         if "analysis" in run: copy_run["analysis"] = {"module": run["analysis"]["module"], "params": run["analysis"]["params"], "return": run["analysis"].get("return", None)}
@@ -31,7 +32,7 @@ def format_name(name):
     return name.replace("_", " ").capitalize()
 
 class NewRun(QWidget):
-    def __init__(self, stacked_widget, dataset_loaders, runs):
+    def __init__(self, step_name, stacked_widget, dataset_loaders, runs):
         super().__init__()
         self.stacked_widget = stacked_widget
         self.dataset_loaders = dataset_loaders
@@ -41,7 +42,7 @@ class NewRun(QWidget):
         layout = QVBoxLayout()
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        self.label = QLabel("Data", self)
+        self.label = QLabel(step_name, self)
         self.label.setStyleSheet("font-size: 20px; font-weight: bold;")
         layout.addWidget(self.label)
 
@@ -69,12 +70,31 @@ class NewRun(QWidget):
 
         button_layout = QHBoxLayout()
         self.next_button = QPushButton("Next", self)
-        self.next_button.setStyleSheet("background-color: #17a2b8; color: white; padding: 6px; border-radius: 5px;")
+        self.next_button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: #007bff; 
+                color: white; 
+                border-radius: 5px;
+                padding: 6px; 
+            }}
+            QPushButton:hover {{
+                background-color: {self.darken_color('#007bff')};
+            }}
+        """)
         self.next_button.clicked.connect(self.next)
 
         self.cancel_button = QPushButton("Cancel", self)
+        self.cancel_button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: #dc3545; 
+                color: white; 
+                border-radius: 5px;
+            }}
+            QPushButton:hover {{
+                background-color: {self.darken_color('#dc3545')};
+            }}
+        """)
         self.cancel_button.setFixedSize(80, 30)
-        self.cancel_button.setStyleSheet("background-color: #dc3545; color: white; border-radius: 5px;")
         self.cancel_button.clicked.connect(self.switch_to_dashboard)
 
         button_layout.addWidget(self.next_button)
@@ -101,7 +121,7 @@ class NewRun(QWidget):
             return
 
         loader = self.dataset_loaders[dataset_name]
-        self.description_label.setText(loader.get("description", "No description available."))
+        self.description_label.setText(loader.get("description", f"No description available:<br><b>{dataset_name}</b>"))
 
         for name, param_type, default, description in loader["parameters"]:
             default = self.defaults.get(name, default)
@@ -113,7 +133,7 @@ class NewRun(QWidget):
     def open_sensitive_modal(self, input_field, columns):
         """Open a modal dialog to select sensitive columns."""
         dialog = QDialog(self)
-        dialog.setWindowTitle("Select Sensitive Columns")
+        dialog.setWindowTitle("Select sensitive attributes")
         dialog.setModal(True)
 
         layout = QVBoxLayout()
@@ -123,7 +143,7 @@ class NewRun(QWidget):
         list_widget.setSelectionMode(QListWidget.SelectionMode.MultiSelection)
         layout.addWidget(list_widget)
 
-        confirm_button = QPushButton("Confirm", dialog)
+        confirm_button = QPushButton("Done", dialog)
         confirm_button.clicked.connect(lambda: self.set_sensitive_values(dialog, list_widget, input_field))
         layout.addWidget(confirm_button)
 
@@ -141,6 +161,7 @@ class NewRun(QWidget):
         param_layout = QHBoxLayout()
 
         helper = None
+        preview = None
         """if name == "numeric" or name == "categorical":
             pass # TODO: add the
         elif name.startswith("target") or name.startswith("label"):
@@ -158,7 +179,7 @@ class NewRun(QWidget):
 
             select_button = QPushButton("...")
             select_button.setFixedSize(30, 20)
-            select_button.setStyleSheet("background-color: #ddd; border-radius: 5px;")
+            select_button.setStyleSheet("background-color: #dd8; border-radius: 5px;")
             select_button.clicked.connect(lambda: self.open_sensitive_modal(input_widget, columns))
 
             helper = select_button
@@ -177,14 +198,51 @@ class NewRun(QWidget):
         elif param_type == "bool":
             input_widget = QCheckBox(self)
             input_widget.setChecked(str(default).lower() == "true")
+        elif "dir" in name:
+            input_widget = QLineEdit(self)
+            input_widget.setText(str(default) if default != "None" else "")
+
+            file_button = QPushButton("...")
+            file_button.setFixedSize(30, 20)
+            file_button.setStyleSheet("background-color: #dd8; border-radius: 5px;")
+            file_button.clicked.connect(lambda: self.select_dir(input_widget))
+            helper = file_button
+
         elif param_type == "url":
             input_widget = QLineEdit(self)
             input_widget.setText(str(default) if default != "None" else "")
+
             file_button = QPushButton("...")
             file_button.setFixedSize(30, 20)
-            file_button.setStyleSheet("background-color: #ddd; border-radius: 5px;")
+            file_button.setStyleSheet("background-color: #dd8; border-radius: 5px;")
             file_button.clicked.connect(lambda: self.select_path(input_widget))
             helper = file_button
+
+            def preview_file():
+                file_path = input_widget.text().strip()
+                if not file_path:
+                    QMessageBox.warning(self, "Error", "No file selected.")
+                    return
+                try:
+                    with open(file_path, "r", encoding="utf-8") as file:
+                        lines = [file.readline().strip() for _ in range(5)]
+                    preview_text = "\n".join(line for line in lines if line)
+
+                    msg_box = QMessageBox(self)
+                    msg_box.setWindowTitle("File preview")
+                    msg_box.setText(preview_text if preview_text else "File is empty.")
+                    msg_box.setIcon(QMessageBox.Icon.NoIcon)  # Removes the information icon
+                    msg_box.exec_()
+
+                except Exception as e:
+                    QMessageBox.critical(self, "Error", f"Could not read the file or failed to convert it to a human-friendly format:\n{str(e)}")
+
+            file_button = QPushButton("Preview")
+            file_button.setFixedSize(50, 20)
+            file_button.setStyleSheet("background-color: #d0d; border-radius: 5px;")
+            file_button.clicked.connect(preview_file)
+            preview = file_button
+
         else:  # Default to a normal text field
             input_widget = QLineEdit(self)
             input_widget.setText(str(default) if default != "None" else "")
@@ -203,21 +261,25 @@ class NewRun(QWidget):
         param_layout.addWidget(label)
         param_layout.addWidget(help_button)
         if helper is not None: param_layout.addWidget(helper);
+        if preview is not None: param_layout.addWidget(preview);
         param_layout.addWidget(input_widget)
 
         param_widget = QWidget()
         param_widget.setLayout(param_layout)
         return param_widget
 
+    def select_dir(self, input_field):
+        path = QFileDialog.getExistingDirectory(self, "Select directory")
+        if path: input_field.setText(path)
+
     def select_path(self, input_field):
-        """Open a file dialog to select a path."""
         path = QFileDialog.getOpenFileName(self, "Select file")
         if path: input_field.setText(path[0])
 
     def show_help_popup(self, param_name, description):
         """Show a popup window with the parameter description."""
         msg = QMessageBox(self)
-        msg.setWindowTitle("Help")
+        msg.setWindowTitle("Parameter info")
         msg.setText(description)
         msg.setIcon(QMessageBox.Icon.NoIcon)
         msg.setStandardButtons(QMessageBox.StandardButton.Ok)
@@ -236,8 +298,19 @@ class NewRun(QWidget):
 
     def show_error_message(self, message):
         error_msg = QMessageBox(self)
+        if message[0] == '\'' and message[-1] == '\'': message = message[1:-1]
+        message = "The following issue must be addressed:<br><b>" + message+"</b>"
         error_msg.setWindowTitle("Error")
         error_msg.setText(message)
         error_msg.setIcon(QMessageBox.Critical)
         error_msg.setModal(True)
         error_msg.exec()
+
+    def darken_color(self, color):
+        if color.startswith("#"):
+            color = color[1:]
+        r, g, b = int(color[:2], 16), int(color[2:4], 16), int(color[4:6], 16)
+        r = min(r + 30, 255)
+        g = min(g + 30, 255)
+        b = min(b + 30, 255)
+        return f"#{r:02x}{g:02x}{b:02x}"

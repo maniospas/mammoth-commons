@@ -4,6 +4,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from datetime import datetime
+from .newrun import save_all_runs
 
 
 class Dashboard(QWidget):
@@ -19,17 +20,15 @@ class Dashboard(QWidget):
         self.label.setStyleSheet("font-size: 24px; font-weight: bold;")
         self.main_layout.addWidget(self.label)
 
-        new_button = QPushButton("New", self)
-        new_button.setStyleSheet("background-color: #007bff; color: white; padding: 8px; border-radius: 5px;")
-        new_button.clicked.connect(self.create_new_item)
+        new_button = self.create_icon_button("➕", "#007bff", "New analysis", self.create_new_item)
         self.main_layout.addWidget(new_button)
 
-        # Scroll Area (Fixed Size, but allows scrolling)
+        # Scroll Area
         self.scroll_area = QScrollArea(self)
         self.scroll_area.setWidgetResizable(True)
         self.scroll_area.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        # Content Widget inside Scroll Area
+        # Content Widget
         self.content_widget = QWidget()
         self.layout = QVBoxLayout(self.content_widget)
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -42,6 +41,80 @@ class Dashboard(QWidget):
 
         self.refresh_dashboard()
 
+    def view_result(self, index):
+        run = self.runs.pop(index)
+        self.runs.append(run)
+        self.refresh_dashboard()
+        self.stacked_widget.setCurrentIndex(4)
+
+    def edit_item(self, index):
+        run = self.runs.pop(index)
+        self.runs.append(run)
+        self.refresh_dashboard()
+        self.stacked_widget.setCurrentIndex(1)
+
+    def create_variation(self, index):
+        if not self.runs:
+            return
+        new_run = self.runs[index].copy()
+        new_run["status"] = "new"
+        self.runs.append(new_run)
+        self.refresh_dashboard()
+        self.stacked_widget.setCurrentIndex(1)
+
+    def create_new_item(self):
+        self.runs.append({
+            "description": "Fairness analysis",
+            "timestamp": datetime.now().strftime("%d-%m-%Y %H:%M"),
+            "status": "in_progress"
+        })
+        self.stacked_widget.setCurrentIndex(1)
+        self.refresh_dashboard()
+
+    def delete_item(self, index):
+        reply = QMessageBox.question(self, "Delete?",
+                                     f"Confirm the deletion of {format_run(self.runs[index])}.",
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.runs.pop(index)
+            self.refresh_dashboard()
+            save_all_runs("history.json", self.runs)
+
+    def create_icon_button(self, text, color, tooltip, callback):
+        button = QPushButton(text, self)
+        button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {color}; 
+                color: white; 
+                border-radius: 5px;
+            }}
+            QPushButton:hover {{
+                background-color: {self.darken_color(color)};
+            }}
+        """)
+        button.setFixedSize(30, 30)
+        button.setToolTip(tooltip)
+        button.clicked.connect(callback)
+        return button
+
+    def create_tag_button(self, text, tooltip, callback):
+        button = QPushButton(text, self)
+        button.setStyleSheet(f"""
+            QPushButton {{
+                background-color: gray; 
+                color: white; 
+                padding: 2px 6px; 
+                border-radius: 10px;
+            }}
+            QPushButton:hover {{
+                background-color: darkgray;
+            }}
+        """)
+        button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        button.setToolTip(tooltip)
+        button.clicked.connect(callback)
+        return button
+
     def clear_layout(self, layout):
         if layout is not None:
             while layout.count():
@@ -51,20 +124,22 @@ class Dashboard(QWidget):
                 elif child.layout():
                     self.clear_layout(child.layout())
 
+
+    def showEvent(self, event):
+        self.refresh_dashboard()
+
     def refresh_dashboard(self):
-        # Clear existing items
         self.clear_layout(self.layout)
 
-        for index, run in enumerate(self.runs):
+        for index, run in sorted(enumerate(self.runs), key=lambda x: x[1]["timestamp"]):
             item_layout = QHBoxLayout()
+            item_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
             description_label = QLabel(format_run(run), self)
             description_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
 
-            spacer = QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
             tag_container = QHBoxLayout()
-            tag_container.setAlignment(Qt.AlignmentFlag.AlignRight)
+            tag_container.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
             tags = []
             if "dataset" in run: tags.append(run["dataset"]["module"])
@@ -72,77 +147,50 @@ class Dashboard(QWidget):
             if "analysis" in run: tags.append(run["analysis"]["module"])
 
             for tag in tags:
-                tag_label = QPushButton(f" {tag} ", self)
-                tag_label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-                tag_label.setStyleSheet("background-color: gray; color: white; padding: 2px 6px; border-radius: 10px;")
-                tag_label.clicked.connect(lambda checked, t=tag: self.show_tag_description(t))
-                tag_container.addWidget(tag_label)
+                tag_button = self.create_tag_button(f" {tag} ", "Module info", lambda checked, t=tag: self.show_tag_description(t))
+                tag_container.addWidget(tag_button)
 
-            if run.get("status") == "completed":
-                action_button = QPushButton("👁", self)
-                action_button.setStyleSheet("background-color: #17a2b8; border-radius: 5px; color: white;")
-                action_button.clicked.connect(lambda checked, i=index: self.view_result(i))
-            else:
-                action_button = QPushButton("✎", self)
-                action_button.setStyleSheet("background-color: #ffc107; border-radius: 5px; color: white;")
-                action_button.clicked.connect(lambda checked, i=index: self.edit_item(i))
+            button_container = QHBoxLayout()
+            button_container.setAlignment(Qt.AlignmentFlag.AlignRight)
 
-            action_button.setFixedSize(30, 30)
+            if run["status"] == "completed":
+                view_button = self.create_icon_button("👁", "#007bff", "Results", lambda checked, i=index: self.view_result(i))
+                button_container.addWidget(view_button)
 
-            delete_button = QPushButton("🗑", self)
-            delete_button.setStyleSheet("background-color: #dc3545; border-radius: 5px; color: white;")
-            delete_button.setFixedSize(30, 30)
-            delete_button.clicked.connect(lambda checked, i=index: self.delete_item(i))
+            if run["status"] == "completed":
+                variation_button = self.create_icon_button("➕", "#d39e00", "New variation", lambda checked, i=index: self.create_variation(i))
+                button_container.addWidget(variation_button)
 
-            item_layout.addWidget(description_label)
-            item_layout.addItem(spacer)
-            item_layout.addLayout(tag_container)
-            item_layout.addWidget(action_button)
-            item_layout.addWidget(delete_button)
+            edit_button = self.create_icon_button("✎", "#d39e00", "Edit", lambda checked, i=index: self.edit_item(i))
+            delete_button = self.create_icon_button("🗑", "#dc3545", "Delete", lambda checked, i=index: self.delete_item(i))
 
-            self.layout.addLayout(item_layout)
+            button_container.addWidget(edit_button)
+            button_container.addWidget(delete_button)
+
+            main_row_layout = QHBoxLayout()
+            main_row_layout.addWidget(description_label)
+            main_row_layout.addLayout(tag_container)
+            main_row_layout.addLayout(button_container)
+
+            self.layout.addLayout(main_row_layout)
 
         self.content_widget.adjustSize()
 
-    def showEvent(self, event):
-        self.refresh_dashboard()
-        super().showEvent(event)
-
-    def edit_item(self, index):
-        # Move the run to the end before editing
-        run = self.runs.pop(index)
-        self.runs.append(run)
-        self.refresh_dashboard()
-        self.stacked_widget.setCurrentIndex(1)  # Navigate to editing page
-
-    def view_result(self, index):
-        # Move the completed run to the end before viewing results
-        run = self.runs.pop(index)
-        self.runs.append(run)
-        self.refresh_dashboard()
-        self.stacked_widget.setCurrentIndex(4)  # Navigate to results page
+    def darken_color(self, color):
+        if color.startswith("#"):
+            color = color[1:]
+        r, g, b = int(color[:2], 16), int(color[2:4], 16), int(color[4:6], 16)
+        r = min(r + 30, 255)
+        g = min(g + 30, 255)
+        b = min(b + 30, 255)
+        return f"#{r:02x}{g:02x}{b:02x}"
 
     def show_tag_description(self, tag):
+        """Show description of a tag."""
         msg = QMessageBox()
-        msg.setWindowTitle("Help")
-        msg.setText(self.tag_descriptions.get(tag, "No description available."))
+        msg.setWindowTitle("Module info")
+        msg.setText(self.tag_descriptions.get(tag, f"No description available:<br><b>{tag}</b>"))
         msg.exec()
-
-    def create_new_item(self):
-        self.runs.append({
-            "description": "Fairness analysis",
-            "timestamp": datetime.now().strftime("%d-%m-%Y %H:%M"),
-            "status": "in_progress"
-        })
-        self.stacked_widget.setCurrentIndex(1)
-
-    def delete_item(self, index):
-        reply = QMessageBox.question(self, "Delete?",
-                                     f"Confirm the deletion of {format_run(self.runs[index])}.",
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            self.runs.pop(index)
-            self.refresh_dashboard()
 
 def format_run(run):
     return "[" + run["timestamp"] + "] " + run["description"]
