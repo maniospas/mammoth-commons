@@ -33,25 +33,14 @@ class CSV(Dataset):
             else (labels if isinstance(labels, dict) else {"label": labels})
         )
         self.cols = numeric + categorical
-        if sensitives != None:
-            self.pred_cols = [col for col in self.cols if col not in sensitives]
-        else:
-            self.pred_cols = [col for col in self.cols]
+        if sensitives is None:
+            sensitives = []
+        self.pred_cols = [col for col in self.cols if col not in sensitives]
 
     def to_features(self, sensitive):
-        """for attr in sensitive:
-        if attr not in self.categorical:
-            raise Exception(
-                "Fairness analysis on CSV datasets is not supported for non-categorical sensitive attributes."
-            )"""
         return _features(self.data, self.numeric, self.categorical).astype(np.float64)
 
     def to_pred(self, sensitive):
-        """for attr in sensitive:
-        if attr not in self.categorical:
-            raise Exception(
-                "Fairness analysis on CSV datasets is not supported for non-categorical sensitive attributes."
-            )"""
         return _pred_features(
             self.data, self.numeric, self.categorical, sensitive
         ).astype(np.float64)

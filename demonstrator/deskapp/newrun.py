@@ -8,6 +8,8 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QIntValidator, QDoubleValidator, QIcon
 import json
 import os
+import pandas as pd
+import csv
 
 def save_all_runs(path, runs):
     copy_runs = list()
@@ -123,6 +125,8 @@ class NewRun(QWidget):
         loader = self.dataset_loaders[dataset_name]
         self.description_label.setText(loader.get("description", f"No description available:<br><b>{dataset_name}</b>"))
 
+        self.last_url = None
+        self.last_delimiter = None  # never set, placeholder for the future perhaps?
         for name, param_type, default, description in loader["parameters"]:
             default = self.defaults.get(name, default)
             if name == "dataset" or name == "model": continue
@@ -130,10 +134,35 @@ class NewRun(QWidget):
             param_widget = self.create_input_widget(name, param_type, default, description, param_options)
             self.param_form.addRow(param_widget)
 
-    def open_sensitive_modal(self, input_field, columns):
+    def open_sensitive_modal(self, title, input_field, columns):
+        if not isinstance(columns, list):
+            path = columns[0].text()
+            delimiter = columns[1].text() if columns[1] is not None else None
+            if len(path) == 0:
+                QMessageBox.warning(self, "Error", f"The previous file was empty and could not be used as reference.")
+                return
+            if delimiter is not None and len(delimiter) == 0:
+                QMessageBox.warning(self, "Error", f"The previous file's delimiter was empty and could not be used as reference</b>")
+                return
+            try:
+                if delimiter is None:
+                    try:
+                        with open(path, "r") as file:
+                            sample = file.read(4096)
+                            sniffer = csv.Sniffer()
+                            delimiter = sniffer.sniff(sample).delimiter
+                            delimiter = str(delimiter)
+                    except Exception as e:
+                        delimiter = ","
+                df = pd.read_csv(path, nrows=3, on_bad_lines="skip", delimiter=delimiter)
+                columns = df.columns.tolist()
+            except Exception as e:
+                QMessageBox.warning(self, "Error", f"Could not read the previous file to use as reference:<br><b>{str(e)}</b>")
+                return
+
         """Open a modal dialog to select sensitive columns."""
         dialog = QDialog(self)
-        dialog.setWindowTitle("Select sensitive attributes")
+        dialog.setWindowTitle(title)
         dialog.setModal(True)
 
         layout = QVBoxLayout()
@@ -162,15 +191,18 @@ class NewRun(QWidget):
 
         helper = None
         preview = None
-        """if name == "numeric" or name == "categorical":
-            pass # TODO: add the
-        elif name.startswith("target") or name.startswith("label"):
-            col_options = self.get_cols()
-            input_widget = QComboBox(self)
-            input_widget.addItems(col_options)
-            input_widget.setCurrentText(default if default in param_options else param_options[0])
-        el"""
-        if name == "sensitive":
+        if "numeric" in name or "categorical" in name or "label" in name or "target" in name:
+            input_widget = QLineEdit(self)
+            input_widget.setText(str(default) if default != "None" else "")
+            if self.last_url is not None:
+                select_button = QPushButton("...")
+                select_button.setFixedSize(30, 20)
+                select_button.setStyleSheet("background-color: #dd8; border-radius: 5px;")
+                last_url = self.last_url
+                last_delimiter = self.last_delimiter
+                select_button.clicked.connect(lambda: self.open_sensitive_modal(f"Select {name} columns", input_widget, (last_url, last_delimiter)))
+                helper = select_button
+        elif name == "sensitive":
             if not self.runs: return QWidget()
             columns = self.runs[-1]["dataset"]["return"].cols
 
@@ -180,7 +212,7 @@ class NewRun(QWidget):
             select_button = QPushButton("...")
             select_button.setFixedSize(30, 20)
             select_button.setStyleSheet("background-color: #dd8; border-radius: 5px;")
-            select_button.clicked.connect(lambda: self.open_sensitive_modal(input_widget, columns))
+            select_button.clicked.connect(lambda: self.open_sensitive_modal("Select sensitive attributes", input_widget, columns))
 
             helper = select_button
         elif param_options:  # If parameter options are provided, use a dropdown
@@ -211,6 +243,7 @@ class NewRun(QWidget):
         elif param_type == "url":
             input_widget = QLineEdit(self)
             input_widget.setText(str(default) if default != "None" else "")
+            self.last_url = input_widget
 
             file_button = QPushButton("...")
             file_button.setFixedSize(30, 20)
@@ -235,12 +268,37 @@ class NewRun(QWidget):
                     msg_box.exec_()
 
                 except Exception as e:
-                    QMessageBox.critical(self, "Error", f"Could not read the file or failed to convert it to a human-friendly format:\n{str(e)}")
+                    QMessageBox.warning(self, "Error", f"Could not read the file or failed to convert it to a human-friendly format:\n{str(e)}")
 
             file_button = QPushButton("Preview")
             file_button.setFixedSize(50, 20)
-            file_button.setStyleSheet("background-color: #d0d; border-radius: 5px;")
+            file_button.setStyleSheet("background-color: #dbd; border-radius: 5px;")
             file_button.clicked.connect(preview_file)
+            preview = file_button
+
+        elif name == "delimiter":
+            input_widget = QLineEdit(self)
+            input_widget.setText(str(default) if default != "None" else "")
+            last_url = self.last_url
+            def recommend_delimiter():
+                path = last_url.text()
+                if len(path) == 0:
+                    QMessageBox.warning(self, "Error", f"The previous file was empty and could not be used as reference.")
+                    return
+                try:
+                    with open(path, "r") as file:
+                        sample = file.read(4096)
+                        sniffer = csv.Sniffer()
+                        delimiter = sniffer.sniff(sample).delimiter
+                        delimiter = str(delimiter)
+                        input_widget.setText(delimiter)
+                except Exception as e:
+                    QMessageBox.warning(self, "Error", f"Could not read the previous file to use as reference:<br><b>{str(e)}</b>")
+
+            file_button = QPushButton("Find")
+            file_button.setFixedSize(30, 20)
+            file_button.setStyleSheet("background-color: #dd8; border-radius: 5px;")
+            file_button.clicked.connect(recommend_delimiter)
             preview = file_button
 
         else:  # Default to a normal text field
@@ -260,8 +318,8 @@ class NewRun(QWidget):
 
         param_layout.addWidget(label)
         param_layout.addWidget(help_button)
-        if helper is not None: param_layout.addWidget(helper);
-        if preview is not None: param_layout.addWidget(preview);
+        if helper is not None: param_layout.addWidget(helper)
+        if preview is not None: param_layout.addWidget(preview)
         param_layout.addWidget(input_widget)
 
         param_widget = QWidget()

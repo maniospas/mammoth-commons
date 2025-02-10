@@ -103,6 +103,7 @@ def read_csv(url, **kwargs):
 )
 def data_custom_csv(
     path: str = "",
+    delimiter: str = ",",
     numeric: Optional[
         List[str]
     ] = None,  # numeric = ["age", "duration", "campaign", "pdays", "previous"]
@@ -110,7 +111,6 @@ def data_custom_csv(
         List[str]
     ] = None,  # ["job", "marital", "education", "default", "housing", "loan", "contact", "poutcome"]
     label: Optional[str] = None,
-    delimiter: str = ",",
     skip_invalid_lines: bool = True,
 ) -> CSV:
     """Loads a CSV file that contains numeric, categorical, and predictive data columns
@@ -132,9 +132,9 @@ def data_custom_csv(
     if not path.endswith(".csv"):
         raise Exception("A file or url with .csv extension is needed.")
     if isinstance(categorical, str):
-        categorical = categorical.split(",")
+        categorical = [cat.strip() for cat in categorical.split(",")]
     if isinstance(numeric, str):
-        numeric = numeric.split(",")
+        numeric = [num.strip() for num in numeric.split(",")]
     raw_data = read_csv(
         path,
         on_bad_lines="skip" if skip_invalid_lines else "error",
