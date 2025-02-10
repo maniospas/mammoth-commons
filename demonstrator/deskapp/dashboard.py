@@ -48,10 +48,19 @@ class Dashboard(QWidget):
         self.stacked_widget.setCurrentIndex(4)
 
     def edit_item(self, index):
-        run = self.runs.pop(index)
-        self.runs.append(run)
-        self.refresh_dashboard()
-        self.stacked_widget.setCurrentIndex(1)
+        if not self.runs: return
+        if self.runs[index].get("status", "") != "completed":
+            reply = QMessageBox.Yes
+        else:
+            reply = QMessageBox.question(self, "Edit?",
+                                         f"You can change modules and modify parameters of {format_run(self.runs[index])}. "
+                                         "However, this will also remove its results. Consider creating a variation if you want to preserve current results.",
+                                         QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            run = self.runs.pop(index)
+            self.runs.append(run)
+            self.refresh_dashboard()
+            self.stacked_widget.setCurrentIndex(1)
 
     def create_variation(self, index):
         if not self.runs:

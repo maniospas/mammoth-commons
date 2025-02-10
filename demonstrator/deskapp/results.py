@@ -35,13 +35,13 @@ class Results(QWidget):
         self.top_container.addItem(QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum))
 
         # Buttons (Square Icons with Short Hints & Mouse Hover Effect)
-        self.edit_button = self.create_icon_button("✎", "#d39e00", "Edit", self.edit_run)
         self.variation_button = self.create_icon_button("➕", "#d39e00", "New variation", self.create_variation)
+        self.edit_button = self.create_icon_button("✎", "#d39e00", "Edit", self.edit_run)
         self.delete_button = self.create_icon_button("🗑", "#dc3545", "Delete", self.delete_run)
         self.close_button = self.create_icon_button("❌", "#6c757d", "Close", self.switch_to_dashboard)
 
-        self.top_container.addWidget(self.edit_button)
         self.top_container.addWidget(self.variation_button)
+        self.top_container.addWidget(self.edit_button)
         self.top_container.addWidget(self.delete_button)
         self.top_container.addWidget(self.close_button)
 
@@ -137,7 +137,12 @@ class Results(QWidget):
         msg.exec()
 
     def edit_run(self):
-        if self.runs:
+        if not self.runs: return
+        reply = QMessageBox.question(self, "Edit?",
+                                     f"You can change modules and modify parameters of the analysis. "
+                                     "However, this will also remove the results presented here. Consider creating a variation if you want to preserve current results.",
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
             self.stacked_widget.setCurrentIndex(1)
 
     def create_variation(self):
@@ -150,7 +155,7 @@ class Results(QWidget):
     def delete_run(self):
         if not self.runs: return
         reply = QMessageBox.question(self, "Delete?",
-                                     f"Confirm the deletion of {format_run(self.runs[-1])}.",
+                                     f"This will permanently remove the analysis and its outcome.",
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             self.runs.pop()
