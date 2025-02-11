@@ -36,7 +36,7 @@ class Results(Styled):
         self.top_container.addItem(QSpacerItem(10, 10, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
 
         # Buttons (Square Icons with Short Hints & Mouse Hover Effect)
-        self.variation_button = self.create_icon_button("➕", "#d39e00", "New variation", self.create_variation)
+        self.variation_button = self.create_icon_button("➕", "#007bff", "New variation", self.create_variation)
         self.edit_button = self.create_icon_button("✎", "#d39e00", "Edit", self.edit_run)
         self.delete_button = self.create_icon_button("🗑", "#dc3545", "Delete", self.delete_run)
         self.close_button = self.create_icon_button("❌", "#6c757d", "Close", self.switch_to_dashboard)

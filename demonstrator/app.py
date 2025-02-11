@@ -16,7 +16,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         tags = {key: "<h1>"+key+"</h1>"+module["description"] for key, module in (dataset_loaders | model_loaders | analysis_methods).items()}
         self.setWindowTitle("MAMMOth Direct")
-        self.setGeometry(100, 100, 1200, 800)
+        self.setGeometry(100, 100, 1024, 768)
         self.stacked_widget = QStackedWidget()
         self.stacked_widget.addWidget(Dashboard(self.stacked_widget, items, tags))
         self.stacked_widget.addWidget(SelectDataset("Data", self.stacked_widget,  dataset_loaders, items))

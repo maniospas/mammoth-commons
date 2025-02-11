@@ -61,7 +61,7 @@ class Styled(QWidget):
         if color.startswith("#"):
             color = color[1:]
         r, g, b = int(color[:2], 16), int(color[2:4], 16), int(color[4:6], 16)
-        r = min(r + 30, 255)
-        g = min(g + 30, 255)
-        b = min(b + 30, 255)
+        r = min(r + 22, 255)
+        g = min(g + 22, 255)
+        b = min(b + 22, 255)
         return f"#{r:02x}{g:02x}{b:02x}"

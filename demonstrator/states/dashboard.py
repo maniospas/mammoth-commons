@@ -134,11 +134,11 @@ class Dashboard(Styled):
                     color: black;
                     border-radius: 5px;
                     font-size: 16px;
-                    border: 2px solid black;
+                    border: 1px solid black;
                     font-weight: bold;
                 }}
                 QPushButton:hover {{
-                    border: 4px solid black;
+                    border: 2px solid black;
                     background-color: {self.highlight_color(button_color)};
                 }}
                 QPushButton:pressed {{
@@ -156,7 +156,8 @@ class Dashboard(Styled):
             if not prev_has_same_next_tags and has_same_next_tags:
                 button_with_tags_layout = QVBoxLayout()
                 label = QLabel(run["description"], self)
-                label.setStyleSheet("font-size: 24px; font-weight: bold;")
+                label.setStyleSheet("font-size: 26px; font-weight: bold;")
+                label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
                 button_with_tags_layout.addWidget(label)
 
             button_with_tags_layout.addWidget(run_button)
@@ -164,7 +165,7 @@ class Dashboard(Styled):
                 # Create a container for tags
                 tag_container = QHBoxLayout()
                 tag_container.setAlignment(Qt.AlignmentFlag.AlignHCenter)
-                tag_container.setContentsMargins(0, -30, 0, 15)  # Slight overlap with button, space below
+                tag_container.setContentsMargins(0, -30, 0, 30)  # Slight overlap with button, space below
                 for tag in tags:
                     tag_container.addWidget(self.create_tag_button(f" {tag} ", "Module info", partial(lambda t=tag: self.show_tag_description(t))))
                 if run["status"] == "completed": tag_container.addWidget(self.create_icon_button("➕", "#007bff", "New variation", partial(lambda i=index: self.create_variation(i))))
@@ -172,7 +173,7 @@ class Dashboard(Styled):
                 button_with_tags_layout.addLayout(tag_container)
 
             if has_same_next_tags or prev_has_same_next_tags:
-                #button_layout.setContentsMargins(0, 0, 0, 0)
+                run_button.setContentsMargins(0, 0, 0, 0)
                 run_button.setFixedHeight(60)
 
             #button_with_tags_layout.setSpacing(-5)  # Reduce spacing for overlap effect
@@ -198,7 +199,9 @@ class Dashboard(Styled):
 
 
 def format_run(run, simpler=False):
+    # this function is a mess because it's easier to try things out this way
     match = re.search(r"<h1\b[^>]*>.*?</h1>", run.get("analysis", dict()).get("return", ""), re.DOTALL)
     if match: match = ("" if simpler else ": ")+match.group().replace("h1", "span")
     else: match = "✎"
+    if simpler: return f"<h2 style=\"margin: 0px;\">{match}</h2>Created at {run["timestamp"]}"
     return f"<h1 style=\"margin: 0px;\">{"" if simpler else run["description"]}{match}</h1>Created at {run["timestamp"]}"
