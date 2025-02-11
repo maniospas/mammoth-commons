@@ -4,14 +4,15 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWebEngineWidgets import QWebEngineView
-from .newrun import save_all_runs
+from .step import save_all_runs
+from .style import Styled
 
 
 def format_run(run):
     return "[" + run["timestamp"] + "] " + run["description"]
 
 
-class Results(QWidget):
+class Results(Styled):
     def __init__(self, stacked_widget, runs, tag_descriptions):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -32,7 +33,7 @@ class Results(QWidget):
         self.top_container.addWidget(self.title_label)
 
         # Spacer between title and buttons
-        self.top_container.addItem(QSpacerItem(10, 10, QSizePolicy.Expanding, QSizePolicy.Minimum))
+        self.top_container.addItem(QSpacerItem(10, 10, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum))
 
         # Buttons (Square Icons with Short Hints & Mouse Hover Effect)
         self.variation_button = self.create_icon_button("➕", "#d39e00", "New variation", self.create_variation)
@@ -60,24 +61,6 @@ class Results(QWidget):
 
         self.setLayout(self.layout)
 
-    def create_icon_button(self, text, color, tooltip, callback):
-        """Create square buttons with icons, short hints, and mouse hover effect."""
-        button = QPushButton(text, self)
-        button.setStyleSheet(f"""
-            QPushButton {{
-                background-color: {color}; 
-                color: white; 
-                border-radius: 5px;
-            }}
-            QPushButton:hover {{
-                background-color: {self.darken_color(color)};
-            }}
-        """)
-        button.setFixedSize(30, 30)
-        button.setToolTip(tooltip)
-        button.clicked.connect(callback)
-        return button
-
     def switch_to_dashboard(self):
         self.stacked_widget.setCurrentIndex(0)
 
@@ -88,7 +71,7 @@ class Results(QWidget):
         if self.runs:
             run = self.runs[-1]
             self.title_label.setText(format_run(run))
-            html_content = run["analysis"].get("return", "<p>No results available.</p>")
+            html_content = run.get("analysis", dict()).get("return", "<p>No results available.</p>")
             self.update_tags(run)  # Update tags
         else:
             html_content = "<p>No results available.</p>"
@@ -112,22 +95,7 @@ class Results(QWidget):
         if "analysis" in run: tags.append(run["analysis"]["module"])
 
         for tag in tags:
-            tag_button = QPushButton(f" {tag} ", self)
-            tag_button.setStyleSheet(f"""
-                QPushButton {{
-                    background-color: gray; 
-                    color: white; 
-                    padding: 2px 6px; 
-                    border-radius: 10px;
-                }}
-                QPushButton:hover {{
-                    background-color: darkgray;
-                }}
-            """)
-            tag_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            tag_button.setToolTip("Module info")  # Short hint
-            tag_button.clicked.connect(lambda checked, t=tag: self.show_tag_description(t))
-            self.tags_container.addWidget(tag_button)
+            self.tags_container.addWidget(self.create_tag_button(f" {tag} ", "Module info", lambda checked, t=tag: self.show_tag_description(t)))
 
     def show_tag_description(self, tag):
         """Show description of a tag."""
@@ -161,13 +129,3 @@ class Results(QWidget):
             self.runs.pop()
             self.stacked_widget.setCurrentIndex(0)
             save_all_runs("history.json", self.runs)
-
-    def darken_color(self, color):
-        """Helper function to darken a given hex color for hover effects."""
-        if color.startswith("#"):
-            color = color[1:]
-        r, g, b = int(color[:2], 16), int(color[2:4], 16), int(color[4:6], 16)
-        r = max(r - 30, 0)
-        g = max(g - 30, 0)
-        b = max(b - 30, 0)
-        return f"#{r:02x}{g:02x}{b:02x}"

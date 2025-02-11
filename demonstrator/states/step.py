@@ -1,5 +1,3 @@
-import copy
-
 from PySide6.QtWidgets import (
     QPushButton, QLabel, QVBoxLayout, QWidget, QHBoxLayout, QComboBox,
     QFormLayout, QLineEdit, QMessageBox, QFrame, QCheckBox, QFileDialog, QDialog, QListWidget
@@ -10,6 +8,7 @@ import json
 import os
 import pandas as pd
 import csv
+from .style import Styled
 
 def save_all_runs(path, runs):
     copy_runs = list()
@@ -33,7 +32,7 @@ def format_name(name):
     """Format parameter names for better display."""
     return name.replace("_", " ").capitalize()
 
-class NewRun(QWidget):
+class Step(Styled):
     def __init__(self, step_name, stacked_widget, dataset_loaders, runs):
         super().__init__()
         self.stacked_widget = stacked_widget
@@ -80,7 +79,7 @@ class NewRun(QWidget):
                 padding: 6px; 
             }}
             QPushButton:hover {{
-                background-color: {self.darken_color('#007bff')};
+                background-color: {self.highlight_color('#007bff')};
             }}
         """)
         self.next_button.clicked.connect(self.next)
@@ -93,7 +92,7 @@ class NewRun(QWidget):
                 border-radius: 5px;
             }}
             QPushButton:hover {{
-                background-color: {self.darken_color('#dc3545')};
+                background-color: {self.highlight_color('#dc3545')};
             }}
         """)
         self.cancel_button.setFixedSize(80, 30)
@@ -160,6 +159,9 @@ class NewRun(QWidget):
                 QMessageBox.warning(self, "Error", f"Could not read the previous file to use as reference:<br><b>{str(e)}</b>")
                 return
 
+        prev_value = input_field.text()
+        prev_selection = set(prev_value.split(","))
+
         """Open a modal dialog to select sensitive columns."""
         dialog = QDialog(self)
         dialog.setWindowTitle(title)
@@ -171,6 +173,19 @@ class NewRun(QWidget):
         list_widget.addItems(columns)
         list_widget.setSelectionMode(QListWidget.SelectionMode.MultiSelection)
         layout.addWidget(list_widget)
+
+        for index in range(list_widget.count()):
+            item = list_widget.item(index)
+            if item.text() in prev_selection:
+                item.setSelected(True)
+
+        def cancel():
+            input_field.setText(prev_value)
+            dialog.accept()
+
+        confirm_button = QPushButton("Cancel", dialog)
+        confirm_button.clicked.connect(cancel)
+        layout.addWidget(confirm_button)
 
         confirm_button = QPushButton("Done", dialog)
         confirm_button.clicked.connect(lambda: self.set_sensitive_values(dialog, list_widget, input_field))
@@ -191,7 +206,7 @@ class NewRun(QWidget):
 
         helper = None
         preview = None
-        if "numeric" in name or "categorical" in name or "label" in name or "target" in name:
+        if "numeric" in name or "categorical" in name or "label" in name or "target" in name or "ignored" in name:
             input_widget = QLineEdit(self)
             input_widget.setText(str(default) if default != "None" else "")
             if self.last_url is not None:
@@ -363,12 +378,3 @@ class NewRun(QWidget):
         error_msg.setIcon(QMessageBox.Critical)
         error_msg.setModal(True)
         error_msg.exec()
-
-    def darken_color(self, color):
-        if color.startswith("#"):
-            color = color[1:]
-        r, g, b = int(color[:2], 16), int(color[2:4], 16), int(color[4:6], 16)
-        r = min(r + 30, 255)
-        g = min(g + 30, 255)
-        b = min(b + 30, 255)
-        return f"#{r:02x}{g:02x}{b:02x}"
