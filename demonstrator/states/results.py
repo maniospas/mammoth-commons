@@ -62,7 +62,7 @@ class Results(Styled):
         self.setLayout(self.layout)
 
     def switch_to_dashboard(self):
-        self.stacked_widget.setCurrentIndex(0)
+        self.stacked_widget.slideToWidget(0)
 
     def showEvent(self, event):
         super().showEvent(event)
@@ -77,7 +77,7 @@ class Results(Styled):
             html_content = "<p>No results available.</p>"
 
         # Use QTimer to ensure WebEngineView renders properly
-        QTimer.singleShot(100, lambda: self.results_viewer.setHtml(html_content))
+        QTimer.singleShot(1, lambda: self.results_viewer.setHtml(html_content))
         self.results_viewer.show()
 
     def update_tags(self, run):
@@ -111,14 +111,14 @@ class Results(Styled):
                                      "However, this will also remove the results presented here. Consider creating a variation if you want to preserve current results.",
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
-            self.stacked_widget.setCurrentIndex(1)
+            self.stacked_widget.slideToWidget(1)
 
     def create_variation(self):
         if not self.runs: return
         new_run = self.runs[-1].copy()
         new_run["status"] = "new"
         self.runs.append(new_run)
-        self.stacked_widget.setCurrentIndex(1)
+        self.stacked_widget.slideToWidget(1)
 
     def delete_run(self):
         if not self.runs: return
@@ -127,5 +127,5 @@ class Results(Styled):
                                      QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if reply == QMessageBox.Yes:
             self.runs.pop()
-            self.stacked_widget.setCurrentIndex(0)
+            self.stacked_widget.slideToWidget(0)
             save_all_runs("history.json", self.runs)

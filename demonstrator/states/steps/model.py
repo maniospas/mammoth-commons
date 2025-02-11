@@ -47,6 +47,7 @@ class ModelLoaderThread(QThread):
 class SelectModel(Step):
     def showEvent(self, event):
         pipeline = self.runs[-1]
+        self.description_input.setText(pipeline["description"])
         module = pipeline["dataset"]["module"]
         loaders = [loader for loader, values in model_loaders.items() if module in values["compatible"]]
         self.dataset_selector.clear()
@@ -79,7 +80,7 @@ class SelectModel(Step):
 
     def on_success(self, pipeline):
         self.loading_message.done(0)
-        self.stacked_widget.setCurrentIndex(3)
+        self.stacked_widget.slideToWidget(3)
 
     def on_failure(self, error_message):
         self.loading_message.done(0)
@@ -97,7 +98,7 @@ class SelectModel(Step):
     def switch_to_dashboard(self):
         self.save("model")
         self.runs[-1]["status"] = "saved"
-        self.stacked_widget.setCurrentIndex(0)
+        self.stacked_widget.slideToWidget(0)
         save_all_runs("history.json", self.runs)
 
     def closeEvent(self, event):

@@ -1,12 +1,8 @@
-from PySide6.QtWidgets import (
-    QPushButton, QLabel, QVBoxLayout, QWidget, QHBoxLayout,
-    QScrollArea, QMessageBox, QSizePolicy, QGraphicsDropShadowEffect
-)
-from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QPushButton, QWidget, QSizePolicy
+
 
 
 class Styled(QWidget):
-
     def create_icon_button(self, text, color, tooltip, callback):
         button = QPushButton(text, self)
         button.setStyleSheet(f"""

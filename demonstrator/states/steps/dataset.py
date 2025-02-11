@@ -73,7 +73,7 @@ class SelectDataset(Step):
 
     def on_success(self, pipeline):
         self.loading_message.done(0)
-        self.stacked_widget.setCurrentIndex(2)
+        self.stacked_widget.slideToWidget(2)
 
     def on_failure(self, error_message):
         self.loading_message.done(0)
@@ -89,6 +89,7 @@ class SelectDataset(Step):
             self.loading_message.done(0)
 
     def showEvent(self, event):
+        self.description_input.setText(self.runs[-1]["description"])
         self.dataset_selector.clear()
         self.dataset_selector.addItems(["Select a dataset loader"] + list(self.dataset_loaders.keys()))
         self.defaults = self.runs[-1].get("dataset", dict()).get("params", dict())
@@ -99,7 +100,7 @@ class SelectDataset(Step):
     def switch_to_dashboard(self):
         self.save("dataset")
         self.runs[-1]["status"] = "saved"
-        self.stacked_widget.setCurrentIndex(0)
+        self.stacked_widget.slideToWidget(0)
         save_all_runs("history.json", self.runs)
 
     def closeEvent(self, event):

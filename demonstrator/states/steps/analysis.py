@@ -61,6 +61,7 @@ class AnalysisThread(QThread):
 class SelectAnalysis(Step):
     def showEvent(self, event):
         pipeline = self.runs[-1]
+        self.description_input.setText(pipeline["description"])
         compatible_methods = [
             method
             for method, entries in analysis_methods.items()
@@ -102,7 +103,7 @@ class SelectAnalysis(Step):
 
     def on_success(self, pipeline):
         self.loading_message.done(0)
-        self.stacked_widget.setCurrentIndex(4)
+        self.stacked_widget.slideToWidget(4)
         save_all_runs("history.json", self.runs)
 
     def on_failure(self, error_message):
@@ -122,7 +123,7 @@ class SelectAnalysis(Step):
     def switch_to_dashboard(self):
         self.save("analysis")
         self.runs[-1]["status"] = "saved"
-        self.stacked_widget.setCurrentIndex(0)
+        self.stacked_widget.slideToWidget(0)
         save_all_runs("history.json", self.runs)
 
     def closeEvent(self, event):

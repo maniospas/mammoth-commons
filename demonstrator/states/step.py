@@ -44,7 +44,7 @@ class Step(Styled):
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
         self.label = QLabel(step_name, self)
-        self.label.setStyleSheet("font-size: 20px; font-weight: bold;")
+        self.label.setStyleSheet("font-size: 30px; font-weight: bold;")
         layout.addWidget(self.label)
 
         self.dataset_selector = QComboBox(self)
@@ -101,8 +101,12 @@ class Step(Styled):
         button_layout.addWidget(self.next_button)
         button_layout.addWidget(self.cancel_button)
 
-        layout.addLayout(button_layout)
         layout.addStretch()
+
+        self.description_input = QLineEdit(self)
+        self.description_input.setPlaceholderText("Fairness analysis")
+        layout.addWidget(self.description_input)
+        layout.addLayout(button_layout)
         self.setLayout(layout)
         self.defaults = dict()
         self.update_param_form(self.dataset_selector.currentText())
@@ -211,6 +215,7 @@ class Step(Styled):
             input_widget.setText(str(default) if default != "None" else "")
             if self.last_url is not None:
                 select_button = QPushButton("...")
+                select_button.setToolTip("Select from options")
                 select_button.setFixedSize(30, 20)
                 select_button.setStyleSheet("background-color: #dd8; border-radius: 5px;")
                 last_url = self.last_url
@@ -219,12 +224,14 @@ class Step(Styled):
                 helper = select_button
         elif name == "sensitive":
             if not self.runs: return QWidget()
-            columns = self.runs[-1]["dataset"]["return"].cols
+            columns = self.runs[-1]["dataset"]["return"]
+            columns = [""] if columns is None else columns.cols
 
             input_widget = QLineEdit(self)
             input_widget.setText(str(default) if default != "None" else "")
 
             select_button = QPushButton("...")
+            select_button.setToolTip("Select from options")
             select_button.setFixedSize(30, 20)
             select_button.setStyleSheet("background-color: #dd8; border-radius: 5px;")
             select_button.clicked.connect(lambda: self.open_sensitive_modal("Select sensitive attributes", input_widget, columns))
@@ -250,6 +257,7 @@ class Step(Styled):
             input_widget.setText(str(default) if default != "None" else "")
 
             file_button = QPushButton("...")
+            file_button.setToolTip("Navigate")
             file_button.setFixedSize(30, 20)
             file_button.setStyleSheet("background-color: #dd8; border-radius: 5px;")
             file_button.clicked.connect(lambda: self.select_dir(input_widget))
@@ -261,6 +269,7 @@ class Step(Styled):
             self.last_url = input_widget
 
             file_button = QPushButton("...")
+            file_button.setToolTip("Navigate")
             file_button.setFixedSize(30, 20)
             file_button.setStyleSheet("background-color: #dd8; border-radius: 5px;")
             file_button.clicked.connect(lambda: self.select_path(input_widget))
@@ -273,11 +282,12 @@ class Step(Styled):
                     return
                 try:
                     with open(file_path, "r", encoding="utf-8") as file:
-                        lines = [file.readline().strip() for _ in range(5)]
+                        lines = [file.readline().strip() for _ in range(20)]
                     preview_text = "\n".join(line for line in lines if line)
 
                     msg_box = QMessageBox(self)
                     msg_box.setWindowTitle("File preview")
+                    msg_box.setToolTip("Peek at the first 20 lines")
                     msg_box.setText(preview_text if preview_text else "File is empty.")
                     msg_box.setIcon(QMessageBox.Icon.NoIcon)  # Removes the information icon
                     msg_box.exec_()
@@ -311,6 +321,7 @@ class Step(Styled):
                     QMessageBox.warning(self, "Error", f"Could not read the previous file to use as reference:<br><b>{str(e)}</b>")
 
             file_button = QPushButton("Find")
+            file_button.setToolTip("Autodetect based on csv rules")
             file_button.setFixedSize(30, 20)
             file_button.setStyleSheet("background-color: #dd8; border-radius: 5px;")
             file_button.clicked.connect(recommend_delimiter)
@@ -329,6 +340,7 @@ class Step(Styled):
         help_button = QPushButton("?")
         help_button.setFixedSize(30, 20)
         help_button.setStyleSheet("background-color: #ddd; border-radius: 10px; font-weight: bold;")
+        help_button.setToolTip("Parameter info")
         help_button.clicked.connect(lambda: self.show_help_popup(format_name(name), description))
 
         param_layout.addWidget(label)
@@ -368,6 +380,7 @@ class Step(Styled):
             elif isinstance(field, QComboBox): params[param] = field.currentText()
             else: params[param] = field.text()
         pipeline[step] = {"module": dataset_name, "params": params}
+        pipeline["description"] = self.description_input.text().strip()
 
     def show_error_message(self, message):
         error_msg = QMessageBox(self)

@@ -1,7 +1,4 @@
-from PySide6.QtWidgets import (
-    QPushButton, QLabel, QVBoxLayout, QWidget, QHBoxLayout,
-    QScrollArea, QMessageBox, QSizePolicy, QGraphicsDropShadowEffect
-)
+from PySide6.QtWidgets import QPushButton, QLabel, QVBoxLayout, QWidget, QHBoxLayout, QScrollArea, QMessageBox
 from PySide6.QtCore import Qt
 from datetime import datetime
 from .step import save_all_runs
@@ -50,7 +47,7 @@ class Dashboard(Styled):
         run = self.runs.pop(index)
         self.runs.append(run)
         self.refresh_dashboard()
-        self.stacked_widget.setCurrentIndex(4)
+        self.stacked_widget.slideToWidget(4)
 
     def edit_item(self, index):
         if self.runs[index].get("status", "") != "completed": reply = QMessageBox.StandardButton.Yes
@@ -63,18 +60,18 @@ class Dashboard(Styled):
         run = self.runs.pop(index)
         self.runs.append(run)
         self.refresh_dashboard()
-        self.stacked_widget.setCurrentIndex(1)
+        self.stacked_widget.slideToWidget(1)
 
     def create_variation(self, index):
         new_run = self.runs[index].copy()
         new_run["status"] = "new"
         new_run["timestamp"] = now()
         self.runs.append(new_run)
-        self.stacked_widget.setCurrentIndex(1)
+        self.stacked_widget.slideToWidget(1)
 
     def create_new_item(self):
         self.runs.append({ "description": "Fairness analysis","timestamp": now(),"status": "in_progress"})
-        self.stacked_widget.setCurrentIndex(1)
+        self.stacked_widget.slideToWidget(1)
         self.refresh_dashboard()
 
     def delete_item(self, index):
@@ -118,7 +115,7 @@ class Dashboard(Styled):
                 has_same_next_tags = next_run["status"]==run["status"] and next_run["description"]==run["description"] and len(set(tags)-set(next_tags)) == 0 and len(set(next_tags)-set(tags)) == 0
 
 
-            button_color = "#bbbbbb" if run["status"] == "completed" else "#d69e02"
+            button_color = ("#bb8888" if "fail" in format_run(run) else "#88bb88") if run["status"] == "completed" else "#d69e02"
             run_button = QPushButton(self)
             run_button.setFixedHeight(90)
             button_label = QLabel(format_run(run, simpler=has_same_next_tags or prev_has_same_next_tags), run_button)
@@ -150,8 +147,6 @@ class Dashboard(Styled):
 
             # Stack button and tags in a vertical layout
             button_with_tags_layout = QVBoxLayout()
-
-
 
             if not prev_has_same_next_tags and has_same_next_tags:
                 button_with_tags_layout = QVBoxLayout()
@@ -200,8 +195,10 @@ class Dashboard(Styled):
 
 def format_run(run, simpler=False):
     # this function is a mess because it's easier to try things out this way
-    match = re.search(r"<h1\b[^>]*>.*?</h1>", run.get("analysis", dict()).get("return", ""), re.DOTALL)
-    if match: match = ("" if simpler else ": ")+match.group().replace("h1", "span")
-    else: match = "✎"
+    try:
+        match = re.search(r"<h1\b[^>]*>.*?</h1>", run.get("analysis", dict()).get("return", ""), re.DOTALL)
+        if match: match = ("" if simpler else ": ")+match.group().replace("h1", "span")
+        else: match = "✎"
+    except Exception: match = "✎"
     if simpler: return f"<h2 style=\"margin: 0px;\">{match}</h2>Created at {run["timestamp"]}"
     return f"<h1 style=\"margin: 0px;\">{"" if simpler else run["description"]}{match}</h1>Created at {run["timestamp"]}"
