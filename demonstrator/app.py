@@ -1,7 +1,4 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QStackedWidget
-from PySide6.QtCore import QPropertyAnimation, QEasingCurve, QRect
-from PySide6.QtWidgets import QStackedWidget, QWidget, QGraphicsOpacityEffect
-from PySide6.QtCore import QEasingCurve, QPropertyAnimation, QParallelAnimationGroup, QPoint, Signal
+from PySide6.QtWidgets import QApplication, QMainWindow
 import sys
 from states.dashboard import Dashboard
 from states.step import load_all_runs
@@ -12,6 +9,8 @@ from states.results import Results
 from demonstrator.backend.loaders import dataset_loaders, model_loaders, analysis_methods
 
 items = load_all_runs("history.json")
+import matplotlib
+matplotlib.use("Agg")
 
 from PySide6.QtWidgets import QStackedWidget, QWidget, QGraphicsOpacityEffect
 from PySide6.QtCore import QEasingCurve, QPropertyAnimation, QParallelAnimationGroup, QPoint, Signal
