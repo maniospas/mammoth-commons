@@ -27,7 +27,7 @@ class AnalysisThread(QThread):
             args = self.pipeline["analysis"]["params"]
             dataset = self.pipeline["dataset"]["return"]
             model = self.pipeline["model"]["return"]
-            sensitive = args["sensitive"]
+            sensitive = args.get("sensitive", "")
             if "," in sensitive: sensitive = sensitive.split(",")
             elif sensitive=="": sensitive = []
             else: sensitive = [sensitive]

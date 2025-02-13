@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QPushButton, QLabel, QVBoxLayout, QWidget, QHBoxLayout, QScrollArea, QMessageBox
+from PySide6.QtWidgets import QPushButton, QLabel, QVBoxLayout, QWidget, QHBoxLayout, QScrollArea, QMessageBox, QLineEdit
 from PySide6.QtCore import Qt
 from datetime import datetime
 from .step import save_all_runs
@@ -18,13 +18,23 @@ class Dashboard(Styled):
         self.main_layout = QVBoxLayout()
         self.main_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
 
-        self.label = QLabel("Dashboard", self)
+        self.label = QLabel("Fairness analysis", self)
         self.label.setStyleSheet("font-size: 30px; font-weight: bold;")
         self.main_layout.addWidget(self.label)
 
         new_button = self.create_icon_button("➕", "#007bff", "New analysis", self.create_new_item)
         new_button.setFixedSize(40, 40)
-        self.main_layout.addWidget(new_button)
+
+        search_field = QLineEdit(self)
+        search_field.setPlaceholderText("Search...")
+        search_field.setFixedWidth(200)
+        search_field.textChanged.connect(self.filter_runs)  # Connect to filtering method
+
+        button_layout = QHBoxLayout()
+        button_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        button_layout.addWidget(new_button)
+        button_layout.addWidget(search_field)
+        self.main_layout.addLayout(button_layout)
 
         self.scroll_area = QScrollArea(self)
         self.scroll_area.setWidgetResizable(True)
@@ -41,6 +51,21 @@ class Dashboard(Styled):
         self.setLayout(self.main_layout)
         self.tag_descriptions = tag_descriptions
 
+        self.invisible_runs = set()
+        self.refresh_dashboard()
+
+    def filter_runs(self, text):
+        prev = self.invisible_runs
+        self.invisible_runs = set()
+        for index, run in enumerate(self.runs):
+            if text.lower() in run["description"].lower(): continue
+            if text.lower() in run.get("dataset", dict()).get("module", "").lower(): continue
+            if text.lower() in run.get("model", dict()).get("module", "").lower(): continue
+            if text.lower() in run.get("analysis", dict()).get("module", "").lower(): continue
+            if text.lower() in format_run(run).lower(): continue
+            self.invisible_runs.add(index)
+        # refresh but only if something changed
+        if len(prev-self.invisible_runs) == 0 and len(self.invisible_runs-prev) == 0: return
         self.refresh_dashboard()
 
     def view_result(self, index):
@@ -97,6 +122,8 @@ class Dashboard(Styled):
         self.clear_layout(self.layout)
         visual_pos = -1
         sorted_items = list(sorted(enumerate(self.runs), key=lambda x: x[1]["description"]+x[1]["status"]+x[1]["timestamp"]))
+        sorted_items = [(index,run) for index,run in sorted_items if index not in self.invisible_runs]
+
         prev_has_same_next_tags = False
         for index, run in sorted_items:
             visual_pos += 1
