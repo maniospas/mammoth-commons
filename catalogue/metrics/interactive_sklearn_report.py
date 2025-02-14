@@ -54,6 +54,8 @@ def interactive_sklearn_report(
     predictor: Options("Logistic regression", "Gaussian naive Bayes") = None,
     intersectional: bool = False,
     compare_groups: Options("Pairwise", "To the total population") = None,
+    view: Options( "Fairness model card", "Detailed description", "Summary table",) = None,
+    minimum_shown_deviation: float = 0
 ) -> HTML:
     """Creates an interactive report using the FairBench library, after running an internal training-test split
     on a basic sklearn model. The report creates traceable evaluations that you can shift through to find sources
@@ -63,6 +65,8 @@ def interactive_sklearn_report(
         predictor: Which sklearn predictor should be used.
         intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute.
         compare_groups: Whether to compare groups pairwise, or each group to the whole population.
+        view: How to display results. You can choose to view a fairness model card which does not have too many details, a full report, or a summary table.
+        minimum_shown_deviation: Show only results where the deviation from ideal values exceeds the given threshold. If nothing is shown, it does not mean that fairness is achieved, but this is a good way to identify the most prominent biases. If value of 0 is set (default) then all results are shown.
     """
     assert len(sensitive)!=0, "Set at least one sensitive attribute"
     X = dataset.to_features(sensitive)
@@ -90,14 +94,10 @@ def interactive_sklearn_report(
         from sklearn.linear_model import LogisticRegression
 
         model = LogisticRegression(max_iter=10000)
-    elif predictor == "Gaussian naive Bayes":
+    else:
         from sklearn.naive_bayes import GaussianNB
 
         model = GaussianNB()
-    else:
-        raise Exception(
-            "Available predictors for interactive sklearn reports are only `Logistic regression` and `Gaussian naive Bayes`"
-        )
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
     scores = model.predict_proba(X_test)[:, 1]
@@ -118,5 +118,15 @@ def interactive_sklearn_report(
         scores=scores,
         sensitive=sensitive,
     )
-    ret = report.show(env=fb.export.Html(view=False, filename=None))
+    minimum_shown_deviation = float(minimum_shown_deviation)
+    assert 0<=minimum_shown_deviation<=1, "Minimum shown deviation should be in the range [0,1]"
+    if minimum_shown_deviation!=0:
+        report = report.filter(fb.investigate.DeviationsOver(minimum_shown_deviation))
+
+    if view == "Summary table":
+        ret = report.show(env=fb.export.HtmlTable(view=False, filename=None))
+    elif view == "Fairness model card":
+        ret = report.filter(fb.investigate.Stamps).show(env=fb.export.Html(view=False, filename=None), depth=1)
+    else:
+        ret = report.show(env=fb.export.Html(view=False, filename=None))
     return HTML(ret)

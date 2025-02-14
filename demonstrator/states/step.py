@@ -104,7 +104,7 @@ class Step(Styled):
         layout.addStretch()
 
         self.description_input = QLineEdit(self)
-        self.description_input.setPlaceholderText("Fairness analysis")
+        self.description_input.setPlaceholderText("Describe your analysis (optional)")
         layout.addWidget(self.description_input)
         layout.addLayout(button_layout)
         self.setLayout(layout)

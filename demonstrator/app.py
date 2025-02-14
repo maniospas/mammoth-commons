@@ -46,7 +46,7 @@ class SlidingStackedWidget(QStackedWidget):
         self.m_mainwindow = parent if parent else self
         self.m_vertical = False
         self.m_speed = 500
-        self.m_animationtype = QEasingCurve.OutQuart
+        self.m_animationtype = QEasingCurve.Type.OutQuart
         self.m_now = 0
         self.m_next = 0
         self.m_wrap = False
@@ -135,7 +135,7 @@ class SlidingStackedWidget(QStackedWidget):
         self.m_next = next_idx
         self.m_now = now
         self.m_active = True
-        self.animgroup.start(QPropertyAnimation.DeleteWhenStopped)
+        self.animgroup.start(QPropertyAnimation.DeletionPolicy.DeleteWhenStopped)
 
     def animationDoneSlot(self):
         self.setCurrentIndex(self.m_next)
@@ -153,7 +153,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         tags = {key: "<h1>"+key+"</h1>"+module["description"] for key, module in (dataset_loaders | model_loaders | analysis_methods).items()}
-        self.setWindowTitle("MAMMOth Direct")
+        self.setWindowTitle("MAI bias")
         self.setGeometry(100, 100, 1024, 768)
         self.stacked_widget = SlidingStackedWidget()
         self.stacked_widget.addWidget(Dashboard(self.stacked_widget, items, tags))

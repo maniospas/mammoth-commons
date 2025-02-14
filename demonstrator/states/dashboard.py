@@ -95,7 +95,7 @@ class Dashboard(Styled):
         self.stacked_widget.slideToWidget(1)
 
     def create_new_item(self):
-        self.runs.append({ "description": "Fairness analysis","timestamp": now(),"status": "in_progress"})
+        self.runs.append({ "description": "","timestamp": now(),"status": "in_progress"})
         self.stacked_widget.slideToWidget(1)
         self.refresh_dashboard()
 
@@ -224,7 +224,7 @@ def format_run(run, simpler=False):
     # this function is a mess because it's easier to try things out this way
     try:
         match = re.search(r"<h1\b[^>]*>.*?</h1>", run.get("analysis", dict()).get("return", ""), re.DOTALL)
-        if match: match = ("" if simpler else ": ")+match.group().replace("h1", "span")
+        if match: match = ("" if simpler or len(run["description"])==0 else ": ")+match.group().replace("h1", "span")
         else: match = "✎"
     except Exception: match = "✎"
     if simpler: return f"<h2 style=\"margin: 0px;\">{match}</h2>Created at {run["timestamp"]}"
