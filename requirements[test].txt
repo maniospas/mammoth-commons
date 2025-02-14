@@ -23,3 +23,4 @@ coverage
 ucimlrepo
 plotly
 docker
+PySide6

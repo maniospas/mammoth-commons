@@ -5,12 +5,12 @@ from mammoth.models import EmptyModel
 from mammoth.exports import HTML
 from typing import Dict, List
 from mammoth.integration import metric, Options
-from fairbench import v1 as fb
+import fairbench as fb
 import sklearn
 import numpy as np
 
 
-@fb.core.Transform
+@fb.v1.core.Transform
 def categories(iterable):
     # print(iterable)
     is_numeric = True
@@ -22,7 +22,7 @@ def categories(iterable):
             is_numeric = False
             break
     if is_numeric:
-        values = np.array(values)
+        values = fb.v1.tobackend(values)
         mx = values.max()
         mn = values.min()
         if mx == mn:
@@ -54,6 +54,8 @@ def interactive_sklearn_report(
     predictor: Options("Logistic regression", "Gaussian naive Bayes") = None,
     intersectional: bool = False,
     compare_groups: Options("Pairwise", "To the total population") = None,
+    view: Options( "Fairness model card", "Detailed description", "Summary table",) = None,
+    minimum_shown_deviation: float = 0
 ) -> HTML:
     """Creates an interactive report using the FairBench library, after running an internal training-test split
     on a basic sklearn model. The report creates traceable evaluations that you can shift through to find sources
@@ -63,7 +65,10 @@ def interactive_sklearn_report(
         predictor: Which sklearn predictor should be used.
         intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute.
         compare_groups: Whether to compare groups pairwise, or each group to the whole population.
+        view: How to display results. You can choose to view a fairness model card which does not have too many details, a full report, or a summary table.
+        minimum_shown_deviation: Show only results where the deviation from ideal values exceeds the given threshold. If nothing is shown, it does not mean that fairness is achieved, but this is a good way to identify the most prominent biases. If value of 0 is set (default) then all results are shown.
     """
+    assert len(sensitive)!=0, "Set at least one sensitive attribute"
     X = dataset.to_features(sensitive)
     y = dataset.labels
     if isinstance(y, dict):
@@ -71,7 +76,7 @@ def interactive_sklearn_report(
     else:
         assert (
             y.shape[1] <= 2
-        ), "Cannot create a logistic regression interactive report for non-binary predictions"
+        ), "Cannot create an interactive report for non-binary predictions"
         y = y[y.columns[-1]]
     from sklearn import model_selection
 
@@ -88,28 +93,24 @@ def interactive_sklearn_report(
     if predictor == "Logistic regression":
         from sklearn.linear_model import LogisticRegression
 
-        model = LogisticRegression(max_iter=1000)
-    elif predictor == "Gaussian naive Bayes":
+        model = LogisticRegression(max_iter=10000)
+    else:
         from sklearn.naive_bayes import GaussianNB
 
         model = GaussianNB()
-    else:
-        raise Exception(
-            "Available predictors for interactive sklearn reports are only `Logistic regression` and `Gaussian naive Bayes`"
-        )
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
     scores = model.predict_proba(X_test)[:, 1]
 
     # declare sensitive attributes
-    sensitive = fb.Fork(
+    sensitive = fb.Dimensions(
         {attr + " ": (categories @ dataset.data[attr][idx_test]) for attr in sensitive}
     )
 
     # change behavior based on arguments
     if intersectional:
         sensitive = sensitive.intersectional()
-    report_type = fb.multireport if compare_groups == "Pairwise" else fb.unireport
+    report_type = fb.reports.pairwise if compare_groups == "Pairwise" else fb.reports.vsall
 
     report = report_type(
         predictions=predictions,
@@ -117,4 +118,15 @@ def interactive_sklearn_report(
         scores=scores,
         sensitive=sensitive,
     )
-    return HTML(fb.interactive_html(report, show=False, name=predictor))
+    minimum_shown_deviation = float(minimum_shown_deviation)
+    assert 0<=minimum_shown_deviation<=1, "Minimum shown deviation should be in the range [0,1]"
+    if minimum_shown_deviation!=0:
+        report = report.filter(fb.investigate.DeviationsOver(minimum_shown_deviation))
+
+    if view == "Summary table":
+        ret = report.show(env=fb.export.HtmlTable(view=False, filename=None))
+    elif view == "Fairness model card":
+        ret = report.filter(fb.investigate.Stamps).show(env=fb.export.Html(view=False, filename=None), depth=1)
+    else:
+        ret = report.show(env=fb.export.Html(view=False, filename=None))
+    return HTML(ret)
