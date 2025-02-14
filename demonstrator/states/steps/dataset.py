@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QMessageBox
 from PySide6.QtCore import QThread, Signal, QMutex
-from demonstrator.backend.loaders import name_to_runnable
+from demonstrator.backend.loaders import registry
 import traceback
 from demonstrator.states.step import Step, save_all_runs
 
@@ -28,7 +28,7 @@ class DatasetLoaderThread(QThread):
                 return
             self.mutex.unlock()
 
-            self.pipeline["dataset"]["return"] = name_to_runnable[self.pipeline["dataset"]["module"]](**self.pipeline["dataset"]["params"])
+            self.pipeline["dataset"]["return"] = registry.name_to_runnable[self.pipeline["dataset"]["module"]](**self.pipeline["dataset"]["params"])
 
             self.mutex.lock()
             if self._is_canceled:

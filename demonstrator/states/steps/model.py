@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QMessageBox
 from PySide6.QtCore import QThread, Signal, QMutex
-from demonstrator.backend.loaders import name_to_runnable, model_loaders
+from demonstrator.backend.loaders import registry
 from demonstrator.states.step import Step, save_all_runs
 
 global items
@@ -24,7 +24,7 @@ class ModelLoaderThread(QThread):
                 self.canceled.emit()
                 return
             self.mutex.unlock()
-            self.pipeline["model"]["return"] = name_to_runnable[self.pipeline["model"]["module"]](**self.pipeline["model"]["params"])
+            self.pipeline["model"]["return"] = registry.name_to_runnable[self.pipeline["model"]["module"]](**self.pipeline["model"]["params"])
             self.mutex.lock()
             if self._is_canceled:
                 self.mutex.unlock()
@@ -49,7 +49,7 @@ class SelectModel(Step):
         pipeline = self.runs[-1]
         self.description_input.setText(pipeline["description"])
         module = pipeline["dataset"]["module"]
-        loaders = [loader for loader, values in model_loaders.items() if module in values["compatible"]]
+        loaders = [loader for loader, values in registry.model_loaders.items() if module in values["compatible"]]
         self.dataset_selector.clear()
         self.dataset_selector.addItems(["Select a model loader"] + loaders)
         self.defaults = self.runs[-1].get("model", dict()).get("params", dict())

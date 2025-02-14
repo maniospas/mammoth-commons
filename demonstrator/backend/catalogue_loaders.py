@@ -30,7 +30,7 @@ from catalogue.metrics.Multi_objective_report import Multi_objective_report
 
 from demonstrator.backend.registry import Registry
 
-registry = Registry()
+registry = Registry(desktopmode=False)
 
 registry.data(data_auto_csv)
 registry.data(data_uci)

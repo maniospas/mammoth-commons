@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QMessageBox
 from PySide6.QtCore import QThread, Signal, QMutex
-from demonstrator.backend.loaders import name_to_runnable, analysis_methods, parameters_to_class
+from demonstrator.backend.loaders import registry
 from demonstrator.states.step import Step, save_all_runs
 import traceback
 
@@ -33,7 +33,7 @@ class AnalysisThread(QThread):
             else: sensitive = [sensitive]
             sensitive = [s.strip() for s in sensitive]
             args = {k:v for k,v in args.items() if k not in ["dataset", "model", "sensitive"]}
-            self.pipeline["analysis"]["return"] = name_to_runnable[self.pipeline["analysis"]["module"]](dataset, model, sensitive, **args).text()
+            self.pipeline["analysis"]["return"] = registry.name_to_runnable[self.pipeline["analysis"]["module"]](dataset, model, sensitive, **args).text()
             self.pipeline["dataset"]["return"] = None
             self.pipeline["model"]["return"] = None
             self.pipeline["status"] = "completed"
@@ -64,14 +64,14 @@ class SelectAnalysis(Step):
         self.description_input.setText(pipeline["description"])
         compatible_methods = [
             method
-            for method, entries in analysis_methods.items()
+            for method, entries in registry.analysis_methods.items()
             if issubclass(
-                parameters_to_class[pipeline["dataset"]["module"]]["return"],
-                parameters_to_class[method][entries["parameters"][0][0]],
+                registry.parameters_to_class[pipeline["dataset"]["module"]]["return"],
+                registry.parameters_to_class[method][entries["parameters"][0][0]],
             )
             and issubclass(
-                parameters_to_class[pipeline["model"]["module"]]["return"],
-                parameters_to_class[method][entries["parameters"][1][0]],
+                registry.parameters_to_class[pipeline["model"]["module"]]["return"],
+                registry.parameters_to_class[method][entries["parameters"][1][0]],
             )
         ]
         self.dataset_selector.clear()
