@@ -52,7 +52,6 @@ def test_researchers_ranking_fair():
 def test_researchers_ranking_comparison():
     with testing.Env(
         data_csv_rankings,
-        model_normal_ranking,
         model_mitigation_ranking,
         exposure_distance_comparison,
     ) as env:
