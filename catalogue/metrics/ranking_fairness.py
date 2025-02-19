@@ -2,7 +2,6 @@ from typing import List
 from mammoth.exports import Markdown, HTML
 from mammoth.integration import metric
 from mammoth.models.researcher_ranking import ResearcherRanking
-from catalogue.dataset_loaders.data_csv_rankings import data_csv_rankings
 from mammoth.datasets.csv import CSV
 import pandas as pd
 import numpy as np
