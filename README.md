@@ -1,4 +1,4 @@
-# MAMMOth-commons: modules for the MAI-bias toolkit
+# MAI-BIAS modules
 
 [![Integration Tests](https://github.com/mammoth-eu/mammoth-commons/actions/workflows/integration.yml/badge.svg)](https://github.com/mammoth-eu/mammoth-commons/actions/workflows/integration.yml)
 ![Coverage](./coverage-badge.svg)
@@ -9,7 +9,7 @@
 This repository holds the mammoth-commons library with supporting
 datatypes and decorators shared by various fairness assessment modules.
 It also hosts a catalogue of dataset loaders, model loaders, and fairness analysis 
-and mitigation modules. It also contains a desktop application
+and mitigation modules. It finally contains
 a **desktop application** that runs the modules in your local machine.
 
 ![logo](demonstrator/logo.png)
