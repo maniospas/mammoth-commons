@@ -7,42 +7,11 @@ library (for example, to add data types) see [here](../mammoth-commons/README.md
 
 **The catalogue may be hosted in a different repository in the future.**
 
-1. [Set things up](#set-things-up)
 2. [Write a new module](#write-a-new-module)
 3. [Locally test a module](#locally-test-a-module)
 4. [Write documentation](#write-documentation)
 5. [Build and upload a module](#build-and-upload-a-module)
 
-## Set things up
-
-**Installation:** Install the latest version of `MAMMOth-commons`
-and the `docker` package in your virtual environment:
-
-*If you are working in your own repository:*
-
-```bash
-pip install --upgrade MAMMOth-commons
-pip install docker
-```
-
-*If you are working in a clone of mammoth-commons and plan to create a pull request:*
-
-```bash
-pip install -e .
-pip install requirements[test].txt # needed only if you want to run all integration tests
-pip install docker
-```
-
-**New account:** You also need to create an account in
-[DockerHub](!https://hub.docker.com/) or any other online
-hosting service for docker images. You can ignore this step
-while developing or testing modules.
-
-**Required tools:** Finally, download, install, and run Decker Desktop
-from [here](https://docs.docker.com/get-docker/). Command 
-line instructions will use this to build docker images locally
-before uploading them to the hosting service. You can also skip
-this at the first stages of development.
 
 ## Write a new module
 
@@ -246,69 +215,4 @@ Args:
     arg1: Detailed description for arg1.
 """
 ```
-
-
-## Build and upload a module
-
-Don't forget to set the correct module version first (if you reuse 
-a previously uploaded version, the toolkit may not be able to see the change).
-Then, [login to your docker account](https://docs.docker.com/engine/reference/commandline/login/).
-For example, in the simplest case where you want to host your module
-in DockerHub, it suffices to run the following command in your terminal:
-
-```bash
-docker login
-```
-
-This will ask for your DockerHub username (if you are not part of
-a team in DockerHub, this should be the same as your namespace) 
-and password. This way, your terminal will have
-permission to push the created docker images there. 
-
-Also make
-sure that the library is visible to your virtual environment by calling
-in the top level (from where you can access subdirecories 
-*mammoth/*, *catalogue/*, *tests/*, etc)
-
-```bash
-pip install -e .
-```
-
-
-Finally, create and upload a module by running the following
-command (kfp is installed alongside MAMMOth-commons):
-
-```bash
-kfp component build . --component-filepattern catalogue/metrics/model_card.py 
-```
-
-In this, replace the `test_modules/metric.py` with any other path
-that contains the Python file in which you implemented your module. 
-
-If you do *not* want to push the created docker image, for
-example to run your new module in a local copy of the MAMMOth
-bias toolkit without logging in and uploading it to DockerHub, run
-this instead:
-
-```bash
-kfp component build . --component-filepattern catalogue/fairbench/modelcard.py --no-push-image
-````
-
-:warning: The build should be called from a directory where both your
-module and virtual environment are subdirectories.
-
-
-## Automatic build toolkit modules
-
-You can use the **Toolkit Modules Build** action from the Actions section in github.
-
-:warning: As this procedure is very heavy on build resources please use it only when it is really needed.
-
-Before running the procedure, update the docker image version of all modules to the new one.
-
-After the procedure is completed the module_yamls file is available that can be downloaded and use the yamls in it to update your local toolkit installation.
-
-Folder named data yamls should be put in components_yaml folder of toolkit.
-
-Folder named meta yamls should be put in components_metadata folder of toolkit.
 
