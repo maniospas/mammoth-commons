@@ -14,6 +14,8 @@ down version of the toolkit.
 
 ## :microscope: Investigate fairness
 
+![logo](demonstrator/logo.png)
+
 Instructions to quickly install and launch the demonstrator in your machine:
 
 1. Download/clone this repository.
