@@ -12,7 +12,6 @@ as a maintainer are provided [here](catalogue/README.md).
 1. [Create a module](#create-a-module)
 2. [Add tests](#locally-test-a-module)
 3. [Write documentation](#write-documentation)
-4. [Common errors](#build-and-upload-a-module)
 
 
 ## Create a module
@@ -21,6 +20,8 @@ Create a fork of the repository. You may work on the `dev` branch and
 create pull requests that repository maintainers will try to merge.
 Those requests will trigger continuous integration actions to verify
 that contributions are compliant with all technical requirements of the toolkit.
+Use the *black* linter. Pull requests with errors other than linter ones
+will be rejected.
 
 Creating a module is as simple as adding a file in the `catalogue/` 
 directory, adding an function with typehints, and decorating the latter.
@@ -181,8 +182,8 @@ during development.
 ## Write documentation
 
 You need to populate your module's docstring with adequate information.
-This information will automatically appear in the demonstrator, 
-in the toolkit, and in the MAMMOth catalogue webpage 
+This information will automatically appear in the desktop application, 
+in the server toolkit, and in the MAMMOth catalogue webpage 
 [here](https://mammoth-eu.github.io/mammoth-commons/).
 Adhere to the following checkpoints:
 

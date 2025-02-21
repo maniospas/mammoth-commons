@@ -4,19 +4,20 @@
 ![Coverage](./coverage-badge.svg)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md) 
 
-Fast module development and running for the MAI-BIAS toolkit.
+*Quickly develop and locally run MAI-BIAS toolkit modules.*
+
 This repository holds the mammoth-commons library with supporting
-datatypes and decorators shared by various fairness assessment modules, a catalogue
-of fairness analysis and mitigation suggestion module, as well as 
-a **desktop application** that runs the modules in your
-local machine.
+datatypes and decorators shared by various fairness assessment modules.
+It also hosts a catalogue of dataset loaders, model loaders, and fairness analysis 
+and mitigation modules. It also contains a desktop application
+a **desktop application** that runs the modules in your local machine.
 
 ![logo](demonstrator/logo.png)
 
 ## 🔬 Run locally
 
 1. Download or clone this repository. Prefer working in a virtual environment.
-2. Install dependencies with `pip install -r requirements[test].txt`. This can take a bit of time to download and install everything.
+2. Install dependencies with `pip install -r requirements[test].txt`. This can take a bit of time.
 3. Launch the local app with `python demonstrator/app.py` or, if this fails on your platform, with `python -m demonstrator.app`.
 
 <details><summary>VSCode launch profile</summary>  
