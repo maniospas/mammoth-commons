@@ -18,7 +18,7 @@ Instructions to quickly install and launch the demonstrator in your machine:
 
 1. Download/clone this repository.
 2. Create a virtual environment. This is optional but recommended.
-3. Install dependencies with `pip install -r requirements[test].txt`. This can take a bit of time to download and install everything, but you will be able to run all modules and interface with most popular data types.
+3. Install dependencies with `pip install -r requirements[test].txt`. This can take a while to download and install everything, but you will be able to run all modules.
 4. Launch the local app with `python demonstrator/app.py` or, if this fails on your platform, with `python -m demonstrator.app` (notice that slash is replaced by a dot and there is no file extension). 
 
 ### IDE settings
