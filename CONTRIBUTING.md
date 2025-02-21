@@ -1,26 +1,31 @@
 # Create Modules
 
 This document contains instructions on how to contribute modules to the MAMMOth catalogue 
-so that they are included in the namesake fairness toolkit. Modules depend on the
-MAMMOTH-commons library to work with its various file types. To contribute to the main
+so that they are included in the MAI-BIAS desktop application and server toolkit. Modules depend on the
+MAMMOTH-commons library's file types types. To contribute to the main
 library (for example, to add data types) see [here](../mammoth-commons/README.md).
+Instructions on how to manually build modules or how to trigger continuous integration
+as a maintainer are provided [here](catalogue/README.md).
 
 **The catalogue may be hosted in a different repository in the future.**
 
-2. [Write a new module](#write-a-new-module)
-3. [Locally test a module](#locally-test-a-module)
-4. [Write documentation](#write-documentation)
-5. [Build and upload a module](#build-and-upload-a-module)
+1. [Create a module](#create-a-module)
+2. [Add tests](#locally-test-a-module)
+3. [Write documentation](#write-documentation)
+4. [Common errors](#build-and-upload-a-module)
 
 
-## Write a new module
+## Create a module
 
-You need to have set everything up as above to build and
-deploy your MAMMOth modules. Follow the next steps
-to write a module by implementing a base function, adding typehints
-and documentation, and wrapping it with a decorator at the end.
-The decorator will automate all preparation needed to convert your
-method to a proper module.
+Create a fork of the repository. You may work on the `dev` branch and 
+create pull requests that repository maintainers will try to merge.
+Those requests will trigger continuous integration actions to verify
+that contributions are compliant with all technical requirements of the toolkit.
+
+Creating a module is as simple as adding a file in the `catalogue/` 
+directory, adding an function with typehints, and decorating the latter.
+The decorator works as a buffer between
+your code and various interfaces. Here are some details: 
 
 1. *Type dependencies.* Import the necessary dataset or model classes
 from the `mammoth.datasets` and `mammoth.models` namespace respectively. 
@@ -45,11 +50,12 @@ what information to give to the users working with your module.
 the `@mammoth.integration.loader(namespace, version, python="3.11", packages=(...))` decorator. 
 These require at least one argument to denote
 the module's version. The namespace refers to whom the module
-should be accredited to and should be the same as your DockerHub 
-username. Finally, packages are library dependencies and must be a tuple of strings 
+should be accredited to (if you are not using continuous integration, it should be the same as your DockerHub 
+username). Finally, packarary dependencies and must be a tuple of strings 
 (take care to write something like `packages=("pandas",)` **comma included** if you only have one dependency).
-These dependencies are any packages other than the few found in `requirements.txt`.
-Notice that mammoth-commons imports packages for its datatypes only at the
+These dependencies are any packages other than the few found in `requirements.txt`, and need to include
+any dependencies. For example, add *pandas* as a package dependency if you use or load the `CSV` datatype
+because it is needed there. Note that mammoth-commons imports packages for its datatypes only at the
 last necessary moment.
 
 Here are some examples of modules:
@@ -154,14 +160,16 @@ with mammoth.testing.Env(dataloader, modelloader, metric) as env:
     print(result.text)
 ```
 
-If you are planning to create a pull request to mammoth-commons, also
+If you are planning to create a pull request to mammoth-commons,
 create a file `tests/test_...` containing the above code. This will be run
 by the `integration_tests.py` script, which is part of the project's
 GitHub actions. Everything new is expected to have high 
 code coverage (more than 80% right now). Please run the script locally
 to ensure that you did not break anything else.
 
-Do not forget to add all requirements to the `requirements[test].txt` file.
+:bulb: Do not forget to add all requirements to the `requirements[test].txt` file.
+Also install the libraries in that file for tests to run locally.
+
 Pull requests will be reviewed manually, so if you plan to create a complex one
 get in touch with us by opening an issue first. Finally, your module should 
 be automatically added to the demonstrator do that you can see how it is going
