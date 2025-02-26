@@ -7,7 +7,7 @@
 *Quickly develop and locally run MAI-BIAS toolkit modules.*
 
 This repository holds the mammoth-commons library with supporting
-datatypes and decorators shared by various fairness assessment modules.
+datatypes and decorators shared by various toolkit modules.
 It also hosts a catalogue of dataset loaders, model loaders, and fairness analysis 
 and mitigation modules. It finally contains
 a **desktop application** that runs the modules in your local machine.
@@ -18,7 +18,7 @@ a **desktop application** that runs the modules in your local machine.
 
 1. Download or clone this repository. Prefer working in a virtual environment.
 2. Install dependencies with `pip install -r requirements[test].txt`. This can take a bit of time.
-3. Launch the local app with `python demonstrator/app.py` or, if this fails on your platform, with `python -m demonstrator.app`.
+3. Launch the local app with `python demonstrator/app.py`.
 
 <details><summary>VSCode launch profile</summary>  
 
