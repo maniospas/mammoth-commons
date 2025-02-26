@@ -1,5 +1,6 @@
 # data loaders
 from catalogue.dataset_loaders.data_csv_rankings import data_csv_rankings
+from catalogue.dataset_loaders.data_researchers import data_researchers
 from catalogue.dataset_loaders.custom_csv import data_custom_csv
 from catalogue.dataset_loaders.auto_csv import data_auto_csv
 from catalogue.dataset_loaders.graph import data_graph
@@ -36,6 +37,7 @@ registry.data(data_auto_csv)
 registry.data(data_uci)
 registry.data(data_custom_csv)
 registry.data(data_csv_rankings)
+registry.data(data_researchers)
 registry.data(data_graph)
 registry.data(data_graph_csv)
 registry.data(data_images)
@@ -56,7 +58,7 @@ registry.model(model_onnx_ensemble,compatible=[data_auto_csv, data_custom_csv, d
 registry.model(model_torch, compatible=[data_images, data_image_pairs])
 registry.model(model_torch2onnx, compatible=[data_images, data_image_pairs])
 registry.model(model_fair_node_ranking, compatible=[data_graph])
-registry.model(model_mitigation_ranking, compatible=[data_csv_rankings])
+registry.model(model_mitigation_ranking, compatible=[data_researchers])
 
 registry.analysis(model_card)
 registry.analysis(interactive_report)
