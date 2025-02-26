@@ -9,8 +9,6 @@ kfp component build . --component-filepattern catalogue/dataset_loaders/custom_c
 docker system prune -a --force --volumes
 kfp component build . --component-filepattern catalogue/dataset_loaders/data_csv_rankings.py
 docker system prune -a --force --volumes
-kfp component build . --component-filepattern catalogue/dataset_loaders/graph_from_csv.py
-docker system prune -a --force --volumes
 kfp component build . --component-filepattern catalogue/dataset_loaders/graph.py
 docker system prune -a --force --volumes
 kfp component build . --component-filepattern catalogue/dataset_loaders/image_pairs.py

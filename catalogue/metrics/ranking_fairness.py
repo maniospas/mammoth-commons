@@ -578,7 +578,25 @@ def validate_input(
 
 
 
-def plot_network(G,pos,title, name_plot, degree, weights, directed=False, amplyfing_size_nodes = 2, division_size_edges=100, size_edges = 1):
+def plot_network(G,title, name_plot, directed=False, amplyfing_size_nodes = 2, division_size_edges=100, size_edges = 1):
+    degree = dict(G.degree(weight="weight"))
+    weights = [G[u][v]["weight"] for u, v in G.edges()]
+    pos = networks_layouts.forceatlas2_layout(
+        G,
+        max_iter=300,
+        jitter_tolerance=0.2,
+        scaling_ratio=10,
+        gravity=0.05,
+        distributed_action=False,
+        strong_gravity=True,
+        node_mass=[400 for i in list(degree.values())],
+        node_size=[400 for i in list(degree.values())],
+        weight=weights,
+        dissuade_hubs=True,
+        linlog=False,
+        seed=10,
+        dim=2,
+    )
     ncols=1
     nrows=1
 
@@ -641,33 +659,15 @@ def exposure_distance_comparison(
 
     researchers_graph = dataset.G
 
-    degree = dict(researchers_graph.degree(weight="weight"))
-    weights = [researchers_graph[u][v]["weight"] for u, v in researchers_graph.edges()]
-
-    pos_authors = networks_layouts.forceatlas2_layout(
-        researchers_graph,
-        max_iter=300,
-        jitter_tolerance=0.2,
-        scaling_ratio=10,
-        gravity=0.05,
-        distributed_action=False,
-        strong_gravity=True,
-        node_mass=[400 for i in list(degree.values())],
-        node_size=[400 for i in list(degree.values())],
-        weight=weights,
-        dissuade_hubs=True,
-        linlog=False,
-        seed=10,
-        dim=2,
-    )
-    network_image = plot_network(
-        G=researchers_graph,
-        pos=pos_authors,
-        title=" Co-authorship network",
-        name_plot="Co-authorship_network.pdf",
-        degree=degree,
-        weights=weights,
-    )
+    # Plot the network if it is small enough
+    if len(researchers_graph.nodes) < 2500:
+        network_image = plot_network(
+            G=researchers_graph,
+            title=" Co-authorship network",
+            name_plot="Co-authorship_network.pdf",
+        )
+    else:
+        network_image = image_to_base64("./data/researchers/network.png")
 
 
     Dataframe_nodes = {"id": []}
