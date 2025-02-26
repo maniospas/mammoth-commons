@@ -8,7 +8,7 @@ import numpy as np
 import networkx as nx
 
 @loader(namespace="mammotheu", version="v0036", python="3.11")
-def data_researchers(papers_path: str = "", papers_affiliations: str = "", delimiter: str = "|") -> Graph_CSH:
+def data_researchers(papers_path: str = "", papers_affiliations: str = "") -> Graph_CSH:
     """
     This is a Loader to load .csv files with information about researchers
     The `papers_path` and `papers_affiliations` should be given relative to your locally running instance 
