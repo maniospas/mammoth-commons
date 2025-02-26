@@ -17,12 +17,10 @@ def data_researchers(papers_path: str = "", papers_affiliations: str = "", delim
     """
     try:
         #Read paper files for information of the papers:
-        DF_papers = pd.read_csv(papers_path, sep='|', index_col=0)
-        #DF_papers = pd.read_csv(papers_path, sep='|', index_col=0, compression='bz2'
+        DF_papers = pd.read_csv(papers_path, sep='|', compression='bz2')
 
         #Affiliations for the information of the authors
-        DF_Affiliations = pd.read_csv(papers_affiliations, sep=',', index_col=0)
-        #DF_Affiliations = pd.read_csv(papers_affiliations, sep='|', index_col=0, compression='bz2')
+        DF_Affiliations = pd.read_csv(papers_affiliations, sep='|', compression='bz2')
 
     except:
         raise ValueError(
@@ -39,6 +37,9 @@ def data_researchers(papers_path: str = "", papers_affiliations: str = "", delim
         delimiter=",",
         header=0,
     )
+
+    # Remove nodes where doi is nan
+    DF_Affiliations = DF_Affiliations.dropna(subset=["doi"])
 
     ##Add year to the affiliations information:
     DF_Affiliations["year"] = [

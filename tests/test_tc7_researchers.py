@@ -14,9 +14,8 @@ def test_researchers_ranking_comparison():
         exposure_distance_comparison,
     ) as env:
         dataset = env.data_researchers(
-            #papers_path="./data/researchers/physics_papers.csv",
-            papers_path="./data/researchers/Filtered_DF_top_1000_papers_Physics_Filtered_DF_top_1000_papers_Physics_cleaned.csv",
-            papers_affiliations="./data/researchers/DDBB_affiliations_corrected.csv",
+            papers_path="./data/researchers/physics_papers.csv.tar.bz2",
+            papers_affiliations="./data/researchers/affiliations.csv.tar.bz2",
         )
 
         model_mitigation = env.model_mitigation_ranking()
