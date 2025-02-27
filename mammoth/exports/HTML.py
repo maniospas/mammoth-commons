@@ -68,8 +68,24 @@ class HTML:
         import webbrowser
 
         with open("temp.html", "w", encoding="utf-8") as file:
-            file.write(self.text())
+            file.write(self.all())
         webbrowser.open_new(file.name)
+
+    def all(self):
+        return f"""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>MAI-BIAS test run</title>
+            {self.header}
+        </head>
+        <body>
+            {self.text()}
+        </body>
+        </html>
+        """
 
     def text(self):
         body = self.body
@@ -82,4 +98,4 @@ class HTML:
     def export(self, output: dsl.Output[integration]):
         with open(output.path, "w") as f:
             output.name = "result.html"
-            f.write(self.text())
+            f.write(self.all())
