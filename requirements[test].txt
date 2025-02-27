@@ -26,3 +26,4 @@ docker
 PySide6
 aif360
 aif360[OptimalTransport]
+shap

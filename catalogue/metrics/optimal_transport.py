@@ -19,17 +19,29 @@ def optimal_transport(
     sensitive: List[str],
 ) -> HTML:
     """Creates an optimal transport evaluation based on the implementation provided by the AIF360 library.
-    The evaluation computes the Wasserstein distance that reflects the cost of transforming the predictive distributions
-    between sensitive attribute groups.
+    The evaluation computes the Wasserstein distance that reflects the cost of transforming the predictive
+    distributions between sensitive attribute groups.
 
-    <i><b>License:</b> The following description is adapted from AIF360 (<a href="https://github.com/Trusted-AI/AIF360">https://github.com/Trusted-AI/AIF360</a>), which is licensed under Apache License 2.0.</i>
+    <i><b>License:</b> The following description is adapted from AIF360
+    (<a href="https://github.com/Trusted-AI/AIF360">https://github.com/Trusted-AI/AIF360</a>),
+    which is licensed under Apache License 2.0.</i>
 
-    <p>Optimal Transport (OT) is a field of mathematics which studies the geometry of probability spaces. Among its many contributions, OT provides a principled way to compare and align probability distributions by taking into account the underlying geometry of the considered metric space.
-    As a mathematical problem, it was first introduced by Gaspard Monge in 1781. It addresses the task of determining the most efficient method for transporting mass from one distribution to another. In this problem, the cost associated with moving a unit of mass from one position to another is referred to as the ground cost. The primary objective of OT is to minimize the total cost incurred when moving one mass distribution onto another.
+    <p>Optimal Transport (OT) is a field of mathematics which studies the geometry of probability spaces. Among its
+    many contributions, OT provides a principled way to compare and align probability distributions by taking into
+    account the underlying geometry of the considered metric space.
+    As a mathematical problem, it was first introduced by Gaspard Monge in 1781. It addresses the task of determining
+    the most efficient method for transporting mass from one distribution to another. In this problem, the cost
+    associated with moving a unit of mass from one position to another is referred to as the ground cost. The primary
+    objective of OT is to minimize the total cost incurred when moving one mass distribution onto another.
     </p><p>
-    OT can be used to detect model-induced bias by calculating the a cost known as Earth Mover's distance or Wasserstein distance between the distribution of ground truth labels and model predictions for each of the protected groups. If its value is close to 1, the model is biased towards this group.
+    OT can be used to detect model-induced bias by calculating the a cost known as Earth Mover's distance or
+    Wasserstein distance between the distribution of ground truth labels and model predictions for each of the
+    protected groups. If its value is close to 1, the model is biased towards this group.
     </p>
     """
+
+    assert len(sensitive) != 0, "At least one sensitive attribute should be selected"
+    assert hasattr(dataset, "labels"), "The chosen dataset loader has not identified any labels"
 
     text = """
     <div class="container mt-4">
@@ -43,29 +55,17 @@ def optimal_transport(
     </div>
     """
 
-    if len(sensitive) == 0:
-        raise Exception("At least one sensitive attribute should be selected")
-
-    # Obtain predictions
     predictions = pd.Series(model.predict(dataset, sensitive))
     labels = dataset.labels
 
     if hasattr(labels, "columns"):
         text += """
         <div class="container mt-4">
-            <table class="table table-striped table-bordered">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Attribute</th>
-                        <th>Group</th>
+        <table class="table table-striped table-bordered">
+        <thead class="table-dark"><tr><th>Attribute</th><th>Group</th>
         """
-        for label_name in labels.columns:
-            text += f"<th>{label_name}</th>"
-        text += """
-                    </tr>
-                </thead>
-                <tbody>
-        """
+        for label_name in labels.columns: text += f"<th>{label_name}</th>"
+        text += "</tr></thead><tbody>"
 
         # Collect distances for merging
         results = {}
@@ -81,50 +81,25 @@ def optimal_transport(
 
         # Render merged table
         for (attr, group), distances in results.items():
-            text += f"""
-            <tr>
-                <td>{attr}</td>
-                <td>{group}</td>
-            """
+            text += f"<tr><td>{attr}</td><td>{group}</td>"
             for label_name in labels.columns:
                 text += f"<td>{distances.get(label_name, 'N/A'):.3f}</td>"
             text += "</tr>"
-
-        text += """
-                </tbody>
-            </table>
-        </div>
-        """
+        text += "</tbody></table></div>"
     else:
         labels = pd.Series(labels)
         text += """
         <div class="container mt-4">
-            <table class="table table-striped table-bordered">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Attribute</th>
-                        <th>Group</th>
-                        <th>Wasserstein Distance</th>
-                    </tr>
-                </thead>
-                <tbody>
+        <table class="table table-striped table-bordered">
+        <thead class="table-dark"><tr><th>Attribute</th><th>Group</th><th>Prediction</th></tr>
+        </thead><tbody>
         """
         for attr in sensitive:
             df = dataset.data[attr]
             dist = ot_distance(y_true=labels, y_pred=predictions, prot_attr=df)
             for k, v in dist.items():
-                text += f"""
-                    <tr>
-                        <td>{attr}</td>
-                        <td>{k}</td>
-                        <td>{v:.3f}</td>
-                    </tr>
-                """
-        text += """
-                </tbody>
-            </table>
-        </div>
-        """
+                text += f"<tr><td>{attr}</td><td>{k}</td><td>{v:.3f}</td></tr>"
+        text += "</tbody></table></div>"
 
     text += """
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
