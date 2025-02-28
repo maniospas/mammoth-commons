@@ -8,11 +8,19 @@ from mammoth.integration import metric
 from aif360.metrics import BinaryLabelDatasetMetric, MDSSClassificationMetric
 from aif360.detectors import bias_scan
 
+
 @metric(
     namespace="mammotheu",
     version="v0036",
     python="3.11",
-    packages=("aif360", "aif360[OptimalTransport]", "pandas", "onnxruntime", "ucimlrepo", "pygrank"),
+    packages=(
+        "aif360",
+        "aif360[OptimalTransport]",
+        "pandas",
+        "onnxruntime",
+        "ucimlrepo",
+        "pygrank",
+    ),
 )
 def bias_scan(
     dataset: Dataset,
@@ -29,7 +37,9 @@ def bias_scan(
     <b>No sensitive attributes can be provided.</b>
     """
 
-    assert len(sensitive) == 0, "Bias scan cannot have any sensitive attributes, as it helps identify those."
+    assert (
+        len(sensitive) == 0
+    ), "Bias scan cannot have any sensitive attributes, as it helps identify those."
 
     text = """
     <div class="container mt-4">

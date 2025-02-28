@@ -28,7 +28,9 @@ class DatasetLoaderThread(QThread):
                 return
             self.mutex.unlock()
 
-            self.pipeline["dataset"]["return"] = registry.name_to_runnable[self.pipeline["dataset"]["module"]](**self.pipeline["dataset"]["params"])
+            self.pipeline["dataset"]["return"] = registry.name_to_runnable[
+                self.pipeline["dataset"]["module"]
+            ](**self.pipeline["dataset"]["params"])
 
             self.mutex.lock()
             if self._is_canceled:
@@ -61,7 +63,9 @@ class SelectDataset(Step):
         self.loading_message.setText("Please wait while the dataset is loading...")
         self.loading_message.setStandardButtons(QMessageBox.StandardButton.Cancel)
         self.loading_message.setModal(True)
-        self.loading_message.button(QMessageBox.StandardButton.Cancel).clicked.connect(self.cancel_loading)
+        self.loading_message.button(QMessageBox.StandardButton.Cancel).clicked.connect(
+            self.cancel_loading
+        )
         self.loading_message.show()
 
         self.thread = DatasetLoaderThread(self.runs[-1])
@@ -83,7 +87,7 @@ class SelectDataset(Step):
         self.loading_message.done(0)
 
     def cancel_loading(self):
-        if hasattr(self, 'thread') and self.thread.isRunning():
+        if hasattr(self, "thread") and self.thread.isRunning():
             self.thread.cancel()
             self.thread.wait()  # Wait until the thread finishes
             self.loading_message.done(0)
@@ -91,10 +95,18 @@ class SelectDataset(Step):
     def showEvent(self, event):
         self.description_input.setText(self.runs[-1]["description"])
         self.dataset_selector.clear()
-        self.dataset_selector.addItems(["Select a dataset loader"] + list(self.dataset_loaders.keys()))
+        self.dataset_selector.addItems(
+            ["Select a dataset loader"] + list(self.dataset_loaders.keys())
+        )
         self.defaults = self.runs[-1].get("dataset", dict()).get("params", dict())
-        #self.update_param_form(self.runs[-1].get("dataset", dict()).get("module", "Select a dataset loader"))
-        self.dataset_selector.setCurrentIndex(self.dataset_selector.findText(self.runs[-1].get("dataset", dict()).get("module", "Select a dataset loader")))
+        # self.update_param_form(self.runs[-1].get("dataset", dict()).get("module", "Select a dataset loader"))
+        self.dataset_selector.setCurrentIndex(
+            self.dataset_selector.findText(
+                self.runs[-1]
+                .get("dataset", dict())
+                .get("module", "Select a dataset loader")
+            )
+        )
         super().showEvent(event)
 
     def switch_to_dashboard(self):
@@ -104,7 +116,7 @@ class SelectDataset(Step):
         save_all_runs("history.json", self.runs)
 
     def closeEvent(self, event):
-        if hasattr(self, 'thread') and self.thread.isRunning():
+        if hasattr(self, "thread") and self.thread.isRunning():
             self.thread.cancel()
             self.thread.wait()  # Ensure the thread has finished
         event.accept()

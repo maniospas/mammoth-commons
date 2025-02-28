@@ -1,11 +1,11 @@
 from PySide6.QtWidgets import QPushButton, QWidget, QSizePolicy
 
 
-
 class Styled(QWidget):
     def create_icon_button(self, text, color, tooltip, callback):
         button = QPushButton(text, self)
-        button.setStyleSheet(f"""
+        button.setStyleSheet(
+            f"""
             QPushButton {{
                 background-color: {color}; 
                 color: white; 
@@ -18,7 +18,8 @@ class Styled(QWidget):
                 border: 4px solid black;
                 background-color: {self.highlight_color(color)};
             }}
-        """)
+        """
+        )
 
         button.setFixedSize(30, 30)
         button.setToolTip(tooltip)
@@ -28,7 +29,8 @@ class Styled(QWidget):
     def create_tag_button(self, text, tooltip, callback):
         button = QPushButton(text, self)
 
-        button.setStyleSheet("""
+        button.setStyleSheet(
+            """
             QPushButton {
                 background-color: #3A3A3A;
                 color: white;
@@ -43,13 +45,14 @@ class Styled(QWidget):
             QPushButton:pressed {
                 background-color: #7A7A7A;
             }
-        """)
+        """
+        )
         button.setFixedHeight(30)
 
         button.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         button.setToolTip(tooltip)
         button.clicked.connect(callback)
-        #button.setFixedSize(180, 30)
+        # button.setFixedSize(180, 30)
 
         return button
 

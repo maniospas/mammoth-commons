@@ -28,12 +28,21 @@ class AnalysisThread(QThread):
             dataset = self.pipeline["dataset"]["return"]
             model = self.pipeline["model"]["return"]
             sensitive = args.get("sensitive", "")
-            if "," in sensitive: sensitive = sensitive.split(",")
-            elif sensitive=="": sensitive = []
-            else: sensitive = [sensitive]
+            if "," in sensitive:
+                sensitive = sensitive.split(",")
+            elif sensitive == "":
+                sensitive = []
+            else:
+                sensitive = [sensitive]
             sensitive = [s.strip() for s in sensitive]
-            args = {k:v for k,v in args.items() if k not in ["dataset", "model", "sensitive"]}
-            self.pipeline["analysis"]["return"] = registry.name_to_runnable[self.pipeline["analysis"]["module"]](dataset, model, sensitive, **args).text()
+            args = {
+                k: v
+                for k, v in args.items()
+                if k not in ["dataset", "model", "sensitive"]
+            }
+            self.pipeline["analysis"]["return"] = registry.name_to_runnable[
+                self.pipeline["analysis"]["module"]
+            ](dataset, model, sensitive, **args).text()
             self.pipeline["dataset"]["return"] = None
             self.pipeline["model"]["return"] = None
             self.pipeline["status"] = "completed"
@@ -75,10 +84,18 @@ class SelectAnalysis(Step):
             )
         ]
         self.dataset_selector.clear()
-        self.dataset_selector.addItems(["Select a fairness analysis method"] + compatible_methods)
+        self.dataset_selector.addItems(
+            ["Select a fairness analysis method"] + compatible_methods
+        )
         self.defaults = self.runs[-1].get("analysis", dict()).get("params", dict())
-        #self.update_param_form(self.runs[-1].get("analysis", dict()).get("module", "Select a fairness analysis method"))
-        self.dataset_selector.setCurrentIndex(self.dataset_selector.findText(self.runs[-1].get("analysis", dict()).get("module", "Select a fairness analysis method")))
+        # self.update_param_form(self.runs[-1].get("analysis", dict()).get("module", "Select a fairness analysis method"))
+        self.dataset_selector.setCurrentIndex(
+            self.dataset_selector.findText(
+                self.runs[-1]
+                .get("analysis", dict())
+                .get("module", "Select a fairness analysis method")
+            )
+        )
         super().showEvent(event)
 
     def next(self):
@@ -87,10 +104,14 @@ class SelectAnalysis(Step):
 
         self.loading_message = QMessageBox(self)
         self.loading_message.setWindowTitle("Running fairness analysis")
-        self.loading_message.setText("Please wait while the fairness analysis is running...")
+        self.loading_message.setText(
+            "Please wait while the fairness analysis is running..."
+        )
         self.loading_message.setStandardButtons(QMessageBox.StandardButton.Cancel)
         self.loading_message.setModal(True)
-        self.loading_message.button(QMessageBox.StandardButton.Cancel).clicked.connect(self.cancel_loading)
+        self.loading_message.button(QMessageBox.StandardButton.Cancel).clicked.connect(
+            self.cancel_loading
+        )
         self.loading_message.show()
 
         # Start the analysis thread
@@ -115,7 +136,7 @@ class SelectAnalysis(Step):
         self.loading_message.done(0)
 
     def cancel_loading(self):
-        if hasattr(self, 'thread') and self.thread.isRunning():
+        if hasattr(self, "thread") and self.thread.isRunning():
             self.thread.cancel()
             self.thread.wait()  # Ensure thread is properly finished
             self.loading_message.done(0)
@@ -127,7 +148,7 @@ class SelectAnalysis(Step):
         save_all_runs("history.json", self.runs)
 
     def closeEvent(self, event):
-        if hasattr(self, 'thread') and self.thread.isRunning():
+        if hasattr(self, "thread") and self.thread.isRunning():
             self.thread.cancel()
             self.thread.wait()
         event.accept()

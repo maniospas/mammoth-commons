@@ -1,13 +1,15 @@
+from fairbench.v2.export import ConsoleTable
+
 from mammoth.datasets import Dataset
 from mammoth.models import Predictor
-from mammoth.exports import Markdown
+from mammoth.exports import HTML
 from typing import Dict, List
 from mammoth.integration import metric, Options
-from fairbench import v1 as fb
+import fairbench as fb
 import numpy as np
 
 
-@fb.core.Transform
+@fb.v1.Transform
 def categories(iterable):
     # print(iterable)
     is_numeric = True
@@ -33,7 +35,7 @@ def categories(iterable):
 
 @metric(
     namespace="mammotheu",
-    version="v0036",
+    version="v0037",
     python="3.11",
     packages=("fairbench", "pandas", "onnxruntime", "ucimlrepo", "pygrank"),
 )
@@ -43,23 +45,22 @@ def model_card(
     sensitive: List[str],
     intersectional: bool = False,
     compare_groups: Options("Pairwise", "To the total population") = None,
-) -> Markdown:
+    minimum_shown_deviation: float = 0,
+) -> HTML:
     """Creates a model card using the <a href="https://github.com/mever-team/FairBench">FairBench</a>
-    library. The card includes several fairness stamps; these are specific measures of bias
-    or fairness that are commonly used in the algorithmic fairness literature. Only the most prominent
-    of those measures are used as stamps, and they correspond to a perfunctory fairness analysis.
+    library. The card includes several types of fairness/bias assessment and you can view
+    either a) a basic model card that does not have too many measures but contains socio-technical concerns about
+    those shown, b) a full report,or  c) a summary table of results.
 
-    This module computes all applicable FairBench stamps, which
-    summarize behavior across all population groups or intersectional
-    subgroups.
-    Multiple sensitive attributes may be present, such as gender, age, and race.
+    The reported values summarize model behavior across all population groups or intersectional
+    subgroups. Multiple sensitive attributes may be present, such as gender, age, and race.
     Furthermore, each of those attributes may obtain multiple values, as happens when multiple genders or
     races are considered. Numeric attributes, like age, are normalized to
     the range [0,1] and we consider the result as truth values of membership to the group of the maximum
     value - as opposed to membership to the group with minimum value.
-    A different stamp is computed for each prediction label.
+    A different set of stamps is computed for each prediction label.
 
-    You may optionally create intersectional subgroups, that is, create
+    You may optionally analyse intersectional subgroups, that is, spawn
     a separate subgroup for each combination of sensitive attribute values. Many of those groups will have few
     members if there are too many attributes, and empty groups are ignored during the analysis.
 
@@ -77,64 +78,107 @@ def model_card(
     Args:
         intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute, but may also be computationally intensive if too many group intersections are selected.
         compare_groups: Whether to compare groups pairwise, or each group to the whole population. For example, if the 4/5ths rule stamp is applicable, it computes positive rates and obtains the minimum ratio, either across all pairs of groups (for pairwise comparison) or otherwise between each group and the total population.
+        minimum_shown_deviation: Show only results where the deviation from ideal values exceeds the given threshold. If nothing is shown, it does not mean that fairness is achieved, but this is a good way to identify the most prominent biases. If value of 0 is set (default) then all results are shown.
     """
 
-    text = ""
-
-    if len(sensitive) == 0:
-        raise Exception("At least one sensitive attribute should be selected")
-
-    # obtain predictions
+    assert len(sensitive) != 0, "At least one sensitive attribute should be selected"
     predictions = model.predict(dataset, sensitive)
-
-    # declare sensitive attributes
     labels = dataset.labels
-    sensitive = fb.Fork({attr: categories @ dataset.data[attr] for attr in sensitive})
+    sensitive = fb.Dimensions({attr: categories @ dataset.data[attr] for attr in sensitive})
 
-    # change behavior based on arguments
     if intersectional:
         sensitive = sensitive.intersectional()
-    report_type = fb.multireport if compare_groups == "Pairwise" else fb.unireport
-    # perform different analysis, depending on whether labels are provided
-    if labels is None:
-        report = report_type(predictions=predictions, sensitive=sensitive)
-        stamps = fb.combine(
-            fb.stamps.prule(report),
-            fb.stamps.four_fifths(report),
-        )
-        text += fb.modelcards.tomarkdown(stamps)
-    else:
-        for label in labels:
-            # TODO: the following analysis is only for one class label
-            report = report_type(
-                predictions=predictions,
-                labels=(
-                    labels[label].to_numpy()
-                    if hasattr(labels[label], "to_numpy")
-                    else labels[label]
-                ),
-                sensitive=sensitive,
-            )
-            stamps = fb.combine(
-                fb.stamps.prule(report),
-                fb.stamps.accuracy(report),
-                fb.stamps.four_fifths(report),
-                fb.stamps.dfpr(report),
-                fb.stamps.dfnr(report),
-                # fb.stamps.auc(report),
-                # fb.stamps.abroca(report),
-            )
-        text += fb.modelcards.tomarkdown(stamps)
+    report_type = fb.reports.pairwise if compare_groups == "Pairwise" else fb.reports.vsall
 
+    if labels is not None and hasattr(labels, "columns"):
+        labels = labels[labels.columns[0]]
+        """labels = fb.Dimensions({
+            label: labels[label].to_numpy()
+            if hasattr(labels[label], "to_numpy")
+            else labels[label]
+            for label in labels.columns
+        })"""
+
+    report = report_type(predictions=predictions, labels=labels, sensitive=sensitive)
+    minimum_shown_deviation = float(minimum_shown_deviation)
+    assert 0 <= minimum_shown_deviation <= 1, "Minimum shown deviation should be in the range [0,1]"
+    if minimum_shown_deviation != 0:
+        report = report.filter(fb.investigate.DeviationsOver(minimum_shown_deviation))
+
+    views = {
+        "Summary": report.show(env=fb.export.HtmlTable(view=False, filename=None)),
+        "Card": report.filter(fb.investigate.Stamps).show(
+            env=fb.export.Html(view=False, filename=None), depth=1
+        ),
+        "Report": report.show(env=fb.export.Html(view=False, filename=None)),
+    }
+    # Generate tabbed HTML content
+    tab_headers = "".join(
+        f'<button class="tablinks" data-tab="{key}">{key}</button>' for key in views
+    )
+    tab_contents = "".join(
+        f'<div id="{key}" class="tabcontent">{value}</div>' for key, value in views.items()
+    )
+
+    dataset_desc = ""
     if hasattr(dataset, "description"):
-        text += "\n## Dataset\n"
+        dataset_desc += "<h1>Dataset</h1>"
         if isinstance(dataset.description, str):
-            text += text + "\n"
+            dataset_desc += dataset.description + "<br>"
         elif isinstance(dataset.description, dict):
             for key, value in dataset.description.items():
-                text += "#### " + key + "\n" + value.replace("\n", "\n\n") + "\n"
+                dataset_desc += f"<h3>{key}</h3>" + value.replace("\n", "<br>") + "<br>"
         else:
-            raise Exception(
-                "Since the dataset's description field exist, it should be either string or dict from headers to descriptions"
-            )
-    return Markdown(text)
+            raise Exception("Dataset description must be a string or a dictionary.")
+
+    html_content = f'''
+       <style>
+           .tablinks {{
+               background-color: #ddd;
+               padding: 10px;
+               cursor: pointer;
+               border: none;
+               border-radius: 5px;
+               margin: 5px;
+           }}
+           .tablinks:hover {{ background-color: #bbb; }}
+           .tablinks.active {{ background-color: #aaa; }}
+
+           .tabcontent {{
+               display: none;
+               padding: 10px;
+               border: 1px solid #ccc;
+           }}
+           .tabcontent.active {{ display: block; }}
+       </style>
+       <script>
+           document.addEventListener("DOMContentLoaded", function() {{
+               const tabContainer = document.querySelector("div");
+               tabContainer.addEventListener("click", function(event) {{
+                   if (event.target.classList.contains("tablinks")) {{
+                       let tabName = event.target.getAttribute("data-tab");
+
+                       // Remove "active" from all tabs and contents
+                       document.querySelectorAll(".tablinks").forEach(tab => tab.classList.remove("active"));
+                       document.querySelectorAll(".tabcontent").forEach(content => content.classList.remove("active"));
+
+                       // Activate the selected tab and content
+                       event.target.classList.add("active");
+                       document.getElementById(tabName).classList.add("active");
+                   }}
+               }});
+
+               // Show the first tab by default
+               let firstTab = document.querySelector(".tablinks");
+               if (firstTab) {{
+                   firstTab.classList.add("active");
+                   document.getElementById(firstTab.getAttribute("data-tab")).classList.add("active");
+               }}
+           }});
+       </script>
+       <div>{tab_headers}</div>
+       {tab_contents}
+       {dataset_desc}
+       '''
+
+    return HTML(html_content)

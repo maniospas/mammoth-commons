@@ -7,11 +7,19 @@ from typing import List
 from mammoth.integration import metric
 from aif360.sklearn.metrics import ot_distance
 
+
 @metric(
     namespace="mammotheu",
-    version="v0036",
+    version="v001",
     python="3.11",
-    packages=("aif360", "aif360[OptimalTransport]", "pandas", "onnxruntime", "ucimlrepo", "pygrank"),
+    packages=(
+        "aif360",
+        "aif360[OptimalTransport]",
+        "pandas",
+        "onnxruntime",
+        "ucimlrepo",
+        "pygrank",
+    ),
 )
 def optimal_transport(
     dataset: Dataset,
@@ -41,7 +49,9 @@ def optimal_transport(
     """
 
     assert len(sensitive) != 0, "At least one sensitive attribute should be selected"
-    assert hasattr(dataset, "labels"), "The chosen dataset loader has not identified any labels"
+    assert hasattr(
+        dataset, "labels"
+    ), "The chosen dataset loader has not identified any labels"
 
     text = """
     <div class="container mt-4">
@@ -64,7 +74,8 @@ def optimal_transport(
         <table class="table table-striped table-bordered">
         <thead class="table-dark"><tr><th>Attribute</th><th>Group</th>
         """
-        for label_name in labels.columns: text += f"<th>{label_name}</th>"
+        for label_name in labels.columns:
+            text += f"<th>{label_name}</th>"
         text += "</tr></thead><tbody>"
 
         # Collect distances for merging
