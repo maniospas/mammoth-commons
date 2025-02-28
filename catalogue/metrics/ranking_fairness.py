@@ -3,6 +3,7 @@ from mammoth.exports import Markdown, HTML
 from mammoth.integration import metric
 from mammoth.models.researcher_ranking import ResearcherRanking
 from mammoth.datasets.csv import CSV
+from mammoth.datasets.graph_csh import Graph_CSH
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,6 +11,8 @@ import seaborn as sns
 from io import BytesIO
 import base64
 import statistics
+from . import networks_layouts
+import networkx as nx
 
 
 def b(k):
@@ -390,8 +393,8 @@ template = """
 
         <div class="main-content">
             <div class="visualization-full network-visualization">
-                <h3 class="section-title">1. Citation Network Structure</h3>
-                <img src="data:image/png;base64,{network_img_str}" alt="Citation Network" style="width: 100%;"/>
+                <h3 class="section-title">1. Network Structure</h3>
+                <img src="data:image/png;base64,{network_img_str}" alt="Network" style="width: 100%;"/>
                 <div class="network-stats">
                     <div class="network-stat">Nodes: 1739</div>
                     <div class="network-stat">Edges: 9943</div>
@@ -490,7 +493,7 @@ def generate_html_report(
     ER_Old,
     ER_Mitigation,
     boxplot_img_str,
-    network_path,
+    network_img_str,
     normal_distribution_img_str,
     distribution_img_str,
     sensitive_attribute,
@@ -508,9 +511,6 @@ def generate_html_report(
     max_disparity_new = max(mean_mitigation_by_group.values()) - min(
         mean_mitigation_by_group.values()
     )
-
-    # Get base64 strings for the images
-    network_img_str = image_to_base64(network_path)
 
     # Generate HTML content
     html_content = template.format(
@@ -575,9 +575,56 @@ def validate_input(
         )
 
 
+
+
+
+def plot_network(G,title, name_plot, directed=False, amplyfing_size_nodes = 2, division_size_edges=100, size_edges = 1):
+    degree = dict(G.degree(weight="weight"))
+    weights = [G[u][v]["weight"] for u, v in G.edges()]
+    pos = networks_layouts.forceatlas2_layout(
+        G,
+        max_iter=300,
+        jitter_tolerance=0.2,
+        scaling_ratio=10,
+        gravity=0.05,
+        distributed_action=False,
+        strong_gravity=True,
+        node_mass=[400 for i in list(degree.values())],
+        node_size=[400 for i in list(degree.values())],
+        weight=weights,
+        dissuade_hubs=True,
+        linlog=False,
+        seed=10,
+        dim=2,
+    )
+    ncols=1
+    nrows=1
+
+    fig, axes = plt.subplots(ncols=ncols, nrows=nrows,figsize=(10,10))
+
+    nx.draw_networkx(G, with_labels = False, 
+                     pos=pos, node_color=(255/256, 102/256, 102/256,0.7), 
+                     node_size=[i*amplyfing_size_nodes+1 for i in list(degree.values())], 
+                     edge_color = 'lightgray',
+                     width = np.array(weights)/division_size_edges+size_edges,arrowsize=3, 
+                     ax=axes)
+    if directed == False:
+        Connected_componets = sorted(nx.connected_components(G), key=len, reverse=True)
+    else:
+        Connected_componets = sorted(nx.weakly_connected_components(G), key=len, reverse=True)
+        
+    plt.title(title, fontweight='bold',fontsize=20)
+    for axis in ['top','bottom','left','right']:
+        axes.spines[axis].set_linewidth(0)
+    
+    # Save and encode
+    plt.close(fig)
+    enc_str = get_base64_encoded_image(fig)
+    return enc_str
+
 @metric(namespace="mammotheu", version="v0036", python="3.11")
 def exposure_distance_comparison(
-    dataset: CSV,
+    dataset: Graph_CSH,
     model: ResearcherRanking,
     sensitive: List[str] = ["Gender"],
     n_runs: int = 1,
@@ -595,21 +642,47 @@ def exposure_distance_comparison(
         - `Ranking Variable`: This refers to the main criteria by which ranking is done.  One of *Degree*, *Citations* or *Productivity*
     """
 
-    validate_input(
-        dataset,
-        model,
-        n_runs,
-        sensitive,
-        protected,
-        sampling_attribute,
-        ranking_variable,
-    )
+    # TODO: uncomment
+    #validate_input(
+    #    dataset,
+    #    model,
+    #    n_runs,
+    #    sensitive,
+    #    protected,
+    #    sampling_attribute,
+    #    ranking_variable,
+    #)
 
     # initialize our own baseline model
     model_baseline = model.baseline_rank
 
+
+    researchers_graph = dataset.G
+
+    # Plot the network if it is small enough
+    if len(researchers_graph.nodes) < 2500:
+        network_image = plot_network(
+            G=researchers_graph,
+            title=" Co-authorship network",
+            name_plot="Co-authorship_network.pdf",
+        )
+    else:
+        network_image = image_to_base64("./data/researchers/network.png")
+
+
+    Dataframe_nodes = {"id": []}
+    for i in researchers_graph.nodes():
+        Dataframe_nodes["id"] += [i]
+        for k, v in researchers_graph.nodes[i].items():
+            try:
+                Dataframe_nodes[k] += [v]
+            except:
+                Dataframe_nodes[k] = [v]
+
+    data = pd.DataFrame(Dataframe_nodes)
+
+
     # Only consider those rows where the sampling attribute is not missing
-    data = dataset.data
     dataframe_sampling = data[~data[sampling_attribute].isnull()]
 
     Old_ranking_variable = ranking_variable
@@ -718,16 +791,13 @@ def exposure_distance_comparison(
         n_runs=n_runs,
     )
 
-    # HACK
-    network_path = "./data/researchers/network.png"
-
     # Generate the complete HTML report
     return generate_html_report(
         dataset=data,
         ER_Old=ER_Old,
         ER_Mitigation=ER_Mitigation,
         boxplot_img_str=mitigation_strategies_image,
-        network_path=network_path,
+        network_img_str=network_image,
         normal_distribution_img_str=normal_distribution_image,
         distribution_img_str=distribution_image,
         sensitive_attribute=sensitive,
