@@ -3,15 +3,23 @@ from mammoth.integration import loader
 import pandas as pd
 import numpy as np
 
-@loader(namespace="mammotheu", version="v0036", python="3.11", packages=("pandas", "networkx"))
-def data_researchers(paper_graph_path: str = "",
-                     paper_graph_delimiter: str = "|",
-                     paper_affiliations_path: str = "",
-                     paper_affiliation_delimiter: str = "|") -> Graph_CSH:
+
+@loader(
+    namespace="mammotheu",
+    version="v0036",
+    python="3.11",
+    packages=("pandas", "networkx"),
+)
+def data_researchers(
+    paper_graph_path: str = "",
+    paper_graph_delimiter: str = "|",
+    paper_affiliations_path: str = "",
+    paper_affiliation_delimiter: str = "|",
+) -> Graph_CSH:
     """
 
     This is a Loader to load .csv files with information about researchers
-    The `papers_path` and `papers_affiliations` should be given relative to your locally running instance 
+    The `papers_path` and `papers_affiliations` should be given relative to your locally running instance
     (e.g.: *./data/researchers/Top&#95;researchers.csv*)
     The `Delimiter` should match the CSV file you have (e.g.: '|')
 
@@ -22,11 +30,15 @@ def data_researchers(paper_graph_path: str = "",
         paper_affiliation_delimiter: The delimiter of the paper affiliation map file.
     """
     try:
-        #Read paper files for information of the papers:
-        DF_papers = pd.read_csv(paper_graph_path, sep=paper_graph_delimiter, compression='bz2')
+        # Read paper files for information of the papers:
+        DF_papers = pd.read_csv(
+            paper_graph_path, sep=paper_graph_delimiter, compression="bz2"
+        )
 
-        #Affiliations for the information of the authors
-        DF_Affiliations = pd.read_csv(paper_affiliations_path, sep=paper_affiliation_delimiter, compression='bz2')
+        # Affiliations for the information of the authors
+        DF_Affiliations = pd.read_csv(
+            paper_affiliations_path, sep=paper_affiliation_delimiter, compression="bz2"
+        )
 
     except:
         raise ValueError(
@@ -54,7 +66,7 @@ def data_researchers(paper_graph_path: str = "",
 
     for i in ["Alpha-3 code", "Alpha-2 code"]:
         country_codes[i] = [j.split(" ")[1] for j in country_codes[i]]
-        
+
     Dict_codes_2_to_3 = {}
     Dict_codes_name_to_3 = {}
     for i in country_codes.index:
@@ -79,7 +91,6 @@ def data_researchers(paper_graph_path: str = "",
         except:
             return np.nan
 
-
     for category in ["Region", "IncomeGroup"]:
         DF_Affiliations["aff_country_" + category] = [
             bring_value(
@@ -103,8 +114,6 @@ def data_researchers(paper_graph_path: str = "",
     graph_data = Graph_CSH(DF_papers, DF_Affiliations)
     graph_data.create_coauth_graph()
 
-
-
     return graph_data
 
 
@@ -122,7 +131,10 @@ def validate_papers(data):
 
     # TODO: Allow it, but don't do visualisations
     if len_papers > 1500:
-        raise ValueError("The papers dataset has too many papers. Please provide a smaller dataset.")
+        raise ValueError(
+            "The papers dataset has too many papers. Please provide a smaller dataset."
+        )
+
 
 def validate_affiliations(data):
     required_columns = ["doi", "researcher_id", "aff_country", "Nationality"]
@@ -132,11 +144,13 @@ def validate_affiliations(data):
         raise ValueError(
             f"The following columns must be present in the dataset, but they are not: {missing_columns}"
         )
-    
+
     len_papers = len(data)
     if len_papers == 0:
         raise ValueError("The affiliations dataset is empty")
 
     # TODO: Allow it, but don't do visualisations
     if len_papers > 2500:
-        raise ValueError("The papers dataset has too many papers. Please provide a smaller dataset.")
+        raise ValueError(
+            "The papers dataset has too many papers. Please provide a smaller dataset."
+        )

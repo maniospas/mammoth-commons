@@ -3,6 +3,7 @@ from catalogue.dataset_loaders.data_researchers import data_researchers
 from catalogue.model_loaders.compute_researcher_ranking import model_mitigation_ranking
 from catalogue.metrics.ranking_fairness import exposure_distance_comparison
 
+
 def test_researchers_ranking_comparison():
     with testing.Env(
         data_researchers,

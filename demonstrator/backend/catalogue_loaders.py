@@ -50,7 +50,10 @@ registry.model(
     ],
 )
 registry.model(model_onnx, compatible=[data_auto_csv, data_custom_csv, data_uci])
-registry.model(model_onnx_ensemble,compatible=[data_auto_csv, data_custom_csv, data_uci],)
+registry.model(
+    model_onnx_ensemble,
+    compatible=[data_auto_csv, data_custom_csv, data_uci],
+)
 registry.model(model_torch, compatible=[data_images, data_image_pairs])
 registry.model(model_torch2onnx, compatible=[data_images, data_image_pairs])
 registry.model(model_fair_node_ranking, compatible=[data_graph])
@@ -63,4 +66,7 @@ registry.analysis(image_bias_analysis)
 registry.analysis(facex_regions)
 registry.analysis(facex_embeddings)
 registry.analysis(Multi_objective_report)
-registry.analysis(exposure_distance_comparison,compatible=[model_mitigation_ranking],)
+registry.analysis(
+    exposure_distance_comparison,
+    compatible=[model_mitigation_ranking],
+)

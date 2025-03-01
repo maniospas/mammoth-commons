@@ -1,4 +1,4 @@
-#Plot the network:
+# Plot the network:
 """
 ******
 Layout
@@ -59,6 +59,7 @@ def _process_params(G, center, dim):
         raise ValueError(msg)
 
     return G, center
+
 
 @np_random_state("seed")
 def forceatlas2_layout(
@@ -175,7 +176,7 @@ def forceatlas2_layout(
     gravities = np.zeros((n, dim))
     attraction = np.zeros((n, dim))
     repulsion = np.zeros((n, dim))
-    A = nx.to_numpy_array(G, weight='weight')
+    A = nx.to_numpy_array(G, weight="weight")
 
     def estimate_factor(n, swing, traction, speed, speed_efficiency, jitter_tolerance):
         """Computes the scaling factor for the force in the ForceAtlas2 layout algorithm.

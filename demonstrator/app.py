@@ -10,10 +10,17 @@ from demonstrator.backend.loaders import registry
 
 items = load_all_runs("history.json")
 import matplotlib
+
 matplotlib.use("Agg")
 
 from PySide6.QtWidgets import QStackedWidget, QWidget, QGraphicsOpacityEffect
-from PySide6.QtCore import QEasingCurve, QPropertyAnimation, QParallelAnimationGroup, QPoint, Signal
+from PySide6.QtCore import (
+    QEasingCurve,
+    QPropertyAnimation,
+    QParallelAnimationGroup,
+    QPoint,
+    Signal,
+)
 
 
 class SlidingStackedWidget(QStackedWidget):
@@ -39,6 +46,7 @@ class SlidingStackedWidget(QStackedWidget):
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
     """
+
     animationFinished = Signal()
 
     def __init__(self, parent=None):
@@ -69,12 +77,15 @@ class SlidingStackedWidget(QStackedWidget):
         return False
 
     def slideInIdx(self, idx: int):
-        if idx >= self.count(): idx %= self.count()
-        elif idx < 0: idx = (idx + self.count()) % self.count()
+        if idx >= self.count():
+            idx %= self.count()
+        elif idx < 0:
+            idx = (idx + self.count()) % self.count()
         self.slideInWgt(self.widget(idx))
 
     def slideInWgt(self, new_widget: QWidget):
-        if self.m_active: return
+        if self.m_active:
+            return
         self.m_active = True
         now = self.currentIndex()
         next_idx = self.indexOf(new_widget)
@@ -86,8 +97,12 @@ class SlidingStackedWidget(QStackedWidget):
         offset_y = self.frameRect().height()
         new_widget.setGeometry(0, 0, offset_x, offset_y)
 
-        direction = (-offset_x if not self.m_vertical else 0, -offset_y if self.m_vertical else 0)
-        if self.invert: direction = (-direction[0], -direction[1])
+        direction = (
+            -offset_x if not self.m_vertical else 0,
+            -offset_y if self.m_vertical else 0,
+        )
+        if self.invert:
+            direction = (-direction[0], -direction[1])
         pnext = new_widget.pos()
         pnow = self.widget(now).pos()
         self.m_pnow = pnow
@@ -122,7 +137,9 @@ class SlidingStackedWidget(QStackedWidget):
         anim_next = QPropertyAnimation(new_widget, b"pos")
         anim_next.setDuration(self.m_speed)
         anim_next.setEasingCurve(self.m_animationtype)
-        anim_next.setStartValue(QPoint(-direction[0] + pnext.x(), direction[1] + pnext.y()))
+        anim_next.setStartValue(
+            QPoint(-direction[0] + pnext.x(), direction[1] + pnext.y())
+        )
         anim_next.setEndValue(QPoint(pnext.x(), pnext.y()))
 
         self.animgroup = QParallelAnimationGroup()
@@ -145,21 +162,38 @@ class SlidingStackedWidget(QStackedWidget):
         self.animationFinished.emit()
 
     def slideToWidget(self, index):
-        if index == self.currentIndex(): return
+        if index == self.currentIndex():
+            return
         self.invert = self.currentIndex() > index
         self.slideInIdx(index)
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        tags = {key: "<h1>"+key+"</h1>"+module["description"] for key, module in (registry.dataset_loaders | registry.model_loaders | registry.analysis_methods).items()}
+        tags = {
+            key: "<h1>" + key + "</h1>" + module["description"]
+            for key, module in (
+                registry.dataset_loaders
+                | registry.model_loaders
+                | registry.analysis_methods
+            ).items()
+        }
         self.setWindowTitle("MAI bias")
         self.setGeometry(100, 100, 1024, 768)
         self.stacked_widget = SlidingStackedWidget()
         self.stacked_widget.addWidget(Dashboard(self.stacked_widget, items, tags))
-        self.stacked_widget.addWidget(SelectDataset("Data", self.stacked_widget,  registry.dataset_loaders, items))
-        self.stacked_widget.addWidget(SelectModel("Model", self.stacked_widget, registry.model_loaders, items))
-        self.stacked_widget.addWidget(SelectAnalysis("Analysis method", self.stacked_widget, registry.analysis_methods, items))
+        self.stacked_widget.addWidget(
+            SelectDataset("Data", self.stacked_widget, registry.dataset_loaders, items)
+        )
+        self.stacked_widget.addWidget(
+            SelectModel("Model", self.stacked_widget, registry.model_loaders, items)
+        )
+        self.stacked_widget.addWidget(
+            SelectAnalysis(
+                "Analysis method", self.stacked_widget, registry.analysis_methods, items
+            )
+        )
         self.stacked_widget.addWidget(Results(self.stacked_widget, items, tags))
         self.setCentralWidget(self.stacked_widget)
 

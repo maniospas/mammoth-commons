@@ -575,10 +575,15 @@ def validate_input(
         )
 
 
-
-
-
-def plot_network(G,title, name_plot, directed=False, amplyfing_size_nodes = 2, division_size_edges=100, size_edges = 1):
+def plot_network(
+    G,
+    title,
+    name_plot,
+    directed=False,
+    amplyfing_size_nodes=2,
+    division_size_edges=100,
+    size_edges=1,
+):
     degree = dict(G.degree(weight="weight"))
     weights = [G[u][v]["weight"] for u, v in G.edges()]
     pos = networks_layouts.forceatlas2_layout(
@@ -597,30 +602,38 @@ def plot_network(G,title, name_plot, directed=False, amplyfing_size_nodes = 2, d
         seed=10,
         dim=2,
     )
-    ncols=1
-    nrows=1
+    ncols = 1
+    nrows = 1
 
-    fig, axes = plt.subplots(ncols=ncols, nrows=nrows,figsize=(10,10))
+    fig, axes = plt.subplots(ncols=ncols, nrows=nrows, figsize=(10, 10))
 
-    nx.draw_networkx(G, with_labels = False, 
-                     pos=pos, node_color=(255/256, 102/256, 102/256,0.7), 
-                     node_size=[i*amplyfing_size_nodes+1 for i in list(degree.values())], 
-                     edge_color = 'lightgray',
-                     width = np.array(weights)/division_size_edges+size_edges,arrowsize=3, 
-                     ax=axes)
+    nx.draw_networkx(
+        G,
+        with_labels=False,
+        pos=pos,
+        node_color=(255 / 256, 102 / 256, 102 / 256, 0.7),
+        node_size=[i * amplyfing_size_nodes + 1 for i in list(degree.values())],
+        edge_color="lightgray",
+        width=np.array(weights) / division_size_edges + size_edges,
+        arrowsize=3,
+        ax=axes,
+    )
     if directed == False:
         Connected_componets = sorted(nx.connected_components(G), key=len, reverse=True)
     else:
-        Connected_componets = sorted(nx.weakly_connected_components(G), key=len, reverse=True)
-        
-    plt.title(title, fontweight='bold',fontsize=20)
-    for axis in ['top','bottom','left','right']:
+        Connected_componets = sorted(
+            nx.weakly_connected_components(G), key=len, reverse=True
+        )
+
+    plt.title(title, fontweight="bold", fontsize=20)
+    for axis in ["top", "bottom", "left", "right"]:
         axes.spines[axis].set_linewidth(0)
-    
+
     # Save and encode
     plt.close(fig)
     enc_str = get_base64_encoded_image(fig)
     return enc_str
+
 
 @metric(namespace="mammotheu", version="v0036", python="3.11")
 def exposure_distance_comparison(
@@ -643,7 +656,7 @@ def exposure_distance_comparison(
     """
 
     # TODO: uncomment
-    #validate_input(
+    # validate_input(
     #    dataset,
     #    model,
     #    n_runs,
@@ -651,13 +664,12 @@ def exposure_distance_comparison(
     #    protected,
     #    sampling_attribute,
     #    ranking_variable,
-    #)
+    # )
 
     n_runs = int(n_runs)
 
     # initialize our own baseline model
     model_baseline = model.baseline_rank
-
 
     researchers_graph = dataset.G
 
@@ -671,7 +683,6 @@ def exposure_distance_comparison(
     else:
         network_image = image_to_base64("./data/researchers/network.png")
 
-
     Dataframe_nodes = {"id": []}
     for i in researchers_graph.nodes():
         Dataframe_nodes["id"] += [i]
@@ -682,7 +693,6 @@ def exposure_distance_comparison(
                 Dataframe_nodes[k] = [v]
 
     data = pd.DataFrame(Dataframe_nodes)
-
 
     # Only consider those rows where the sampling attribute is not missing
     dataframe_sampling = data[~data[sampling_attribute].isnull()]
