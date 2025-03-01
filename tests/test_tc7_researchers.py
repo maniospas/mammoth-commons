@@ -12,7 +12,7 @@ def test_researchers_ranking_comparison():
     ) as env:
         dataset = env.data_researchers(
             paper_graph_path="./data/researchers/physics_papers.csv.tar.bz2",
-            paper_affiliation_delimiter="./data/researchers/affiliations.csv.tar.bz2",
+            paper_affiliations_path="./data/researchers/affiliations.csv.tar.bz2",
         )
 
         model_mitigation = env.model_mitigation_ranking()
@@ -23,6 +23,8 @@ def test_researchers_ranking_comparison():
             n_runs=10,
             sampling_attribute="Nationality_IncomeGroup",
             ranking_variable="Degree",
+            sensitive=["Gender"],
+            protected="female"
         )
         analysis_outcome_mitigation.show()
 

@@ -1,4 +1,6 @@
 from typing import List
+
+import mammoth.integration
 from mammoth.exports import Markdown, HTML
 from mammoth.integration import metric
 from mammoth.models.researcher_ranking import ResearcherRanking
@@ -635,7 +637,7 @@ def plot_network(
     return enc_str
 
 
-@metric(namespace="mammotheu", version="v0036", python="3.11")
+@metric(namespace="mammotheu", version="v0037", python="3.11")
 def exposure_distance_comparison(
     dataset: Graph_CSH,
     model: ResearcherRanking,
@@ -643,7 +645,7 @@ def exposure_distance_comparison(
     n_runs: int = 1,
     protected: str = "female",
     sampling_attribute: str = "Nationality_IncomeGroup",
-    ranking_variable: str = "Degree",
+    ranking_variable: mammoth.integration.Options("Degree", "Citations", "Productivity") = "Degree"
 ) -> HTML:
     """
     Compute the exposure distance between the protected and non-protected groups in the dataset and ranking.

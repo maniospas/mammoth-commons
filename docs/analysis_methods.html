@@ -279,11 +279,51 @@
 Compare groups
 <br>
 <h2 id='exposure-distance-comparison'>Exposure distance comparison</h2>
-<p><p>Compute the exposure distance between the protected and non-protected groups in the dataset and ranking. Parameters:</p>  <ul> <li><p><code>N runs</code>: Choose a natural number between 1 and 100</p></li> <li><p><code>Sensitive attributes</code>: Which attribute is relevant for fairness analysis.  To select this, click the blue '+' and then use the dropdown.  Currently, only <em>Gender</em> is supported</p></li> <li><p><code>Protected</code>: The protected group for the fairness analysis. Currently, only <em>female</em> or <em>male</em> are supported</p></li> <li><p><code>Sampling Attribute</code>: The value by which we group the analysis for finer-grained results. One of <em>Nationality&#95;IncomeGroup</em> or <em>Nationality&#95;Region</em>.</p></li> <li><p><code>Ranking Variable</code>: This refers to the main criteria by which ranking is done.  One of <em>Degree</em>, <em>Citations</em> or <em>Productivity</em></p></li> </ul> </p>
-<b>Parameters</b><br>N runs
-Protected
-Sampling attribute
-Ranking variable
+<p><p>Compute the exposure distance between the protected and non-protected groups in the dataset and ranking. Sensitive attributes is a comma-separated list of the attributes relevant for fairness analysis. WCurrently, only <em>Gender</em> is supported.</p> </p>
+<b>Parameters</b><br><button
+                          type="button"
+                          class="btn btn-light"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          title=" Choose a natural number between 1 and 100."
+                          data-description=" Choose a natural number between 1 and 100."
+                          data-name="N runs"
+                          onclick="showDescriptionModal(this)">
+                          <i class="bi bi-info-circle"></i> N runs
+                        </button>
+<button
+                          type="button"
+                          class="btn btn-light"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          title=" The protected group for the fairness analysis. Currently, only *female* or *male* are supported."
+                          data-description=" The protected group for the fairness analysis. Currently, only *female* or *male* are supported."
+                          data-name="Protected"
+                          onclick="showDescriptionModal(this)">
+                          <i class="bi bi-info-circle"></i> Protected
+                        </button>
+<button
+                          type="button"
+                          class="btn btn-light"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          title=" The value by which we group the analysis for finer-grained results. One of *Nationality&#95;IncomeGroup* or *Nationality&#95;Region*."
+                          data-description=" The value by which we group the analysis for finer-grained results. One of *Nationality&#95;IncomeGroup* or *Nationality&#95;Region*."
+                          data-name="Sampling attribute"
+                          onclick="showDescriptionModal(this)">
+                          <i class="bi bi-info-circle"></i> Sampling attribute
+                        </button>
+<button
+                          type="button"
+                          class="btn btn-light"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          title=" This refers to the main criteria by which ranking is done.  One of *Degree*, *Citations* or *Productivity*."
+                          data-description=" This refers to the main criteria by which ranking is done.  One of *Degree*, *Citations* or *Productivity*."
+                          data-name="Ranking variable"
+                          onclick="showDescriptionModal(this)">
+                          <i class="bi bi-info-circle"></i> Ranking variable
+                        </button>
 <br>
 
             </div>
