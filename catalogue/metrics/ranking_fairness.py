@@ -626,7 +626,7 @@ def plot_network(G,title, name_plot, directed=False, amplyfing_size_nodes = 2, d
 def exposure_distance_comparison(
     dataset: Graph_CSH,
     model: ResearcherRanking,
-    sensitive: List[str] = ["Gender"],
+    sensitive: List[str] = "Gender",
     n_runs: int = 1,
     protected: str = "female",
     sampling_attribute: str = "Nationality_IncomeGroup",
@@ -634,12 +634,12 @@ def exposure_distance_comparison(
 ) -> HTML:
     """
     Compute the exposure distance between the protected and non-protected groups in the dataset and ranking.
-    Parameters:  \n
-        - `N runs`: Choose a natural number between 1 and 100 \n
-        - `Sensitive attributes`: Which attribute is relevant for fairness analysis.  To select this, click the blue '+' and then use the dropdown.  Currently, only *Gender* is supported \n
-        - `Protected`: The protected group for the fairness analysis. Currently, only *female* or *male* are supported \n
-        - `Sampling Attribute`: The value by which we group the analysis for finer-grained results. One of *Nationality&#95;IncomeGroup* or *Nationality&#95;Region*. \n
-        - `Ranking Variable`: This refers to the main criteria by which ranking is done.  One of *Degree*, *Citations* or *Productivity*
+    Sensitive attributes is a comma-separated list of the attributes relevant for fairness analysis. WCurrently, only *Gender* is supported.
+    Args:
+        n_runs: Choose a natural number between 1 and 100.
+        protected: The protected group for the fairness analysis. Currently, only *female* or *male* are supported.
+        sampling_attribute: The value by which we group the analysis for finer-grained results. One of *Nationality&#95;IncomeGroup* or *Nationality&#95;Region*.
+        ranking_variable: This refers to the main criteria by which ranking is done.  One of *Degree*, *Citations* or *Productivity*.
     """
 
     # TODO: uncomment
@@ -652,6 +652,8 @@ def exposure_distance_comparison(
     #    sampling_attribute,
     #    ranking_variable,
     #)
+
+    n_runs = int(n_runs)
 
     # initialize our own baseline model
     model_baseline = model.baseline_rank

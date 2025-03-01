@@ -1,26 +1,32 @@
-import os.path
-
-from mammoth.datasets import CSV
 from mammoth.datasets.graph_csh import Graph_CSH
 from mammoth.integration import loader
 import pandas as pd
 import numpy as np
-import networkx as nx
 
-@loader(namespace="mammotheu", version="v0036", python="3.11")
-def data_researchers(papers_path: str = "", papers_affiliations: str = "") -> Graph_CSH:
+@loader(namespace="mammotheu", version="v0036", python="3.11", packages=("pandas", "networkx"))
+def data_researchers(paper_graph_path: str = "",
+                     paper_graph_delimiter: str = "|",
+                     paper_affiliations_path: str = "",
+                     paper_affiliation_delimiter: str = "|") -> Graph_CSH:
     """
+
     This is a Loader to load .csv files with information about researchers
     The `papers_path` and `papers_affiliations` should be given relative to your locally running instance 
     (e.g.: *./data/researchers/Top&#95;researchers.csv*)
     The `Delimiter` should match the CSV file you have (e.g.: '|')
+
+    Args:
+        paper_graph_path: The path to the paper citation graph.
+        paper_graph_delimiter: The delimiter in the paper graph file.
+        paper_affiliations_path: The path to the paper affiliation map.
+        paper_affiliation_delimiter: The delimiter of the paper affiliation map file.
     """
     try:
         #Read paper files for information of the papers:
-        DF_papers = pd.read_csv(papers_path, sep='|', compression='bz2')
+        DF_papers = pd.read_csv(paper_graph_path, sep=paper_graph_delimiter, compression='bz2')
 
         #Affiliations for the information of the authors
-        DF_Affiliations = pd.read_csv(papers_affiliations, sep='|', compression='bz2')
+        DF_Affiliations = pd.read_csv(paper_affiliations_path, sep=paper_affiliation_delimiter, compression='bz2')
 
     except:
         raise ValueError(

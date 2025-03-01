@@ -210,7 +210,7 @@ class Step(Styled):
 
         helper = None
         preview = None
-        if "numeric" in name or "categorical" in name or "label" in name or "target" in name or "ignored" in name:
+        if "numeric" in name or "categorical" in name or "label" in name or "target" in name or "ignored" in name or "attribute" in name:
             input_widget = QLineEdit(self)
             input_widget.setText(str(default) if default != "None" else "")
             if self.last_url is not None:
@@ -225,7 +225,7 @@ class Step(Styled):
         elif name == "sensitive":
             if not self.runs: return QWidget()
             columns = self.runs[-1]["dataset"]["return"]
-            columns = [""] if columns is None else columns.cols
+            columns = [""] if columns is None or not hasattr(columns, "cols") else columns.cols
 
             input_widget = QLineEdit(self)
             input_widget.setText(str(default) if default != "None" else "")

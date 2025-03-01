@@ -1,5 +1,6 @@
 from mammoth.integration import loader
 from mammoth.models.researcher_ranking import ResearcherRanking
+from random import choices
 
 
 def normal_ranking(dataset, ranking_variable):
@@ -17,19 +18,10 @@ def Compute_mitigation_strategy(
     sensitive_attribute,
     protected_attribute,
 ):
-    from random import choices
-
     """Function for several mitigation strategies"""
-
     Dataframe_ranking = dataset[~dataset[sensitive_attribute].isnull()]
-
-    ERr_list = {}
-    New_ranking_DDBB = {}
-
     Chosen_groups, Chosen_researchers = {}, {}
-
     sensitive = set(Dataframe_ranking[sensitive_attribute])
-
     Ranking_sets = {
         attribute: Dataframe_ranking[
             Dataframe_ranking[sensitive_attribute] == attribute

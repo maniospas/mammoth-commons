@@ -1,10 +1,6 @@
 from mammoth import testing
-from catalogue.dataset_loaders.data_csv_rankings import data_csv_rankings
 from catalogue.dataset_loaders.data_researchers import data_researchers
-
-from catalogue.model_loaders.compute_researcher_ranking import model_normal_ranking
 from catalogue.model_loaders.compute_researcher_ranking import model_mitigation_ranking
-
 from catalogue.metrics.ranking_fairness import exposure_distance_comparison
 
 def test_researchers_ranking_comparison():
@@ -14,8 +10,8 @@ def test_researchers_ranking_comparison():
         exposure_distance_comparison,
     ) as env:
         dataset = env.data_researchers(
-            papers_path="./data/researchers/physics_papers.csv.tar.bz2",
-            papers_affiliations="./data/researchers/affiliations.csv.tar.bz2",
+            paper_graph_path="./data/researchers/physics_papers.csv.tar.bz2",
+            paper_affiliation_delimiter="./data/researchers/affiliations.csv.tar.bz2",
         )
 
         model_mitigation = env.model_mitigation_ranking()
