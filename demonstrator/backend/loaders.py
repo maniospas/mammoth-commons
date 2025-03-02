@@ -1,11 +1,11 @@
 # data loaders
 from catalogue.dataset_loaders.data_csv_rankings import data_csv_rankings
+from catalogue.dataset_loaders.data_researchers import data_researchers
 from catalogue.dataset_loaders.custom_csv import data_custom_csv
 from catalogue.dataset_loaders.auto_csv import data_auto_csv
 from catalogue.dataset_loaders.graph import data_graph
 from catalogue.dataset_loaders.images import data_images
 from catalogue.dataset_loaders.image_pairs import data_image_pairs
-from catalogue.dataset_loaders.graph_from_csv import data_graph_csv
 from catalogue.dataset_loaders.uci_csv import data_uci
 
 # model loaders
@@ -24,7 +24,6 @@ from catalogue.metrics.interactive_sklearn_report import interactive_sklearn_rep
 from catalogue.metrics.image_bias_analysis import image_bias_analysis
 from catalogue.metrics.xai_analysis import facex_regions
 from catalogue.metrics.xai_analysis_embeddings import facex_embeddings
-from catalogue.metrics.ma_graph_connection import connection_properties
 from catalogue.metrics.ranking_fairness import exposure_distance_comparison
 from catalogue.metrics.Multi_objective_report import Multi_objective_report
 from catalogue.metrics.optimal_transport import optimal_transport
@@ -38,8 +37,8 @@ registry.data(data_auto_csv)
 registry.data(data_uci)
 registry.data(data_custom_csv)
 registry.data(data_csv_rankings)
+registry.data(data_researchers)
 registry.data(data_graph)
-registry.data(data_graph_csv)
 registry.data(data_images)
 registry.data(data_image_pairs)
 
@@ -50,7 +49,6 @@ registry.model(
         data_custom_csv,
         data_uci,
         data_images,
-        data_graph_csv,
     ],
 )
 registry.model(model_onnx, compatible=[data_auto_csv, data_custom_csv, data_uci])
@@ -61,7 +59,7 @@ registry.model(
 registry.model(model_torch, compatible=[data_images, data_image_pairs])
 registry.model(model_torch2onnx, compatible=[data_images, data_image_pairs])
 registry.model(model_fair_node_ranking, compatible=[data_graph])
-registry.model(model_mitigation_ranking, compatible=[data_csv_rankings])
+registry.model(model_mitigation_ranking, compatible=[data_researchers])
 
 registry.analysis(model_card)
 registry.analysis(interactive_report)
@@ -71,7 +69,6 @@ registry.analysis(bias_scan)
 registry.analysis(image_bias_analysis)
 registry.analysis(facex_regions)
 registry.analysis(facex_embeddings)
-registry.analysis(connection_properties)
 registry.analysis(Multi_objective_report)
 registry.analysis(
     exposure_distance_comparison,
