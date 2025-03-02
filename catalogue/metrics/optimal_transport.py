@@ -1,4 +1,5 @@
 import pandas as pd
+from skimage.filters import threshold_otsu
 
 from mammoth.datasets import Dataset
 from mammoth.models import Predictor
@@ -25,6 +26,7 @@ def optimal_transport(
     dataset: Dataset,
     model: Predictor,
     sensitive: List[str],
+    threshold: float = 0.01
 ) -> HTML:
     """Creates an optimal transport evaluation based on the implementation provided by the AIF360 library.
     The evaluation computes the Wasserstein distance that reflects the cost of transforming the predictive
@@ -46,28 +48,22 @@ def optimal_transport(
     Wasserstein distance between the distribution of ground truth labels and model predictions for each of the
     protected groups. If its value is close to 1, the model is biased towards this group.
     </p>
+
+    Args:
+        threshold: Transport distances below the given threshold are considered negligible.
     """
 
     assert len(sensitive) != 0, "At least one sensitive attribute should be selected"
     assert hasattr(
         dataset, "labels"
     ), "The chosen dataset loader has not identified any labels"
+    threshold = float(threshold)
 
-    text = """
-    <div class="container mt-4">
-        <h1 class="text-primary">Distribution Distances</h1>
-        <p>
-            The normalized Wasserstein distance is computed for each group. 
-            Higher values (maximum is 1, minimum is 0) indicate greater 
-            distribution differences between each group and the rest of the population. 
-            This approach is based on optimal transport theory.
-        </p>
-    </div>
-    """
-
+    text = ""
     predictions = pd.Series(model.predict(dataset, sensitive))
     labels = dataset.labels
-
+    worst_distance = 0
+    offenders = list()
     if hasattr(labels, "columns"):
         text += """
         <div class="container mt-4">
@@ -94,6 +90,9 @@ def optimal_transport(
         for (attr, group), distances in results.items():
             text += f"<tr><td>{attr}</td><td>{group}</td>"
             for label_name in labels.columns:
+                if distances.get(label_name, 0) > threshold:
+                    offenders.append(f"{attr} {group} for target {label_name}")
+                worst_distance = max(distances.get(label_name, 0), worst_distance)
                 text += f"<td>{distances.get(label_name, 'N/A'):.3f}</td>"
             text += "</tr>"
         text += "</tbody></table></div>"
@@ -109,10 +108,25 @@ def optimal_transport(
             df = dataset.data[attr]
             dist = ot_distance(y_true=labels, y_pred=predictions, prot_attr=df)
             for k, v in dist.items():
+                if v > threshold:
+                    offenders.append(f"{attr} for target {v}")
+                worst_distance = max(v, worst_distance)
                 text += f"<tr><td>{attr}</td><td>{k}</td><td>{v:.3f}</td></tr>"
         text += "</tbody></table></div>"
 
-    text += """
+    offenders = (f"<h2 class='text-danger'>Distances over threshold</h2>-"+"<br>-".join(set(offenders))) if offenders else "<i>No bias concerns found (this does not mean that there are none)</i>"
+    message = f'Bias detected' if worst_distance>threshold else f'No concern'
+    text = f"""
+    <div class="container mt-4">
+        <h1 class={"text-danger" if worst_distance>=threshold else "text-primary"}>{message}</h1>
+        <p>
+            The normalized Wasserstein distance is computed for each group based on optimal transport theory. 
+            Higher values (maximum is 1, minimum is 0) indicate greater 
+            distribution differences between each group and the rest of the population. 
+            Differences more than the manually provided threshold {threshold:.3f} are considered to indicate bias.
+        </p>
+    </div>
+    """ + text + f""""<div class="container">{offenders}</div>""" + """
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     """

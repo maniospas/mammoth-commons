@@ -202,7 +202,7 @@ class Dashboard(Styled):
                 )
 
             button_color = (
-                ("#bb8888" if "fail" in format_run(run) else "#88bb88")
+                ("#bb8888" if "fail" in format_run(run).lower() or "bias" in format_run(run).lower() else "#88bb88")
                 if run["status"] == "completed"
                 else "#d69e02"
             )

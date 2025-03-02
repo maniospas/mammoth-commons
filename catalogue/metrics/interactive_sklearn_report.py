@@ -54,16 +54,17 @@ def interactive_sklearn_report(
     predictor: Options("Logistic regression", "Gaussian naive Bayes") = None,
     intersectional: bool = False,
     compare_groups: Options("Pairwise", "To the total population") = None,
-    view: Options(
-        "Fairness model card",
-        "Detailed description",
-        "Summary table",
-    ) = None,
     minimum_shown_deviation: float = 0,
 ) -> HTML:
-    """Creates an interactive report using the FairBench library, after running an internal training-test split
-    on a basic sklearn model. The report creates traceable evaluations that you can shift through to find sources
-    of unfairness on a common task.
+    """One method to compute the fairness of a dataset is to check for biases when making predictions with simple models
+    that can exhibit up to a limited degrees of freedom. This module checks for this functionality by training one of
+    the simple models provided by the <a href="https://scikit-learn.org/stable/index.html">scikit-learn</a> library
+    on half the analysed dataset. Then the second half of the dataset is used as test data whose predictive performance
+    is tested both in terms of classification and in terms of recommendation/scoring.
+
+    The test consists of a card report using the <a href="https://fairbench.readthedocs.io/">FairBench</a> library.
+    Excessive biases are cause for concern when .
+    Show only high bias values by controlling the minimum shown deviation parameter.
 
     Args:
         predictor: Which sklearn predictor should be used.
@@ -80,7 +81,7 @@ def interactive_sklearn_report(
     else:
         assert (
             y.shape[1] <= 2
-        ), "Cannot create an interactive report for non-binary predictions"
+        ), "Cannot create an interactive sklearn report for non-binary predictions"
         y = y[y.columns[-1]]
     from sklearn import model_selection
 
@@ -105,38 +106,93 @@ def interactive_sklearn_report(
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
     scores = model.predict_proba(X_test)[:, 1]
-
-    # declare sensitive attributes
     sensitive = fb.Dimensions(
         {attr + " ": (categories @ dataset.data[attr][idx_test]) for attr in sensitive}
     )
 
-    # change behavior based on arguments
     if intersectional:
         sensitive = sensitive.intersectional()
-    report_type = (
-        fb.reports.pairwise if compare_groups == "Pairwise" else fb.reports.vsall
-    )
+    report_type = fb.reports.pairwise if compare_groups == "Pairwise" else fb.reports.vsall
 
-    report = report_type(
-        predictions=predictions,
-        labels=y_test.to_numpy(),
-        scores=scores,
-        sensitive=sensitive,
-    )
+    report = report_type(predictions=predictions, labels=y_test.to_numpy(), scores=scores, sensitive=sensitive)
     minimum_shown_deviation = float(minimum_shown_deviation)
-    assert (
-        0 <= minimum_shown_deviation <= 1
-    ), "Minimum shown deviation should be in the range [0,1]"
+    assert 0 <= minimum_shown_deviation <= 1, "Minimum shown deviation should be in the range [0,1]"
     if minimum_shown_deviation != 0:
         report = report.filter(fb.investigate.DeviationsOver(minimum_shown_deviation))
 
-    if view == "Summary table":
-        ret = report.show(env=fb.export.HtmlTable(view=False, filename=None))
-    elif view == "Fairness model card":
-        ret = report.filter(fb.investigate.Stamps).show(
+    views = {
+        "Summary": report.show(env=fb.export.HtmlTable(view=False, filename=None)),
+        "Stamps": report.filter(fb.investigate.Stamps).show(
             env=fb.export.Html(view=False, filename=None), depth=1
-        )
-    else:
-        ret = report.show(env=fb.export.Html(view=False, filename=None))
-    return HTML(ret)
+        ),
+        "Full report": report.show(env=fb.export.Html(view=False, filename=None), depth=2),
+    }
+    # Generate tabbed HTML content
+    tab_headers = "".join(
+        f'<button class="tablinks" data-tab="{key}">{key}</button>' for key in views
+    )
+    tab_contents = "".join(
+        f'<div id="{key}" class="tabcontent">{value}</div>' for key, value in views.items()
+    )
+
+    dataset_desc = ""
+    if hasattr(dataset, "description"):
+        dataset_desc += "<h1>Dataset</h1>"
+        if isinstance(dataset.description, str):
+            dataset_desc += dataset.description + "<br>"
+        elif isinstance(dataset.description, dict):
+            for key, value in dataset.description.items():
+                dataset_desc += f"<h3>{key}</h3>" + value.replace("\n", "<br>") + "<br>"
+        else:
+            raise Exception("Dataset description must be a string or a dictionary.")
+
+    html_content = f'''
+       <style>
+           .tablinks {{
+               background-color: #ddd;
+               padding: 10px;
+               cursor: pointer;
+               border: none;
+               border-radius: 5px;
+               margin: 5px;
+           }}
+           .tablinks:hover {{ background-color: #bbb; }}
+           .tablinks.active {{ background-color: #aaa; }}
+
+           .tabcontent {{
+               display: none;
+               padding: 10px;
+               border: 1px solid #ccc;
+           }}
+           .tabcontent.active {{ display: block; }}
+       </style>
+       <script>
+           document.addEventListener("DOMContentLoaded", function() {{
+               const tabContainer = document.querySelector("div");
+               tabContainer.addEventListener("click", function(event) {{
+                   if (event.target.classList.contains("tablinks")) {{
+                       let tabName = event.target.getAttribute("data-tab");
+
+                       // Remove "active" from all tabs and contents
+                       document.querySelectorAll(".tablinks").forEach(tab => tab.classList.remove("active"));
+                       document.querySelectorAll(".tabcontent").forEach(content => content.classList.remove("active"));
+
+                       // Activate the selected tab and content
+                       event.target.classList.add("active");
+                       document.getElementById(tabName).classList.add("active");
+                   }}
+               }});
+
+               // Show the first tab by default
+               let firstTab = document.querySelector(".tablinks");
+               if (firstTab) {{
+                   firstTab.classList.add("active");
+                   document.getElementById(firstTab.getAttribute("data-tab")).classList.add("active");
+               }}
+           }});
+       </script>
+       <div>{tab_headers}</div>
+       {tab_contents}
+       {dataset_desc}
+       '''
+    return HTML(html_content)

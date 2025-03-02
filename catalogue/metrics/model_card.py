@@ -107,10 +107,10 @@ def model_card(
 
     views = {
         "Summary": report.show(env=fb.export.HtmlTable(view=False, filename=None)),
-        "Card": report.filter(fb.investigate.Stamps).show(
+        "Stamps": report.filter(fb.investigate.Stamps).show(
             env=fb.export.Html(view=False, filename=None), depth=1
         ),
-        "Report": report.show(env=fb.export.Html(view=False, filename=None)),
+        "Full report": report.show(env=fb.export.Html(view=False, filename=None), depth=2),
     }
     # Generate tabbed HTML content
     tab_headers = "".join(
