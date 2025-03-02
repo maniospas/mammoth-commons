@@ -91,7 +91,6 @@
 <a href='#image-bias-analysis'>Image bias analysis</a>
 <a href='#facex-regions'>Facex regions</a>
 <a href='#facex-embeddings'>Facex embeddings</a>
-<a href='#connection-properties'>Connection properties</a>
 <a href='#multi-objective-report'>Multi objective report</a>
 <a href='#exposure-distance-comparison'>Exposure distance comparison</a>
 
@@ -274,19 +273,57 @@
                           <i class="bi bi-info-circle"></i> Target layer
                         </button>
 <br>
-<h2 id='connection-properties'>Connection properties</h2>
-<p><p>Performs analysis of connection properties in a graph. If no sensitive attributes are provided, all node column attributes are considered sensitive.</p> </p>
 <h2 id='multi-objective-report'>Multi objective report</h2>
 <p><p>This module presents an interactive <a href="https://plotly.com/python/3d-charts/" target=" blank">Plotly 3D plot</a> visualizing multiple objectives to evaluate model fairness and performance trade-offs. The report highlights three primary objectives: <b>accuracy loss</b>, <b>balanced accuracy loss</b>, and <b>discrimination (MMM-fairness) loss</b>. Each point plotted within the 3D space represents a <i>Pareto-optimal</i> solution, which achieves an optimal balance between these objectives where no single objective can improve without worsening another.</p>  <p>Users can hover over any solution point to display the corresponding loss values for each objective. Additionally, each point includes a <b>theta</b> value, indicating up to which sequence in the ONNX ensemble the particular solution is achieved. This allows users to observe performance changes throughout different stages of the ensemble, helping them better understand the trade-offs involved in each model configuration.</p>  <p><b>Disclaimer</b><br> <button type="button" class="btn btn-light" data-bs-toggle="tooltip" data-bs-placement="top" title="The multi-objective report requires generating predictions at each step of the partial ensemble. This may result in slower processing times when the number of Pareto solutions is high." onclick="showDescriptionModal(this)"> <i class="bi bi-info-circle"></i> Note on Processing Time </button> </p> </p>
 <b>Parameters</b><br>Intersectional
 Compare groups
 <br>
 <h2 id='exposure-distance-comparison'>Exposure distance comparison</h2>
-<p><p>Compute the exposure distance between the protected and non-protected groups in the dataset and ranking. Parameters:</p>  <ul> <li><p><code>N runs</code>: Choose a natural number between 1 and 100</p></li> <li><p><code>Sensitive attributes</code>: Which attribute is relevant for fairness analysis.  To select this, click the blue '+' and then use the dropdown.  Currently, only <em>Gender</em> is supported</p></li> <li><p><code>Protected</code>: The protected group for the fairness analysis. Currently, only <em>female</em> or <em>male</em> are supported</p></li> <li><p><code>Sampling Attribute</code>: The value by which we group the analysis for finer-grained results. One of <em>Nationality&#95;IncomeGroup</em> or <em>Nationality&#95;Region</em>.</p></li> <li><p><code>Ranking Variable</code>: This refers to the main criteria by which ranking is done.  One of <em>Degree</em>, <em>Citations</em> or <em>Productivity</em></p></li> </ul> </p>
-<b>Parameters</b><br>N runs
-Protected
-Sampling attribute
-Ranking variable
+<p><p>Compute the exposure distance between the protected and non-protected groups in the dataset and ranking. Sensitive attributes is a comma-separated list of the attributes relevant for fairness analysis. WCurrently, only <em>Gender</em> is supported.</p> </p>
+<b>Parameters</b><br><button
+                          type="button"
+                          class="btn btn-light"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          title=" Choose a natural number between 1 and 100."
+                          data-description=" Choose a natural number between 1 and 100."
+                          data-name="N runs"
+                          onclick="showDescriptionModal(this)">
+                          <i class="bi bi-info-circle"></i> N runs
+                        </button>
+<button
+                          type="button"
+                          class="btn btn-light"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          title=" The protected group for the fairness analysis. Currently, only *female* or *male* are supported."
+                          data-description=" The protected group for the fairness analysis. Currently, only *female* or *male* are supported."
+                          data-name="Protected"
+                          onclick="showDescriptionModal(this)">
+                          <i class="bi bi-info-circle"></i> Protected
+                        </button>
+<button
+                          type="button"
+                          class="btn btn-light"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          title=" The value by which we group the analysis for finer-grained results. One of *Nationality&#95;IncomeGroup* or *Nationality&#95;Region*."
+                          data-description=" The value by which we group the analysis for finer-grained results. One of *Nationality&#95;IncomeGroup* or *Nationality&#95;Region*."
+                          data-name="Sampling attribute"
+                          onclick="showDescriptionModal(this)">
+                          <i class="bi bi-info-circle"></i> Sampling attribute
+                        </button>
+<button
+                          type="button"
+                          class="btn btn-light"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          title=" This refers to the main criteria by which ranking is done.  One of *Degree*, *Citations* or *Productivity*."
+                          data-description=" This refers to the main criteria by which ranking is done.  One of *Degree*, *Citations* or *Productivity*."
+                          data-name="Ranking variable"
+                          onclick="showDescriptionModal(this)">
+                          <i class="bi bi-info-circle"></i> Ranking variable
+                        </button>
 <br>
 
             </div>

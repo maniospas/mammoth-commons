@@ -1,6 +1,18 @@
 from PySide6.QtWidgets import (
-    QPushButton, QLabel, QVBoxLayout, QWidget, QHBoxLayout, QComboBox,
-    QFormLayout, QLineEdit, QMessageBox, QFrame, QCheckBox, QFileDialog, QDialog, QListWidget
+    QPushButton,
+    QLabel,
+    QVBoxLayout,
+    QWidget,
+    QHBoxLayout,
+    QComboBox,
+    QFormLayout,
+    QLineEdit,
+    QMessageBox,
+    QFrame,
+    QCheckBox,
+    QFileDialog,
+    QDialog,
+    QListWidget,
 )
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIntValidator, QDoubleValidator, QIcon
@@ -10,6 +22,7 @@ import pandas as pd
 import csv
 from .style import Styled
 
+
 def save_all_runs(path, runs):
     copy_runs = list()
     for run in runs:
@@ -17,20 +30,38 @@ def save_all_runs(path, runs):
         copy_run["timestamp"] = run["timestamp"]
         copy_run["description"] = run["description"]
         copy_run["status"] = run.get("status", None)
-        if "dataset" in run: copy_run["dataset"] = {"module": run["dataset"]["module"], "params": run["dataset"]["params"]}
-        if "model" in run: copy_run["model"] = {"module": run["model"]["module"], "params": run["model"]["params"]}
-        if "analysis" in run: copy_run["analysis"] = {"module": run["analysis"]["module"], "params": run["analysis"]["params"], "return": run["analysis"].get("return", None)}
+        if "dataset" in run:
+            copy_run["dataset"] = {
+                "module": run["dataset"]["module"],
+                "params": run["dataset"]["params"],
+            }
+        if "model" in run:
+            copy_run["model"] = {
+                "module": run["model"]["module"],
+                "params": run["model"]["params"],
+            }
+        if "analysis" in run:
+            copy_run["analysis"] = {
+                "module": run["analysis"]["module"],
+                "params": run["analysis"]["params"],
+                "return": run["analysis"].get("return", None),
+            }
         copy_runs.append(copy_run)
-    with open(path, 'w', encoding='utf-8') as file: file.write(json.dumps(copy_runs))
+    with open(path, "w", encoding="utf-8") as file:
+        file.write(json.dumps(copy_runs))
+
 
 def load_all_runs(path):
-    if not os.path.exists(path): return list()
-    with open(path, 'r', encoding='utf-8') as file: return json.load(file)
+    if not os.path.exists(path):
+        return list()
+    with open(path, "r", encoding="utf-8") as file:
+        return json.load(file)
 
 
 def format_name(name):
     """Format parameter names for better display."""
     return name.replace("_", " ").capitalize()
+
 
 class Step(Styled):
     def __init__(self, step_name, stacked_widget, dataset_loaders, runs):
@@ -48,14 +79,22 @@ class Step(Styled):
         layout.addWidget(self.label)
 
         self.dataset_selector = QComboBox(self)
-        self.dataset_selector.addItems(["Select a module"] + list(dataset_loaders.keys()))
+        self.dataset_selector.addItems(
+            ["Select a module"] + list(dataset_loaders.keys())
+        )
         self.dataset_selector.currentTextChanged.connect(self.update_param_form)
         layout.addWidget(self.dataset_selector)
 
         # Dataset description section
-        self.description_label = QLabel("Select a module to see its description and parameters to fill in.", self, openExternalLinks=True)
+        self.description_label = QLabel(
+            "Select a module to see its description and parameters to fill in.",
+            self,
+            openExternalLinks=True,
+        )
         self.description_label.setWordWrap(True)
-        self.description_label.setStyleSheet("font-size: 14px; color: #555; margin-top: 5px;")
+        self.description_label.setStyleSheet(
+            "font-size: 14px; color: #555; margin-top: 5px;"
+        )
         layout.addWidget(self.description_label)
 
         separator = QFrame()
@@ -71,7 +110,8 @@ class Step(Styled):
 
         button_layout = QHBoxLayout()
         self.next_button = QPushButton("Next", self)
-        self.next_button.setStyleSheet(f"""
+        self.next_button.setStyleSheet(
+            f"""
             QPushButton {{
                 background-color: #007bff; 
                 color: white; 
@@ -81,11 +121,13 @@ class Step(Styled):
             QPushButton:hover {{
                 background-color: {self.highlight_color('#007bff')};
             }}
-        """)
+        """
+        )
         self.next_button.clicked.connect(self.next)
 
         self.cancel_button = QPushButton("Cancel", self)
-        self.cancel_button.setStyleSheet(f"""
+        self.cancel_button.setStyleSheet(
+            f"""
             QPushButton {{
                 background-color: #dc3545; 
                 color: white; 
@@ -94,7 +136,8 @@ class Step(Styled):
             QPushButton:hover {{
                 background-color: {self.highlight_color('#dc3545')};
             }}
-        """)
+        """
+        )
         self.cancel_button.setFixedSize(80, 30)
         self.cancel_button.clicked.connect(self.switch_to_dashboard)
 
@@ -113,7 +156,7 @@ class Step(Styled):
 
     def update_param_form(self, dataset_name):
         """Update the form based on the selected dataset loader."""
-        if self.first_selection and dataset_name!=self.dataset_selector.itemText(0):
+        if self.first_selection and dataset_name != self.dataset_selector.itemText(0):
             self.dataset_selector.removeItem(0)
             self.first_selection = False
 
@@ -122,19 +165,30 @@ class Step(Styled):
         self.param_inputs.clear()
 
         if dataset_name not in self.dataset_loaders:
-            self.description_label.setText("Select a dataset loader to see its description.")
+            self.description_label.setText(
+                "Select a dataset loader to see its description."
+            )
             return
 
         loader = self.dataset_loaders[dataset_name]
-        self.description_label.setText(loader.get("description", f"No description available:<br><b>{dataset_name}</b>"))
+        self.description_label.setText(
+            loader.get(
+                "description", f"No description available:<br><b>{dataset_name}</b>"
+            )
+        )
 
         self.last_url = None
         self.last_delimiter = None  # never set, placeholder for the future perhaps?
         for name, param_type, default, description in loader["parameters"]:
             default = self.defaults.get(name, default)
-            if name == "dataset" or name == "model": continue
-            param_options = loader.get("parameter_options", {}).get(name, [])  # Get options if available
-            param_widget = self.create_input_widget(name, param_type, default, description, param_options)
+            if name == "dataset" or name == "model":
+                continue
+            param_options = loader.get("parameter_options", {}).get(
+                name, []
+            )  # Get options if available
+            param_widget = self.create_input_widget(
+                name, param_type, default, description, param_options
+            )
             self.param_form.addRow(param_widget)
 
     def open_sensitive_modal(self, title, input_field, columns):
@@ -142,10 +196,18 @@ class Step(Styled):
             path = columns[0].text()
             delimiter = columns[1].text() if columns[1] is not None else None
             if len(path) == 0:
-                QMessageBox.warning(self, "Error", f"The previous file was empty and could not be used as reference.")
+                QMessageBox.warning(
+                    self,
+                    "Error",
+                    f"The previous file was empty and could not be used as reference.",
+                )
                 return
             if delimiter is not None and len(delimiter) == 0:
-                QMessageBox.warning(self, "Error", f"The previous file's delimiter was empty and could not be used as reference</b>")
+                QMessageBox.warning(
+                    self,
+                    "Error",
+                    f"The previous file's delimiter was empty and could not be used as reference</b>",
+                )
                 return
             try:
                 if delimiter is None:
@@ -157,10 +219,16 @@ class Step(Styled):
                             delimiter = str(delimiter)
                     except Exception as e:
                         delimiter = ","
-                df = pd.read_csv(path, nrows=3, on_bad_lines="skip", delimiter=delimiter)
+                df = pd.read_csv(
+                    path, nrows=3, on_bad_lines="skip", delimiter=delimiter
+                )
                 columns = df.columns.tolist()
             except Exception as e:
-                QMessageBox.warning(self, "Error", f"Could not read the previous file to use as reference:<br><b>{str(e)}</b>")
+                QMessageBox.warning(
+                    self,
+                    "Error",
+                    f"Could not read the previous file to use as reference:<br><b>{str(e)}</b>",
+                )
                 return
 
         prev_value = input_field.text()
@@ -192,7 +260,9 @@ class Step(Styled):
         layout.addWidget(confirm_button)
 
         confirm_button = QPushButton("Done", dialog)
-        confirm_button.clicked.connect(lambda: self.set_sensitive_values(dialog, list_widget, input_field))
+        confirm_button.clicked.connect(
+            lambda: self.set_sensitive_values(dialog, list_widget, input_field)
+        )
         layout.addWidget(confirm_button)
 
         dialog.setLayout(layout)
@@ -204,28 +274,50 @@ class Step(Styled):
         input_field.setText(", ".join(selected_items))
         dialog.accept()
 
-    def create_input_widget(self, name, param_type, default, description, param_options):
+    def create_input_widget(
+        self, name, param_type, default, description, param_options
+    ):
         """Create an appropriate input widget based on the parameter type."""
         param_layout = QHBoxLayout()
 
         helper = None
         preview = None
-        if "numeric" in name or "categorical" in name or "label" in name or "target" in name or "ignored" in name:
+        if (
+            "numeric" in name
+            or "categorical" in name
+            or "label" in name
+            or "target" in name
+            or "ignored" in name
+            or "attribute" in name
+        ):
             input_widget = QLineEdit(self)
             input_widget.setText(str(default) if default != "None" else "")
             if self.last_url is not None:
                 select_button = QPushButton("...")
                 select_button.setToolTip("Select from options")
                 select_button.setFixedSize(30, 20)
-                select_button.setStyleSheet("background-color: #dd8; border-radius: 5px;")
+                select_button.setStyleSheet(
+                    "background-color: #dd8; border-radius: 5px;"
+                )
                 last_url = self.last_url
                 last_delimiter = self.last_delimiter
-                select_button.clicked.connect(lambda: self.open_sensitive_modal(f"Select {name} columns", input_widget, (last_url, last_delimiter)))
+                select_button.clicked.connect(
+                    lambda: self.open_sensitive_modal(
+                        f"Select {name} columns",
+                        input_widget,
+                        (last_url, last_delimiter),
+                    )
+                )
                 helper = select_button
         elif name == "sensitive":
-            if not self.runs: return QWidget()
+            if not self.runs:
+                return QWidget()
             columns = self.runs[-1]["dataset"]["return"]
-            columns = [""] if columns is None else columns.cols
+            columns = (
+                [""]
+                if columns is None or not hasattr(columns, "cols")
+                else columns.cols
+            )
 
             input_widget = QLineEdit(self)
             input_widget.setText(str(default) if default != "None" else "")
@@ -234,13 +326,19 @@ class Step(Styled):
             select_button.setToolTip("Select from options")
             select_button.setFixedSize(30, 20)
             select_button.setStyleSheet("background-color: #dd8; border-radius: 5px;")
-            select_button.clicked.connect(lambda: self.open_sensitive_modal("Select sensitive attributes", input_widget, columns))
+            select_button.clicked.connect(
+                lambda: self.open_sensitive_modal(
+                    "Select sensitive attributes", input_widget, columns
+                )
+            )
 
             helper = select_button
         elif param_options:  # If parameter options are provided, use a dropdown
             input_widget = QComboBox(self)
             input_widget.addItems(param_options)
-            input_widget.setCurrentText(default if default in param_options else param_options[0])
+            input_widget.setCurrentText(
+                default if default in param_options else param_options[0]
+            )
         elif param_type == "int":
             input_widget = QLineEdit(self)
             input_widget.setValidator(QIntValidator())
@@ -289,11 +387,17 @@ class Step(Styled):
                     msg_box.setWindowTitle("File preview")
                     msg_box.setToolTip("Peek at the first 20 lines")
                     msg_box.setText(preview_text if preview_text else "File is empty.")
-                    msg_box.setIcon(QMessageBox.Icon.NoIcon)  # Removes the information icon
+                    msg_box.setIcon(
+                        QMessageBox.Icon.NoIcon
+                    )  # Removes the information icon
                     msg_box.exec_()
 
                 except Exception as e:
-                    QMessageBox.warning(self, "Error", f"Could not read the file or failed to convert it to a human-friendly format:\n{str(e)}")
+                    QMessageBox.warning(
+                        self,
+                        "Error",
+                        f"Could not read the file or failed to convert it to a human-friendly format:\n{str(e)}",
+                    )
 
             file_button = QPushButton("Preview")
             file_button.setFixedSize(50, 20)
@@ -305,10 +409,15 @@ class Step(Styled):
             input_widget = QLineEdit(self)
             input_widget.setText(str(default) if default != "None" else "")
             last_url = self.last_url
+
             def recommend_delimiter():
                 path = last_url.text()
                 if len(path) == 0:
-                    QMessageBox.warning(self, "Error", f"The previous file was empty and could not be used as reference.")
+                    QMessageBox.warning(
+                        self,
+                        "Error",
+                        f"The previous file was empty and could not be used as reference.",
+                    )
                     return
                 try:
                     with open(path, "r") as file:
@@ -318,7 +427,11 @@ class Step(Styled):
                         delimiter = str(delimiter)
                         input_widget.setText(delimiter)
                 except Exception as e:
-                    QMessageBox.warning(self, "Error", f"Could not read the previous file to use as reference:<br><b>{str(e)}</b>")
+                    QMessageBox.warning(
+                        self,
+                        "Error",
+                        f"Could not read the previous file to use as reference:<br><b>{str(e)}</b>",
+                    )
 
             file_button = QPushButton("Find")
             file_button.setToolTip("Autodetect based on csv rules")
@@ -339,14 +452,20 @@ class Step(Styled):
 
         help_button = QPushButton("?")
         help_button.setFixedSize(30, 20)
-        help_button.setStyleSheet("background-color: #ddd; border-radius: 10px; font-weight: bold;")
+        help_button.setStyleSheet(
+            "background-color: #ddd; border-radius: 10px; font-weight: bold;"
+        )
         help_button.setToolTip("Parameter info")
-        help_button.clicked.connect(lambda: self.show_help_popup(format_name(name), description))
+        help_button.clicked.connect(
+            lambda: self.show_help_popup(format_name(name), description)
+        )
 
         param_layout.addWidget(label)
         param_layout.addWidget(help_button)
-        if helper is not None: param_layout.addWidget(helper)
-        if preview is not None: param_layout.addWidget(preview)
+        if helper is not None:
+            param_layout.addWidget(helper)
+        if preview is not None:
+            param_layout.addWidget(preview)
         param_layout.addWidget(input_widget)
 
         param_widget = QWidget()
@@ -355,11 +474,13 @@ class Step(Styled):
 
     def select_dir(self, input_field):
         path = QFileDialog.getExistingDirectory(self, "Select directory")
-        if path: input_field.setText(path)
+        if path:
+            input_field.setText(path)
 
     def select_path(self, input_field):
         path = QFileDialog.getOpenFileName(self, "Select file")
-        if path: input_field.setText(path[0])
+        if path:
+            input_field.setText(path[0])
 
     def show_help_popup(self, param_name, description):
         """Show a popup window with the parameter description."""
@@ -376,16 +497,20 @@ class Step(Styled):
         dataset_name = self.dataset_selector.currentText()
         params = {}
         for param, field in self.param_inputs.items():
-            if isinstance(field, QCheckBox): params[param] = field.isChecked()
-            elif isinstance(field, QComboBox): params[param] = field.currentText()
-            else: params[param] = field.text()
+            if isinstance(field, QCheckBox):
+                params[param] = field.isChecked()
+            elif isinstance(field, QComboBox):
+                params[param] = field.currentText()
+            else:
+                params[param] = field.text()
         pipeline[step] = {"module": dataset_name, "params": params}
         pipeline["description"] = self.description_input.text().strip()
 
     def show_error_message(self, message):
         error_msg = QMessageBox(self)
-        if message[0] == '\'' and message[-1] == '\'': message = message[1:-1]
-        message = "The following issue must be addressed:<br><b>" + message+"</b>"
+        if message[0] == "'" and message[-1] == "'":
+            message = message[1:-1]
+        message = "The following issue must be addressed:<br><b>" + message + "</b>"
         error_msg.setWindowTitle("Error")
         error_msg.setText(message)
         error_msg.setIcon(QMessageBox.Critical)

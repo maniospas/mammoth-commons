@@ -38,15 +38,23 @@ all arguments.*
 arguments for each type of module, you may add any number of 
 `str`, `bool`, `int` or `float` keyword arguments. These
 serve as parameters with default values, where the default `None` should
-be set if no common default is known beforehand. You must also create
-a docstring for your module, which should include both its main description
-and parameter descriptions under an `Args:`
-section. The parameter descriptions should follow the convention `name: description` and not
-specify any type. In case a string is an enumeration, you can replace the `str` type with
+be set if no common default is known beforehand. 
+If a string is an enumeration of different options, prefer replacing the `str` type with
 `Options("option1", "option2", ...)`. All these requirements help the toolkit understand
-what information to give to the users working with your module.
+what information to give to the users working with your module. Use the substrings *path*
+to have a loading dialog in MAI-BIAS, *delimiter* to enable automatic detection of delimiters,
+as well as one of *numeric*, *categorical*, *attribute*, *ignored*, or *target*
+to indicate to the UI that it should try to select among CSV column names in provided data by
+peaking at them. Delimiters and column names are recognized to 
+correspond to the last previous path.
 
-3. *Decorators.* Decorate your module with either the 
+3. You must also create
+a docstring for your module. This should include both the main description
+and parameter descriptions under an `Args:` section (the title of this secion is mandatory). 
+The parameter descriptions should follow the convention `name: description` and not
+specify any type. You cannot have line breaks in the description.
+
+4. *Decorators.* Decorate your module with either the 
 `@mammoth.integration.metric(namespace, version, python="3.11", packages=(...))` or 
 the `@mammoth.integration.loader(namespace, version, python="3.11", packages=(...))` decorator. 
 These require at least one argument to denote

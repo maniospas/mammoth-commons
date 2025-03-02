@@ -5,6 +5,7 @@ from demonstrator.states.step import Step, save_all_runs
 
 global items
 
+
 class ModelLoaderThread(QThread):
     finished_success = Signal(object)
     finished_failure = Signal(str)
@@ -24,7 +25,9 @@ class ModelLoaderThread(QThread):
                 self.canceled.emit()
                 return
             self.mutex.unlock()
-            self.pipeline["model"]["return"] = registry.name_to_runnable[self.pipeline["model"]["module"]](**self.pipeline["model"]["params"])
+            self.pipeline["model"]["return"] = registry.name_to_runnable[
+                self.pipeline["model"]["module"]
+            ](**self.pipeline["model"]["params"])
             self.mutex.lock()
             if self._is_canceled:
                 self.mutex.unlock()
@@ -43,18 +46,27 @@ class ModelLoaderThread(QThread):
         self.mutex.unlock()
 
 
-
 class SelectModel(Step):
     def showEvent(self, event):
         pipeline = self.runs[-1]
         self.description_input.setText(pipeline["description"])
         module = pipeline["dataset"]["module"]
-        loaders = [loader for loader, values in registry.model_loaders.items() if module in values["compatible"]]
+        loaders = [
+            loader
+            for loader, values in registry.model_loaders.items()
+            if module in values["compatible"]
+        ]
         self.dataset_selector.clear()
         self.dataset_selector.addItems(["Select a model loader"] + loaders)
         self.defaults = self.runs[-1].get("model", dict()).get("params", dict())
-        #self.update_param_form(self.runs[-1].get("model", dict()).get("module", "Select a model loader"))
-        self.dataset_selector.setCurrentIndex(self.dataset_selector.findText(self.runs[-1].get("model", dict()).get("module", "Select a model loader")))
+        # self.update_param_form(self.runs[-1].get("model", dict()).get("module", "Select a model loader"))
+        self.dataset_selector.setCurrentIndex(
+            self.dataset_selector.findText(
+                self.runs[-1]
+                .get("model", dict())
+                .get("module", "Select a model loader")
+            )
+        )
         super().showEvent(event)
 
     def next(self):
@@ -67,7 +79,9 @@ class SelectModel(Step):
         self.loading_message.setText("Please wait while the model is loading...")
         self.loading_message.setStandardButtons(QMessageBox.StandardButton.Cancel)
         self.loading_message.setModal(True)
-        self.loading_message.button(QMessageBox.StandardButton.Cancel).clicked.connect(self.cancel_loading)
+        self.loading_message.button(QMessageBox.StandardButton.Cancel).clicked.connect(
+            self.cancel_loading
+        )
         self.loading_message.show()
 
         # Start the model loading thread using QThread
@@ -90,7 +104,7 @@ class SelectModel(Step):
         self.loading_message.done(0)
 
     def cancel_loading(self):
-        if hasattr(self, 'thread') and self.thread.isRunning():
+        if hasattr(self, "thread") and self.thread.isRunning():
             self.thread.cancel()
             self.thread.wait()  # Ensure the thread is completely finished
             self.loading_message.done(0)
@@ -102,7 +116,7 @@ class SelectModel(Step):
         save_all_runs("history.json", self.runs)
 
     def closeEvent(self, event):
-        if hasattr(self, 'thread') and self.thread.isRunning():
+        if hasattr(self, "thread") and self.thread.isRunning():
             self.thread.cancel()
             self.thread.wait()
         event.accept()

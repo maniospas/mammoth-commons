@@ -2,10 +2,12 @@ import inspect
 from typing import get_type_hints
 import markdown2
 
+
 def format_name(name):
     ret = " ".join(name.split("_")).replace("data ", "").replace("model ", "")
     ret = ret[0].upper() + ret[1:]
     return ret
+
 
 class Registry:
     def __init__(self, desktopmode=True):
@@ -51,7 +53,9 @@ class Registry:
                     separator_title = "<br><h3>" + separator_title + "</h3>"
             elif started_options and ":" in line:
                 splt = line.split(":", maxsplit=2)
-                args_options[splt[0]] = [option.strip() for option in splt[1].split(",")]
+                args_options[splt[0]] = [
+                    option.strip() for option in splt[1].split(",")
+                ]
             elif started_args and ":" in line:
                 splt = line.split(":", maxsplit=2)
                 name = format_name(splt[0]).replace(sep_title + " ", "")
@@ -59,9 +63,9 @@ class Registry:
                 # args_desc[splt[0]] = f"{separator_title}<i>{name} - </i> {splt[1]}"
 
                 args_desc[splt[0]] = (
-                    f"""<h1>{separator_title} {name}</h1> {splt[1]}""" if self.desktopmode
-                    else
-                    f"""<button
+                    f"""<h1>{separator_title} {name}</h1> {splt[1]}"""
+                    if self.desktopmode
+                    else f"""<button
                           type="button"
                           class="btn btn-light"
                           data-bs-toggle="tooltip"
@@ -85,7 +89,9 @@ class Registry:
             assert pname != "return"
             args_to_classes[pname] = arg_type
             arg_type = arg_type.__name__
-            if arg_type == "str" and ("path" in pname.lower() or "url" in pname.lower()):
+            if arg_type == "str" and (
+                "path" in pname.lower() or "url" in pname.lower()
+            ):
                 arg_type = "url"
             if parameter.default is not inspect.Parameter.empty:  # ignore kwargs
                 args.append(
