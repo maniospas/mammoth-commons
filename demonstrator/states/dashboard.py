@@ -202,12 +202,12 @@ class Dashboard(Styled):
                 )
 
             button_color = (
-                ("#bb8888" if "fail" in format_run(run) else "#88bb88")
+                ("#bb8888" if "fail" in format_run(run).lower() or "bias" in format_run(run).lower() else "#88bb88")
                 if run["status"] == "completed"
                 else "#d69e02"
             )
             run_button = QPushButton(self)
-            run_button.setFixedHeight(90)
+            run_button.setFixedHeight(80)
             button_label = QLabel(
                 format_run(run, simpler=has_same_next_tags or prev_has_same_next_tags),
                 run_button,
@@ -263,7 +263,7 @@ class Dashboard(Styled):
                 tag_container = QHBoxLayout()
                 tag_container.setAlignment(Qt.AlignmentFlag.AlignHCenter)
                 tag_container.setContentsMargins(
-                    0, -30, 0, 30
+                    0, -30, 0, 10
                 )  # Slight overlap with button, space below
                 for tag in tags:
                     tag_container.addWidget(
@@ -331,9 +331,9 @@ def format_run(run, simpler=False):
                 "" if simpler or len(run["description"]) == 0 else ": "
             ) + match.group().replace("h1", "span")
         else:
-            match = "✎"
+            match = ""
     except Exception:
-        match = "✎"
+        match = ""
     if simpler:
         return f'<h2 style="margin: 0px;">{match}</h2>Created at {run["timestamp"]}'
     return f'<h1 style="margin: 0px;">{"" if simpler else run["description"]}{match}</h1>Created at {run["timestamp"]}'

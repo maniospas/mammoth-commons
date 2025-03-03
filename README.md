@@ -9,8 +9,8 @@
 This repository holds the mammoth-commons library with supporting
 datatypes and decorators shared by various toolkit modules.
 It also hosts a catalogue of dataset loaders, model loaders, and fairness analysis 
-and mitigation modules. It finally contains
-a **desktop application** that runs the modules in your local machine.
+and mitigation modules. Finally, find ad desktop application that 
+runs the modules in your local machine.
 
 ![logo](demonstrator/logo.png)
 
@@ -61,6 +61,6 @@ a **desktop application** that runs the modules in your local machine.
  
 ## 🖥 [Deploy in a server](https://github.com/mammoth-eu/mammoth-toolkit-releases)
 
-## :clipboard: [Modules](https://mammoth-eu.github.io/mammoth-commons/)
+## :clipboard: [Module catalogue](https://mammoth-eu.github.io/mammoth-commons/)
 
-## :thumbsup: [Contributing](CONTRIBUTING.md)
+## :thumbsup: [Contribute](CONTRIBUTING.md)

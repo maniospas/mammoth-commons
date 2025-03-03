@@ -26,10 +26,8 @@ def categories(iterable):
         mx = values.max()
         mn = values.min()
         if mx == mn:
-            raise Exception(
-                "Numerical sensitive attribute has the same value everywhere"
-            )
-        values = (values - mn) / (mx - mn)
+            mx += 1
+        values = fb.v1.tobackend((values - mn) / (mx - mn))
         return {f"fuzzy min ({mn:.3f})": 1 - values, f"fuzzy max ({mx:.3f})": values}
     return fb.categories @ iterable
 
@@ -47,30 +45,53 @@ def categories(iterable):
         "pygrank",
     ),
 )
-def interactive_sklearn_report(
+def sklearn_report(
     dataset: CSV,
     model: EmptyModel,
     sensitive: List[str],
     predictor: Options("Logistic regression", "Gaussian naive Bayes") = None,
     intersectional: bool = False,
     compare_groups: Options("Pairwise", "To the total population") = None,
-    view: Options(
-        "Fairness model card",
-        "Detailed description",
-        "Summary table",
-    ) = None,
-    minimum_shown_deviation: float = 0,
+    minimum_shown_deviation: float = 0.1,
 ) -> HTML:
-    """Creates an interactive report using the FairBench library, after running an internal training-test split
-    on a basic sklearn model. The report creates traceable evaluations that you can shift through to find sources
-    of unfairness on a common task.
+    """
+    <p>One way to evaluate the fairness of a dataset is by testing for biases using simple models with limited
+    degrees of freedom. This module audits datasets by training such models provided by the
+    <a href="https://scikit-learn.org/stable/index.html">scikit-learn</a> library on half of the dataset.
+    The second half is then used as test data to assess predictive performance and detect classification
+    or scoring biases.</p>
+
+    <p>The test generates a fairness and bias report using the
+    <a href="https://fairbench.readthedocs.io/">FairBench</a> library. If strong biases appear in the simple models
+    that are explored, they may also persist in more complex models trained on the same data. To focus on the most
+    significant biases, adjust the minimum shown deviation parameter.</p>
+
+    <p>The report provides multiple types of fairness and bias assessments and can be viewed in three different formats,
+    where the model card contains a subset of results but attaches to these socio-technical concerns to be taken into
+    account:</p>
+    <ol>
+        <li>A summary table of results.</li>
+        <li>A simplified model card with key fairness concerns.</li>
+        <li>A full detailed report.</li>
+    </ol>
+
+    <h3>Details</h3>
+
+    <p>The report summarizes how a model behaves on a provided dataset across different population groups.
+    These groups are based on sensitive attributes like gender, age, and race. Each attribute can have multiple values,
+    such as several genders or races. Numeric attributes, like age, are normalized to the range [0,1] and treated
+    as fuzzy values, where 0 indicates membership to a fuzzy group of "small" values, and 1 indicates membership to
+    a fuzzy group of "large" values. A separate set of fairness metrics is calculated for each prediction label.</p>
+
+    <p>If intersectional subgroup analysis is enabled, separate subgroups are created for each combination of sensitive
+    attribute values. However, if there are too many attributes, some groups will be small or empty. Empty groups are
+    ignored in the analysis. The report may also include information about built-in datasets.</p>
 
     Args:
-        predictor: Which sklearn predictor should be used.
-        intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute.
-        compare_groups: Whether to compare groups pairwise, or each group to the whole population.
-        view: How to display results. You can choose to view a fairness model card which does not have too many details, a full report, or a summary table.
-        minimum_shown_deviation: Show only results where the deviation from ideal values exceeds the given threshold. If nothing is shown, it does not mean that fairness is achieved, but this is a good way to identify the most prominent biases. If value of 0 is set (default) then all results are shown.
+        predictor: Which simple model should be used.
+        intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute. It could be computationally intensive if too many group intersections are selected.
+        compare_groups: Whether to compare groups pairwise, or each group to the behavior of the whole population.
+        minimum_shown_deviation: Show only results where the deviation from ideal values exceeds the given threshold. If nothing is shown, fairness is not necessarily achieved, but this is a good way to identify the most prominent biases. If value of 0 is set, all report values are shown, including those that have no set ideal value.
     """
     assert len(sensitive) != 0, "Set at least one sensitive attribute"
     X = dataset.to_features(sensitive)
@@ -80,7 +101,7 @@ def interactive_sklearn_report(
     else:
         assert (
             y.shape[1] <= 2
-        ), "Cannot create an interactive report for non-binary predictions"
+        ), "Cannot create an sklearn report for non-binary predictions"
         y = y[y.columns[-1]]
     from sklearn import model_selection
 
@@ -105,38 +126,98 @@ def interactive_sklearn_report(
     model.fit(X_train, y_train)
     predictions = model.predict(X_test)
     scores = model.predict_proba(X_test)[:, 1]
-
-    # declare sensitive attributes
     sensitive = fb.Dimensions(
         {attr + " ": (categories @ dataset.data[attr][idx_test]) for attr in sensitive}
     )
 
-    # change behavior based on arguments
     if intersectional:
         sensitive = sensitive.intersectional()
-    report_type = (
-        fb.reports.pairwise if compare_groups == "Pairwise" else fb.reports.vsall
-    )
+    report_type = fb.reports.pairwise if compare_groups == "Pairwise" else fb.reports.vsall
 
-    report = report_type(
-        predictions=predictions,
-        labels=y_test.to_numpy(),
-        scores=scores,
-        sensitive=sensitive,
-    )
+    report = report_type(predictions=predictions, labels=y_test.to_numpy(), scores=scores, sensitive=sensitive)
     minimum_shown_deviation = float(minimum_shown_deviation)
-    assert (
-        0 <= minimum_shown_deviation <= 1
-    ), "Minimum shown deviation should be in the range [0,1]"
+    assert 0 <= minimum_shown_deviation <= 1, "Minimum shown deviation should be in the range [0,1]"
     if minimum_shown_deviation != 0:
         report = report.filter(fb.investigate.DeviationsOver(minimum_shown_deviation))
 
-    if view == "Summary table":
-        ret = report.show(env=fb.export.HtmlTable(view=False, filename=None))
-    elif view == "Fairness model card":
-        ret = report.filter(fb.investigate.Stamps).show(
+    views = {
+        "Summary": report.show(env=fb.export.HtmlTable(view=False, filename=None)),
+        "Stamps": report.filter(fb.investigate.Stamps).show(
             env=fb.export.Html(view=False, filename=None), depth=1
-        )
-    else:
-        ret = report.show(env=fb.export.Html(view=False, filename=None))
-    return HTML(ret)
+        ),
+        "Full report": report.show(env=fb.export.Html(view=False, filename=None), depth=2),
+    }
+    # Generate tabbed HTML content
+    tab_headers = "".join(
+        f'<button class="tablinks" data-tab="{key}">{key}</button>' for key in views
+    )
+    tab_contents = "".join(
+        f'<div id="{key}" class="tabcontent">{value}</div>' for key, value in views.items()
+    )
+
+    dataset_desc = ""
+    if hasattr(dataset, "description"):
+        dataset_desc += "<h1>Dataset</h1>"
+        if isinstance(dataset.description, str):
+            dataset_desc += dataset.description + "<br>"
+        elif isinstance(dataset.description, dict):
+            for key, value in dataset.description.items():
+                dataset_desc += f"<h3>{key}</h3>" + value.replace("\n", "<br>") + "<br>"
+        else:
+            raise Exception("Dataset description must be a string or a dictionary.")
+
+    html_content = f'''
+       <style>
+           .tablinks {{
+               background-color: #ddd;
+               padding: 10px;
+               cursor: pointer;
+               border: none;
+               border-radius: 5px;
+               margin: 5px;
+           }}
+           .tablinks:hover {{ background-color: #bbb; }}
+           .tablinks.active {{ background-color: #aaa; }}
+
+           .tabcontent {{
+               display: none;
+               padding: 10px;
+               border: 1px solid #ccc;
+           }}
+           .tabcontent.active {{ display: block; }}
+       </style>
+       <script>
+           document.addEventListener("DOMContentLoaded", function() {{
+               const tabContainer = document.querySelector("div");
+               tabContainer.addEventListener("click", function(event) {{
+                   if (event.target.classList.contains("tablinks")) {{
+                       let tabName = event.target.getAttribute("data-tab");
+
+                       // Remove "active" from all tabs and contents
+                       document.querySelectorAll(".tablinks").forEach(tab => tab.classList.remove("active"));
+                       document.querySelectorAll(".tabcontent").forEach(content => content.classList.remove("active"));
+
+                       // Activate the selected tab and content
+                       event.target.classList.add("active");
+                       document.getElementById(tabName).classList.add("active");
+                   }}
+               }});
+
+               // Show the first tab by default
+               let firstTab = document.querySelector(".tablinks");
+               if (firstTab) {{
+                   firstTab.classList.add("active");
+                   document.getElementById(firstTab.getAttribute("data-tab")).classList.add("active");
+               }}
+           }});
+       </script>
+       <h1>Bias report</h1>
+       <p>A report was computed over several prospective biases. 
+       Many values are computed to paint a broad picture
+       {'; set a minimum shown deviation parameter for this analysis to simplify what is shown.' if minimum_shown_deviation==0 else f', but for simplicity only those that differ at least {minimum_shown_deviation:.3f} from their ideal values are shown; this is the minimum shown deviation parameter for the analysis.'}
+       Results may not give the full picture, and not all biases may be harmful to the social context. Switch between different views.</p>
+       <div>{tab_headers}</div>
+       {tab_contents}
+       {dataset_desc}
+       '''
+    return HTML(html_content)
