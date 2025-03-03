@@ -19,7 +19,7 @@ def test_bias_scan():
             "contact",
             "poutcome",
         ]
-        sensitive = []
+        sensitive = ["poutcome"]
         dataset_uri = "https://archive.ics.uci.edu/static/public/222/bank+marketing.zip/bank/bank.csv"
         dataset = env.data_custom_csv(
             dataset_uri,
@@ -32,7 +32,7 @@ def test_bias_scan():
         model_path = "file://localhost//" + os.path.abspath("./data/model.onnx")
         model = env.model_onnx(model_path)
 
-        markdown_result = env.bias_scan(dataset, model, sensitive)
+        markdown_result = env.bias_scan(dataset, model, sensitive, penalty=0.5)
         markdown_result.show()
 
 
