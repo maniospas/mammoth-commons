@@ -20,7 +20,7 @@ from catalogue.model_loaders.compute_researcher_ranking import model_mitigation_
 # metrics
 from catalogue.metrics.model_card import model_card
 from catalogue.metrics.interactive_report import interactive_report
-from catalogue.metrics.interactive_sklearn_report import interactive_sklearn_report
+from catalogue.metrics.interactive_sklearn_report import sklearn_report
 from catalogue.metrics.image_bias_analysis import image_bias_analysis
 from catalogue.metrics.xai_analysis import facex_regions
 from catalogue.metrics.xai_analysis_embeddings import facex_embeddings
@@ -63,7 +63,7 @@ registry.model(model_mitigation_ranking, compatible=[data_researchers])
 
 registry.analysis(model_card)
 registry.analysis(interactive_report)
-registry.analysis(interactive_sklearn_report)
+registry.analysis(sklearn_report)
 registry.analysis(optimal_transport)
 registry.analysis(bias_scan)
 registry.analysis(image_bias_analysis)

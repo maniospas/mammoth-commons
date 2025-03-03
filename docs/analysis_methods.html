@@ -104,7 +104,7 @@
             <div class="container">
 <h1 class='display-4 text-center my-4'>Analysis metrics</h1>
 <h2 id='card'>Card</h2>
-<p><p>Creates a model card using the <a href="https://github.com/mever-team/FairBench">FairBench</a> library. The card includes several fairness stamps; these are specific measures of bias or fairness that are commonly used in the algorithmic fairness literature. Only the most prominent of those measures are used as stamps, and they correspond to a perfunctory fairness analysis.</p>  <p>This module computes all applicable FairBench stamps, which summarize behavior across all population groups or intersectional subgroups. Multiple sensitive attributes may be present, such as gender, age, and race. Furthermore, each of those attributes may obtain multiple values, as happens when multiple genders or races are considered. Numeric attributes, like age, are normalized to the range [0,1] and we consider the result as truth values of membership to the group of the maximum value - as opposed to membership to the group with minimum value. A different stamp is computed for each prediction label.</p>  <p>You may optionally create intersectional subgroups, that is, create a separate subgroup for each combination of sensitive attribute values. Many of those groups will have few members if there are too many attributes, and empty groups are ignored during the analysis.</p>  <p>The created model card contains exact descriptions of methods used to compute fairness under the selected stamps, and it lists population groups that were taken into account These come alongside an extensive list of caveats and recommendations that help the reader get a grasp on how they should account for the social context. This material is retrieved from FairBench's online socio-technical database generated through MAMMOth's multidisciplinary activities.</p>  <p>Finally, the generated model card may contain details about out-of-the-box datasets. To get the full picture, a detailed fairness report that also allows you to backtrack computations is available in the <code>interactive report</code> module.</p> </p>
+<p><p>Creates a model card using the <a href="https://github.com/mever-team/FairBench">FairBench</a> library. The card includes several types of fairness/bias assessment and you can view either a) a basic model card that does not have too many measures but contains socio-technical concerns about those shown, b) a full report,or  c) a summary table of results.</p>  <p>The reported values summarize model behavior across all population groups or intersectional subgroups. Multiple sensitive attributes may be present, such as gender, age, and race. Furthermore, each of those attributes may obtain multiple values, as happens when multiple genders or races are considered. Numeric attributes, like age, are normalized to the range [0,1] and we consider the result as truth values of membership to the group of the maximum value - as opposed to membership to the group with minimum value. A different set of stamps is computed for each prediction label.</p>  <p>You may optionally analyse intersectional subgroups, that is, spawn a separate subgroup for each combination of sensitive attribute values. Many of those groups will have few members if there are too many attributes, and empty groups are ignored during the analysis.</p>  <p>The created model card contains exact descriptions of methods used to compute fairness under the selected stamps, and it lists population groups that were taken into account These come alongside an extensive list of caveats and recommendations that help the reader get a grasp on how they should account for the social context. This material is retrieved from FairBench's online socio-technical database generated through MAMMOth's multidisciplinary activities.</p>  <p>Finally, the generated model card may contain details about out-of-the-box datasets. To get the full picture, a detailed fairness report that also allows you to backtrack computations is available in the <code>interactive report</code> module.</p> </p>
 <b>Parameters</b><br><button
                           type="button"
                           class="btn btn-light"
@@ -126,6 +126,17 @@
                           data-name="Compare groups"
                           onclick="showDescriptionModal(this)">
                           <i class="bi bi-info-circle"></i> Compare groups
+                        </button>
+<button
+                          type="button"
+                          class="btn btn-light"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          title=" Show only results where the deviation from ideal values exceeds the given threshold. If nothing is shown, it does not mean that fairness is achieved, but this is a good way to identify the most prominent biases. If value of 0 is set (default) then all results are shown."
+                          data-description=" Show only results where the deviation from ideal values exceeds the given threshold. If nothing is shown, it does not mean that fairness is achieved, but this is a good way to identify the most prominent biases. If value of 0 is set (default) then all results are shown."
+                          data-name="Minimum shown deviation"
+                          onclick="showDescriptionModal(this)">
+                          <i class="bi bi-info-circle"></i> Minimum shown deviation
                         </button>
 <br>
 <h2 id='interactive-report'>Interactive report</h2>
@@ -154,7 +165,7 @@
                         </button>
 <br>
 <h2 id='interactive-sklearn-report'>Interactive sklearn report</h2>
-<p><p>Creates an interactive report using the FairBench library, after running an internal training-test split on a basic sklearn model. The report creates traceable evaluations that you can shift through to find sources of unfairness on a common task.</p> </p>
+<p><p>One method to compute the fairness of a dataset is to check for biases when making predictions with simple models that can exhibit up to a limited degrees of freedom. This module checks for this functionality by training one of the simple models provided by the <a href="https://scikit-learn.org/stable/index.html">scikit-learn</a> library on half the analysed dataset. Then the second half of the dataset is used as test data whose predictive performance is tested both in terms of classification and in terms of recommendation/scoring.</p>  <p>The test consists of a card report using the <a href="https://fairbench.readthedocs.io/">FairBench</a> library. Excessive biases are cause for concern when . Show only high bias values by controlling the minimum shown deviation parameter.</p> </p>
 <b>Parameters</b><br><button
                           type="button"
                           class="btn btn-light"
@@ -193,17 +204,6 @@
                           class="btn btn-light"
                           data-bs-toggle="tooltip"
                           data-bs-placement="top"
-                          title=" How to display results. You can choose to view a fairness model card which does not have too many details, a full report, or a summary table."
-                          data-description=" How to display results. You can choose to view a fairness model card which does not have too many details, a full report, or a summary table."
-                          data-name="View"
-                          onclick="showDescriptionModal(this)">
-                          <i class="bi bi-info-circle"></i> View
-                        </button>
-<button
-                          type="button"
-                          class="btn btn-light"
-                          data-bs-toggle="tooltip"
-                          data-bs-placement="top"
                           title=" Show only results where the deviation from ideal values exceeds the given threshold. If nothing is shown, it does not mean that fairness is achieved, but this is a good way to identify the most prominent biases. If value of 0 is set (default) then all results are shown."
                           data-description=" Show only results where the deviation from ideal values exceeds the given threshold. If nothing is shown, it does not mean that fairness is achieved, but this is a good way to identify the most prominent biases. If value of 0 is set (default) then all results are shown."
                           data-name="Minimum shown deviation"
@@ -213,8 +213,20 @@
 <br>
 <h2 id='optimal-transport'>Optimal transport</h2>
 <p><p>Creates an optimal transport evaluation based on the implementation provided by the AIF360 library. The evaluation computes the Wasserstein distance that reflects the cost of transforming the predictive distributions between sensitive attribute groups.</p>  <p><i><b>License:</b> The following description is adapted from AIF360 (<a href="https://github.com/Trusted-AI/AIF360">https://github.com/Trusted-AI/AIF360</a>), which is licensed under Apache License 2.0.</i></p>  <p>Optimal Transport (OT) is a field of mathematics which studies the geometry of probability spaces. Among its many contributions, OT provides a principled way to compare and align probability distributions by taking into account the underlying geometry of the considered metric space. As a mathematical problem, it was first introduced by Gaspard Monge in 1781. It addresses the task of determining the most efficient method for transporting mass from one distribution to another. In this problem, the cost associated with moving a unit of mass from one position to another is referred to as the ground cost. The primary objective of OT is to minimize the total cost incurred when moving one mass distribution onto another. </p><p>  <p>OT can be used to detect model-induced bias by calculating the a cost known as Earth Mover's distance or Wasserstein distance between the distribution of ground truth labels and model predictions for each of the protected groups. If its value is close to 1, the model is biased towards this group. </p></p> </p>
+<b>Parameters</b><br><button
+                          type="button"
+                          class="btn btn-light"
+                          data-bs-toggle="tooltip"
+                          data-bs-placement="top"
+                          title=" Transport distances below the given threshold are considered negligible."
+                          data-description=" Transport distances below the given threshold are considered negligible."
+                          data-name="Threshold"
+                          onclick="showDescriptionModal(this)">
+                          <i class="bi bi-info-circle"></i> Threshold
+                        </button>
+<br>
 <h2 id='bias-scan'>Bias scan</h2>
-<p><p>Performs a scan for biased attributes by comparing their fraction of positive predictions to the dataset. It is up to the user to determine which of the biased attributes should be considered sensitive.</p>  <p><i><b>License:</b> The following description is adapted from AIF360 (<a href="https://github.com/Trusted-AI/AIF360">https://github.com/Trusted-AI/AIF360</a>), which is licensed under Apache License 2.0.</i></p> </p>
+<p><p>Performs a scan for biased attributes by comparing their fraction of positive predictions to the dataset. It is up to the user to determine which of the biased attributes should be considered sensitive.</p>  <p><i><b>License:</b> The following description is adapted from AIF360 (<a href="https://github.com/Trusted-AI/AIF360">https://github.com/Trusted-AI/AIF360</a>), which is licensed under Apache License 2.0.</i></p>  <p><b>No sensitive attributes can be provided.</b></p> </p>
 <h2 id='image-bias-analysis'>Image bias analysis</h2>
 <p><p>This module provides a comprehensive solution for analyzing image bias and recommending effective mitigation strategies. It can be used for both classification tasks (e.g., facial attribute extraction) and face verification. The core functionality revolves around evaluating how well different population groups, defined by a given protected attribute (such as gender, age, or ethnicity), are represented in the dataset. Representation bias occurs when some groups are overrepresented or underrepresented, leading to models that may perform poorly or unfairly on certain groups.</p>  <p>Additionally, the module detects spurious correlations between the target attribute (e.g., the label a model is trying to predict) and other annotated attributes (such as image features like color or shape). Spurious correlations are misleading patterns that do not reflect meaningful relationships and can cause a model to make biased or inaccurate predictions. By identifying and addressing these hidden biases, the module helps improve the fairness and accuracy of your model.</p>  <p>When you run the analysis, the module identifies specific biases within the dataset and suggests tailored mitigation approaches. Specifically, the suitable mitigation methodologies are determined based on the task and the types of the detected biases in the data. The analysis is conducted based on the <a href="https://github.com/gsarridis/cv-bias-mitigation-library">CV Bias Mitigation Library</a>.</p> </p>
 <b>Parameters</b><br><button

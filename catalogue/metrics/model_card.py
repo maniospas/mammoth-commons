@@ -45,35 +45,25 @@ def model_card(
     sensitive: List[str],
     intersectional: bool = False,
     compare_groups: Options("Pairwise", "To the total population") = None,
-    minimum_shown_deviation: float = 0,
+    minimum_shown_deviation: float = 0.1,
 ) -> HTML:
-    """Creates a model card using the <a href="https://github.com/mever-team/FairBench">FairBench</a>
+    """Creates a report that uses the <a href="https://github.com/mever-team/FairBench">FairBench</a>
     library. The card includes several types of fairness/bias assessment and you can view
-    either a) a basic model card that does not have too many measures but contains socio-technical concerns about
-    those shown, b) a full report,or  c) a summary table of results.
+    it either as a) a summary table of results, b) a model card that does not have too many measures but contains
+    socio-technical concerns about those shown, or c) a full report.
 
-    The reported values summarize model behavior across all population groups or intersectional
-    subgroups. Multiple sensitive attributes may be present, such as gender, age, and race.
+    The reported values summarize model behavior across all population groups.
+    Multiple sensitive attributes may be present, such as gender, age, and race.
     Furthermore, each of those attributes may obtain multiple values, as happens when multiple genders or
     races are considered. Numeric attributes, like age, are normalized to
     the range [0,1] and we consider the result as truth values of membership to the group of the maximum
     value - as opposed to membership to the group with minimum value.
     A different set of stamps is computed for each prediction label.
 
-    You may optionally analyse intersectional subgroups, that is, spawn
-    a separate subgroup for each combination of sensitive attribute values. Many of those groups will have few
-    members if there are too many attributes, and empty groups are ignored during the analysis.
-
-    The created model card contains exact descriptions of methods used to compute fairness under
-    the selected stamps, and it lists population groups that were taken into account
-    These come alongside an extensive list of
-    caveats and recommendations that help the reader get a grasp on how they should
-    account for the social context. This material is retrieved from FairBench's
-    online socio-technical database generated through MAMMOth's multidisciplinary activities.
-
-    Finally, the generated model card may contain details about out-of-the-box datasets.
-    To get the full picture, a detailed fairness report that also allows you to backtrack computations
-    is available in the `interactive report` module.
+    You may optionally analyse intersectional subgroups. In this case,
+    a separate subgroup is created for each combination of sensitive attribute values. Many of those groups will have
+    few members if there are too many attributes, and empty groups are ignored during the analysis.
+    The generated report may be followed by details about out-of-the-box datasets.
 
     Args:
         intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute, but may also be computationally intensive if too many group intersections are selected.
@@ -176,6 +166,11 @@ def model_card(
                }}
            }});
        </script>
+       <h1>Bias report</h1>
+       <p>A report was computed over several prospective biases. 
+       Many values are computed to paint a broad picture
+       {'; set a minimum shown deviation parameter for this analysis to simplify what is shown.' if minimum_shown_deviation==0 else f', but for simplicity only those that differ at least {minimum_shown_deviation:.3f} from their ideal values are shown; this is the minimum shown deviation parameter for the analysis.'}
+       Results may not give the full picture, and not all biases may be harmful to the social context. Switch between different views.</p>
        <div>{tab_headers}</div>
        {tab_contents}
        {dataset_desc}
