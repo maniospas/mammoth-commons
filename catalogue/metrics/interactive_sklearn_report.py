@@ -29,7 +29,7 @@ def categories(iterable):
             raise Exception(
                 "Numerical sensitive attribute has the same value everywhere"
             )
-        values = (values - mn) / (mx - mn)
+        values = fb.v1.tobackend((values - mn) / (mx - mn))
         return {f"fuzzy min ({mn:.3f})": 1 - values, f"fuzzy max ({mx:.3f})": values}
     return fb.categories @ iterable
 

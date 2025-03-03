@@ -32,7 +32,7 @@ def test_bias_exploration():
         model_path = "file://localhost//" + os.path.abspath("./data/model.onnx")
         model = env.model_onnx(model_path)
 
-        html_result = env.interactive_sklearn_report(
+        html_result = env.sklearn_report(
             dataset, model, sensitive, predictor="Logistic regression"
         )
         html_result.show()
