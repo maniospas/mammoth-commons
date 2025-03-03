@@ -23,9 +23,7 @@ def categories(iterable):
         mx = values.max()
         mn = values.min()
         if mx == mn:
-            raise Exception(
-                "Numerical sensitive attribute has the same value everywhere"
-            )
+            mx += 1
         values = fb.v1.tobackend((values - mn) / (mx - mn))
         return {f"fuzzy min ({mn:.3f})": 1 - values, f"fuzzy max ({mx:.3f})": values}
     return fb.categories @ iterable
@@ -45,28 +43,35 @@ def model_card(
     compare_groups: Options("Pairwise", "To the total population") = None,
     minimum_shown_deviation: float = 0.1,
 ) -> HTML:
-    """Creates a report that uses the <a href="https://github.com/mever-team/FairBench">FairBench</a>
-    library. The card includes several types of fairness/bias assessment and you can view
-    it either as a) a summary table of results, b) a model card that does not have too many measures but contains
-    socio-technical concerns about those shown, or c) a full report.
+    """
+    <p>Generates a fairness and bias report using the <a href="https://github.com/mever-team/FairBench">FairBench</a>
+    library. This explores many kinds of bias to paint a broad picture and help you decide on what is problematic
+    and what is acceptable behavior.
 
-    The reported values summarize model behavior across all population groups.
-    Multiple sensitive attributes may be present, such as gender, age, and race.
-    Furthermore, each of those attributes may obtain multiple values, as happens when multiple genders or
-    races are considered. Numeric attributes, like age, are normalized to
-    the range [0,1] and we consider the result as truth values of membership to the group of the maximum
-    value - as opposed to membership to the group with minimum value.
-    A different set of stamps is computed for each prediction label.
+    <p>The report can be viewed in three different formats, where the model card contains a subset of
+    results but attaches to these socio-technical concerns to be taken into account:</p>
+    <ol>
+        <li>A summary table of results.</li>
+        <li>A simplified model card that includes concerns.</li>
+        <li>The full report, including details.</li>
+    </ol>
 
-    You may optionally analyse intersectional subgroups. In this case,
-    a separate subgroup is created for each combination of sensitive attribute values. Many of those groups will have
-    few members if there are too many attributes, and empty groups are ignored during the analysis.
-    The generated report may be followed by details about out-of-the-box datasets.
+    <h3>Details</h3>
+
+    <p>The report summarizes how a model behaves on a provided dataset across different population groups.
+    These groups are based on sensitive attributes like gender, age, and race. Each attribute can have multiple values,
+    such as several genders or races. Numeric attributes, like age, are normalized to the range [0,1] and treated
+    as fuzzy values, where 0 indicates membership to a fuzzy group of "small" values, and 1 indicates membership to
+    a fuzzy group of "large" values. A separate set of fairness metrics is calculated for each prediction label.</p>
+
+    <p>If intersectional subgroup analysis is enabled, separate subgroups are created for each combination of sensitive
+    attribute values. However, if there are too many attributes, some groups will be small or empty. Empty groups are
+    ignored in the analysis. The report may also include information about built-in datasets.</p>
 
     Args:
-        intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute, but may also be computationally intensive if too many group intersections are selected.
-        compare_groups: Whether to compare groups pairwise, or each group to the whole population. For example, if the 4/5ths rule stamp is applicable, it computes positive rates and obtains the minimum ratio, either across all pairs of groups (for pairwise comparison) or otherwise between each group and the total population.
-        minimum_shown_deviation: Show only results where the deviation from ideal values exceeds the given threshold. If nothing is shown, it does not mean that fairness is achieved, but this is a good way to identify the most prominent biases. If value of 0 is set (default) then all results are shown.
+        intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute. It could be computationally intensive if too many group intersections are selected.
+        compare_groups: Whether to compare groups pairwise, or each group to the behavior of the whole population.
+        minimum_shown_deviation: Show only results where the deviation from ideal values exceeds the given threshold. If nothing is shown, fairness is not necessarily achieved, but this is a good way to identify the most prominent biases. If value of 0 is set, all report values are shown, including those that have no set ideal value.
     """
 
     assert len(sensitive) != 0, "At least one sensitive attribute should be selected"

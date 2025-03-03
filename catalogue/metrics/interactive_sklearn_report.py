@@ -26,9 +26,7 @@ def categories(iterable):
         mx = values.max()
         mn = values.min()
         if mx == mn:
-            raise Exception(
-                "Numerical sensitive attribute has the same value everywhere"
-            )
+            mx += 1
         values = fb.v1.tobackend((values - mn) / (mx - mn))
         return {f"fuzzy min ({mn:.3f})": 1 - values, f"fuzzy max ({mx:.3f})": values}
     return fb.categories @ iterable
@@ -56,39 +54,44 @@ def sklearn_report(
     compare_groups: Options("Pairwise", "To the total population") = None,
     minimum_shown_deviation: float = 0.1,
 ) -> HTML:
-    """One method to compute the fairness of a dataset is to check for biases when making predictions with simple models
-    that exhibit limited degrees of freedom. This module audits datasets by training one of
-    the simple models provided by the <a href="https://scikit-learn.org/stable/index.html">scikit-learn</a> library
-    on half the analysed dataset. Then the second half of the dataset is used as test data whose predictive performance
-    is tested for classification and recommendation/scoring biases.
+    """
+    <p>One way to evaluate the fairness of a dataset is by testing for biases using simple models with limited
+    degrees of freedom. This module audits datasets by training such models provided by the
+    <a href="https://scikit-learn.org/stable/index.html">scikit-learn</a> library on half of the dataset.
+    The second half is then used as test data to assess predictive performance and detect classification
+    or scoring biases.</p>
 
-    The test consists creates a bias and fairness report using the
-    <a href="https://fairbench.readthedocs.io/">FairBench</a> library.
-    Excessive biases are cause for concern when other models are trained too.
-    Keep only high bias values by controlling the minimum shown deviation parameter.
+    <p>The test generates a fairness and bias report using the
+    <a href="https://fairbench.readthedocs.io/">FairBench</a> library. If strong biases appear in the simple models
+    that are explored, they may also persist in more complex models trained on the same data. To focus on the most
+    significant biases, adjust the minimum shown deviation parameter.</p>
 
-    The report includes several types of fairness/bias assessment and you can view
-    it either as a) a summary table of results, b) a model card that does not have too many measures but contains
-    socio-technical concerns about those shown, or c) a full report.
+    <p>The report provides multiple types of fairness and bias assessments and can be viewed in three different formats,
+    where the model card contains a subset of results but attaches to these socio-technical concerns to be taken into
+    account:</p>
+    <ol>
+        <li>A summary table of results.</li>
+        <li>A simplified model card with key fairness concerns.</li>
+        <li>A full detailed report.</li>
+    </ol>
 
-    The reported values summarize model behavior across all population groups.
-    Multiple sensitive attributes may be present, such as gender, age, and race.
-    Furthermore, each of those attributes may obtain multiple values, as happens when multiple genders or
-    races are considered. Numeric attributes, like age, are normalized to
-    the range [0,1] and we consider the result as truth values of membership to the group of the maximum
-    value - as opposed to membership to the group with minimum value.
-    A different set of stamps is computed for each prediction label.
+    <h3>Details</h3>
 
-    You may optionally analyse intersectional subgroups. In this case,
-    a separate subgroup is created for each combination of sensitive attribute values. Many of those groups will have
-    few members if there are too many attributes, and empty groups are ignored during the analysis.
+    <p>The report summarizes how a model behaves on a provided dataset across different population groups.
+    These groups are based on sensitive attributes like gender, age, and race. Each attribute can have multiple values,
+    such as several genders or races. Numeric attributes, like age, are normalized to the range [0,1] and treated
+    as fuzzy values, where 0 indicates membership to a fuzzy group of "small" values, and 1 indicates membership to
+    a fuzzy group of "large" values. A separate set of fairness metrics is calculated for each prediction label.</p>
+
+    <p>If intersectional subgroup analysis is enabled, separate subgroups are created for each combination of sensitive
+    attribute values. However, if there are too many attributes, some groups will be small or empty. Empty groups are
+    ignored in the analysis. The report may also include information about built-in datasets.</p>
 
     Args:
         predictor: Which simple model should be used.
-        intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute.
-        compare_groups: Whether to compare groups pairwise, or each group to the whole population.
-        view: How to display results. You can choose to view a fairness model card which does not have too many details, a full report, or a summary table.
-        minimum_shown_deviation: Show only results where the deviation from ideal values exceeds the given threshold. If nothing is shown, it does not mean that fairness is achieved, but this is a good way to identify the most prominent biases. If value of 0 is set (default) then all results are shown.
+        intersectional: Whether to consider all non-empty group intersections during analysis. This does nothing if there is only one sensitive attribute. It could be computationally intensive if too many group intersections are selected.
+        compare_groups: Whether to compare groups pairwise, or each group to the behavior of the whole population.
+        minimum_shown_deviation: Show only results where the deviation from ideal values exceeds the given threshold. If nothing is shown, fairness is not necessarily achieved, but this is a good way to identify the most prominent biases. If value of 0 is set, all report values are shown, including those that have no set ideal value.
     """
     assert len(sensitive) != 0, "Set at least one sensitive attribute"
     X = dataset.to_features(sensitive)
