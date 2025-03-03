@@ -61,12 +61,11 @@ def sklearn_report(
     The second half is then used as test data to assess predictive performance and detect classification
     or scoring biases.</p>
 
-    <p>The test generates a fairness and bias report using the
+    <p>Test data are used to generate a fairness and bias report using the
     <a href="https://fairbench.readthedocs.io/">FairBench</a> library. If strong biases appear in the simple models
     that are explored, they may also persist in more complex models trained on the same data. To focus on the most
-    significant biases, adjust the minimum shown deviation parameter.</p>
-
-    <p>The report provides multiple types of fairness and bias assessments and can be viewed in three different formats,
+    significant biases, adjust the minimum shown deviation parameter.
+    The report provides multiple types of fairness and bias assessments and can be viewed in three different formats,
     where the model card contains a subset of results but attaches to these socio-technical concerns to be taken into
     account:</p>
     <ol>
@@ -75,9 +74,7 @@ def sklearn_report(
         <li>A full detailed report.</li>
     </ol>
 
-    <h3>Details</h3>
-
-    <p>The report summarizes how a model behaves on a provided dataset across different population groups.
+    <p>The module's report summarizes how a model behaves on a provided dataset across different population groups.
     These groups are based on sensitive attributes like gender, age, and race. Each attribute can have multiple values,
     such as several genders or races. Numeric attributes, like age, are normalized to the range [0,1] and treated
     as fuzzy values, where 0 indicates membership to a fuzzy group of "small" values, and 1 indicates membership to
@@ -211,10 +208,12 @@ def sklearn_report(
                }}
            }});
        </script>
-       <h1>Bias report</h1>
-       <p>A report was computed over several prospective biases. 
-       Many values are computed to paint a broad picture
-       {'; set a minimum shown deviation parameter for this analysis to simplify what is shown.' if minimum_shown_deviation==0 else f', but for simplicity only those that differ at least {minimum_shown_deviation:.3f} from their ideal values are shown; this is the minimum shown deviation parameter for the analysis.'}
+       <h1>Report</h1>
+       <p>A report was computed over several prospective biases
+       when a {predictor} model is trained. 
+       The following {len(sensitive.branches())} protected groups were analysed: <i>{', '.join(sensitive.branches().keys())}</i>.
+       </p><p>Several values are computed to paint a broad picture
+       {'; set a minimum shown deviation parameter for this analysis to simplify what is shown.' if minimum_shown_deviation==0 else f', but for simplicity only those that differ at least {minimum_shown_deviation:.3f} from their ideal values are shown; this is the minimum shown deviation parameter of the analysis.'}
        Results may not give the full picture, and not all biases may be harmful to the social context. Switch between different views.</p>
        <div>{tab_headers}</div>
        {tab_contents}

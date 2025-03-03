@@ -28,17 +28,13 @@ def bias_scan(
     penalty: float = 0.5,
     scoring: mammoth.integration.Options("Bernoulli", "Gaussian", "Poisson", "BerkJones") = "Bernoulli"
 ) -> HTML:
-    """Performs a scan for the most biased attribute intersection in the dataset.
-    A paper describing how this approach is implemented to estimate the intersection
-    in linear rather than exponential time is available <a href="https://arxiv.org/pdf/1611.08292">here</a>.
+    """<p>Performs a scan for the most biased attribute intersection in the dataset.
     Any sensitive attributes that are already known will be <b>excluded</b> from the scan. That is, you can
     condition the scan to discover more attributes other than those declared as sensitive (these may not be
     actually sensitive, but set so because you are trying to find more subtle biases).
     To start a scan for the first time, do not set any sensitive attributes.
-
-    <i><b>License:</b> This is a wrapper around AIF360's
-    (<a href="https://github.com/Trusted-AI/AIF360">https://github.com/Trusted-AI/AIF360</a>) implementation,
-    which is licensed under Apache License 2.0.</i>
+    A paper describing how this approach is implemented to estimate the intersection
+    in linear rather than exponential time is available <a href="https://arxiv.org/pdf/1611.08292">here</a>.</p>
 
     Args:
         penalty: The higher the penalty, the less complex the highest scoring subset that gets returned is.
@@ -71,7 +67,7 @@ def bias_scan(
 
     text = f"""
         <div class="container mt-4">
-            {'<h1 class="text-success">No concern</h1>' if counts==0 else '<h1 class="text-danger">Bias candidates: intersections of up to '+str(counts)+' attributes</h1>'}
+            {'<h1 class="text-success">No concern</h1>' if counts==0 else '<h1 class="text-danger">Biased intersections of up to '+str(counts)+' attributes</h1>'}
             {"" if len(dataset.numeric) == 0 else "<p><b>Numeric attributes have been ignored; the scan can work with only categorical ones.</b></p>"}
             <p>After scanning for imbalances, the following attribute combinations out of those that were
             <i>not</i> already marked as sensitive were found to be underestimated. There may be more attribute

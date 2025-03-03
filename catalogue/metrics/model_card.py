@@ -47,8 +47,7 @@ def model_card(
     <p>Generates a fairness and bias report using the <a href="https://github.com/mever-team/FairBench">FairBench</a>
     library. This explores many kinds of bias to paint a broad picture and help you decide on what is problematic
     and what is acceptable behavior.
-
-    <p>The report can be viewed in three different formats, where the model card contains a subset of
+    The generated report can be viewed in three different formats, where the model card contains a subset of
     results but attaches to these socio-technical concerns to be taken into account:</p>
     <ol>
         <li>A summary table of results.</li>
@@ -56,9 +55,7 @@ def model_card(
         <li>The full report, including details.</li>
     </ol>
 
-    <h3>Details</h3>
-
-    <p>The report summarizes how a model behaves on a provided dataset across different population groups.
+    <p>The module's report summarizes how a model behaves on a provided dataset across different population groups.
     These groups are based on sensitive attributes like gender, age, and race. Each attribute can have multiple values,
     such as several genders or races. Numeric attributes, like age, are normalized to the range [0,1] and treated
     as fuzzy values, where 0 indicates membership to a fuzzy group of "small" values, and 1 indicates membership to
@@ -169,10 +166,11 @@ def model_card(
                }}
            }});
        </script>
-       <h1>Bias report</h1>
+       <h1>Report</h1>
        <p>A report was computed over several prospective biases. 
-       Many values are computed to paint a broad picture
-       {'; set a minimum shown deviation parameter for this analysis to simplify what is shown.' if minimum_shown_deviation==0 else f', but for simplicity only those that differ at least {minimum_shown_deviation:.3f} from their ideal values are shown; this is the minimum shown deviation parameter for the analysis.'}
+       The following {len(sensitive.branches())} protected groups were analysed: <i>{', '.join(sensitive.branches().keys())}</i>.
+       </p><p>Several values are computed to paint a broad picture
+       {'; set a minimum shown deviation parameter for this analysis to simplify what is shown.' if minimum_shown_deviation==0 else f', but for simplicity only those that differ at least {minimum_shown_deviation:.3f} from their ideal values are shown; this is the minimum shown deviation parameter of the analysis.'}
        Results may not give the full picture, and not all biases may be harmful to the social context. Switch between different views.</p>
        <div>{tab_headers}</div>
        {tab_contents}

@@ -207,13 +207,13 @@ class Dashboard(Styled):
                 else "#d69e02"
             )
             run_button = QPushButton(self)
-            run_button.setFixedHeight(80)
+            run_button.setFixedHeight(95)
             button_label = QLabel(
                 format_run(run, simpler=has_same_next_tags or prev_has_same_next_tags),
                 run_button,
             )
             button_label.setTextFormat(Qt.TextFormat.RichText)
-            button_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            button_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
             button_label.setWordWrap(True)
             button_layout = QVBoxLayout(run_button)
             button_layout.addWidget(button_label)
@@ -254,14 +254,14 @@ class Dashboard(Styled):
                 button_with_tags_layout = QVBoxLayout()
                 label = QLabel(run["description"], self)
                 label.setStyleSheet("font-size: 26px; font-weight: bold;")
-                label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+                label.setAlignment(Qt.AlignmentFlag.AlignLeft)
                 button_with_tags_layout.addWidget(label)
 
             button_with_tags_layout.addWidget(run_button)
             if not has_same_next_tags:
                 # Create a container for tags
                 tag_container = QHBoxLayout()
-                tag_container.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+                tag_container.setAlignment(Qt.AlignmentFlag.AlignLeft)
                 tag_container.setContentsMargins(
                     0, -30, 0, 10
                 )  # Slight overlap with button, space below
@@ -294,7 +294,7 @@ class Dashboard(Styled):
 
             if has_same_next_tags or prev_has_same_next_tags:
                 run_button.setContentsMargins(0, 0, 0, 0)
-                run_button.setFixedHeight(60)
+                run_button.setFixedHeight(55)
 
             # button_with_tags_layout.setSpacing(-5)  # Reduce spacing for overlap effect
             button_with_tags_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -327,13 +327,11 @@ def format_run(run, simpler=False):
             re.DOTALL,
         )
         if match:
-            match = (
-                "" if simpler or len(run["description"]) == 0 else ": "
-            ) + match.group().replace("h1", "span")
+            match = match.group().replace("h1", "span")
         else:
             match = ""
     except Exception:
         match = ""
     if simpler:
-        return f'<h2 style="margin: 0px;">{match}</h2>Created at {run["timestamp"]}'
-    return f'<h1 style="margin: 0px;">{"" if simpler else run["description"]}{match}</h1>Created at {run["timestamp"]}'
+        return f'<div style="margin: 0px;font-size:20px;">{match}</div>Created at {run["timestamp"]}'
+    return f'<h1 style="margin: 0px;">{run["description"] if run["description"] else "[no info]"}</h1><div  style="margin: 0px;font-size:20px;">{match}</div>Created at {run["timestamp"]}'

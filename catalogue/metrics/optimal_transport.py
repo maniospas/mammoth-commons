@@ -32,10 +32,6 @@ def optimal_transport(
     The evaluation computes the Wasserstein distance that reflects the cost of transforming the predictive
     distributions between sensitive attribute groups.
 
-    <i><b>License:</b> The following description is adapted from AIF360
-    (<a href="https://github.com/Trusted-AI/AIF360">https://github.com/Trusted-AI/AIF360</a>),
-    which is licensed under Apache License 2.0.</i>
-
     <p>Optimal Transport (OT) is a field of mathematics which studies the geometry of probability spaces. Among its
     many contributions, OT provides a principled way to compare and align probability distributions by taking into
     account the underlying geometry of the considered metric space.
@@ -48,6 +44,10 @@ def optimal_transport(
     Wasserstein distance between the distribution of ground truth labels and model predictions for each of the
     protected groups. If its value is close to 1, the model is biased towards this group.
     </p>
+
+    <b>License</b><p><i>Parts of the above description are adapted from AIF360
+    (<a href="https://github.com/Trusted-AI/AIF360">https://github.com/Trusted-AI/AIF360</a>),
+    which is licensed under Apache License 2.0.</i></p>
 
     Args:
         threshold: Transport distances below the given threshold are considered negligible.
