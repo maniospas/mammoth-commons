@@ -7,12 +7,6 @@ from states.steps.model import SelectModel
 from states.steps.analysis import SelectAnalysis
 from states.results import Results
 from demonstrator.backend.loaders import registry
-
-items = load_all_runs("history.json")
-import matplotlib
-
-matplotlib.use("Agg")
-
 from PySide6.QtWidgets import QStackedWidget, QWidget, QGraphicsOpacityEffect
 from PySide6.QtCore import (
     QEasingCurve,
@@ -21,7 +15,18 @@ from PySide6.QtCore import (
     QPoint,
     Signal,
 )
+from PySide6.QtGui import QSurfaceFormat
 
+
+fmt = QSurfaceFormat()
+fmt.setVersion(3, 3)  # OpenGL 3.3 or higher
+fmt.setProfile(QSurfaceFormat.CoreProfile)
+fmt.setDepthBufferSize(24)
+QSurfaceFormat.setDefaultFormat(fmt)
+
+items = load_all_runs("history.json")
+import matplotlib
+matplotlib.use("Agg")
 
 class SlidingStackedWidget(QStackedWidget):
     """

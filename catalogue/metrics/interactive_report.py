@@ -64,7 +64,6 @@ def interactive_report(
     if intersectional:
         sensitive = sensitive.intersectional()
     report_type = fb.multireport if compare_groups == "Pairwise" else fb.unireport
-    print(labels)
     if labels is None:
         report = report_type(predictions=predictions, sensitive=sensitive)
     else:
